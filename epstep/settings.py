@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'steptracker.apps.SteptrackerConfig',
     'django_extensions',
     'django_pdb',
-
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'epstep.urls'
+ROOT_URLCONF = 'epstep.url'
 
 TEMPLATES = [
     {
@@ -85,7 +85,15 @@ DATABASES = {
     }
 }
 
-
+"""DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
+    }
+}"""
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
