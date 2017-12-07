@@ -1,9 +1,12 @@
 from django.conf.urls import url
 from django.views.generic import TemplateView, DetailView
 from django.views.decorators.cache import cache_page
-
+import views
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="index.html")),
+    url(r'^auth/(?P<token>\w{0,50})/$', views.auth,),
+    url(r'^gentoken/$', views.gen_token, ),
+
 ]
 """urlpatterns = ['restaurant.views',
                url(r'^$', cache_page(60 * 15)(TemplateView.as_view(template_name="home.haml")), name='home'),

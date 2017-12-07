@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'steptracker.apps.SteptrackerConfig',
     'django_extensions',
     'django_pdb',
-    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -84,8 +83,8 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
-"""DATABASES = {
+"""
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
