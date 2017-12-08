@@ -14,6 +14,7 @@ from models import AuthToken
 def validate_token(request):
     pass
 
+
 def auth(request):
 
     return HttpResponse(json.dumps([{
@@ -28,7 +29,7 @@ def auth(request):
         "international_phone_number": x.get_international_phone_number(),
         "absolute_url": x.get_absolute_url(),
         "tags": [tag.name for tag in x.tags.all()],
-    } for x in Restaurant.objects.filter(**f).prefetch_related("tags")], indent=4))
+    } for x in AuthToken.objects.all()], indent=4))
 
 
 def gen_token(request):
@@ -51,4 +52,4 @@ def gen_token(request):
         "international_phone_number": x.get_international_phone_number(),
         "absolute_url": x.get_absolute_url(),
         "tags": [tag.name for tag in x.tags.all()],
-    } for x in Restaurant.objects.filter(**f).prefetch_related("tags")], indent=4))
+    } for x in AuthToken.objects.all()], indent=4))

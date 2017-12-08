@@ -56,7 +56,7 @@ class AuthTokenTest(TestCase):
 
         self.assertIs(True, auth.valid)
 
-    @unittest.skipUnless(settings.EMAILS_ENABLED)
+    @unittest.skipUnless(settings.EMAILS_ENABLED, 'can''t work unless it''s enabled')
     def test_send_mail(self):
         from models import AuthToken, User
         from django.core import mail
@@ -72,3 +72,16 @@ class AuthTokenTest(TestCase):
 
         auth.send_validation_mail()
         self.assertEqual(len(mail.outbox), 1, msg='is settings.EMAILS_ENABLED set to True ?')
+
+
+class AuthViewTest(TestCase):
+
+    def test_auth_view(self):
+        from django.test import RequestFactory
+        from django.core.urlresolvers import reverse
+        from views import auth
+        factory = RequestFactory()
+
+        rq = factory.get(reverse('auth', kwargs={'token': 'iuerhgiluer15641hgeriugh'}))
+        response = auth(rq)
+        self.assertIsNotNone(response)
