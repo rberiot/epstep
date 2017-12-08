@@ -106,3 +106,7 @@ ENV/
 
 db.sqlite3
 node_modules/
+build/
+static/
+templates/
+.DS_Store
