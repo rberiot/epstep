@@ -11,6 +11,7 @@ from django.test import TestCase
 import models
 from epstep import settings
 import unittest
+import json
 
 
 class RegistrationTest(TestCase):
@@ -29,11 +30,12 @@ class AuthTokenTest(TestCase):
     def test_token_generation(self):
         from models import AuthToken
 
+#we want each token to be different as the same user can have more than one if they have multiple devices
         token = AuthToken.gen_token_string('remy@.com')
         same_token = AuthToken.gen_token_string('remy@.com')
         different_token = AuthToken.gen_token_string('autre@.com')
 
-        self.assertIs(True, token == same_token)
+        self.assertIs(False, token == same_token)
         self.assertIs(False, token == different_token)
 
     def test_token_validation(self):
@@ -56,7 +58,7 @@ class AuthTokenTest(TestCase):
 
         self.assertIs(True, auth.valid)
 
-    @unittest.skipUnless(settings.EMAILS_ENABLED, 'can''t work unless it''s enabled')
+    @unittest.skipUnless(settings.EMAILS_ENABLED, 'can''t work unless settings.EMAILS_ENABLED is True')
     def test_send_mail(self):
         from models import AuthToken, User
         from django.core import mail
@@ -76,12 +78,56 @@ class AuthTokenTest(TestCase):
 
 class AuthViewTest(TestCase):
 
-    def test_auth_view(self):
+    def test_auth_view_process(self):
         from django.test import RequestFactory
         from django.core.urlresolvers import reverse
         from views import auth
+        from models import AuthToken
+
         factory = RequestFactory()
 
-        rq = factory.get(reverse('auth', kwargs={'token': 'iuerhgiluer15641hgeriugh'}))
+        rq = factory.get(reverse('auth'), data={'email': 'ee@ext.europarl.europa.eu'})
         response = auth(rq)
         self.assertIsNotNone(response)
+        data = json.loads(response.content)
+        self.assertIsNotNone(data['token'])
+        self.assertIsNotNone(data['status'])
+        self.assertEqual(data['status'], 'OK')
+        token_string = data['token']
+
+        internal_token = AuthToken.objects.get(token_string=token_string)
+        self.assertIsNotNone(internal_token)
+
+
+        #phase 2. check that login is denied before token is activated
+        rq = factory.get(reverse('auth'), data={'email': 'ee@ext.europarl.europa.eu', 'token': token_string})
+        response = auth(rq)
+        data = json.loads(response.content)
+        self.assertEqual(data['status'], 'TOKEN_NOT_ACTIVATED')
+
+        internal_token.valid = True
+        internal_token.save()
+
+        #phase 3. login allowed
+        rq = factory.get(reverse('auth'), data={'email': 'ee@ext.europarl.europa.eu', 'token': token_string})
+        response = auth(rq)
+        data = json.loads(response.content)
+        self.assertEqual(data['status'], 'OK')
+
+
+class GenTokenViewTest(TestCase):
+
+    def test_gen_token_view(self):
+        from django.test import RequestFactory
+        from django.core.urlresolvers import reverse
+        from views import gen_token
+        factory = RequestFactory()
+
+        rq = factory.get(reverse('gen_token'), data={'email': 'ee@ext.europarl.europa.eu'})
+
+        response = gen_token(rq)
+        self.assertIsNotNone(response)
+        data = json.loads(response.content)
+        self.assertEqual(data['email'], 'ee@ext.europarl.europa.eu')
+
+

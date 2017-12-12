@@ -4,8 +4,9 @@ from django.views.decorators.cache import cache_page
 import views
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="index.html")),
-    url(r'^auth/(?P<token>\w{0,50})/$', views.auth, name='auth'),
-    url(r'^gentoken/$', views.gen_token, ),
+    #url(r'^auth/(?P<token>\w{0,50})/$', views.auth, name='auth'),
+    url(r'^auth/$', views.auth, name='auth'),
+    url(r'^gentoken/$', views.gen_token, name='gen_token'),
 
 ]
 """urlpatterns = ['restaurant.views',

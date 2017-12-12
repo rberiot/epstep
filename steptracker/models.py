@@ -5,6 +5,7 @@ from django.db import models
 import datetime
 from epstep import settings
 
+
 class StairWell(models.Model):
     building = models.TextField('building name ex: ASP, PHS, RMD')
     shaft = models.TextField('a name for the specific stairwell ex: North, South, Main')
@@ -21,7 +22,7 @@ class User(models.Model):
 
 
 class AuthToken(models.Model):
-    token = models.TextField()
+    token_string = models.TextField(unique=True)
     user = models.ForeignKey(User, models.CASCADE)
     date = models.DateField(default=datetime.date.today)
     valid = models.BooleanField(default=False)
@@ -34,6 +35,7 @@ class AuthToken(models.Model):
         m = hashlib.md5()
         m.update(email)
         m.update("token_salt35457")
+        m.update(str(datetime.datetime.now()))
         return m.hexdigest()
 
     def gen_validation_key(self):
@@ -42,10 +44,10 @@ class AuthToken(models.Model):
 
         import hashlib
         m = hashlib.md5()
-        m.update(self.token)
+        m.update(self.token_string)
         m.update("token_salt74541")
+        m.update(str(datetime.datetime.now()))
         self.validation_key = m.hexdigest()
-        self.save()
 
     def validate(self, validation_key):
         if self.valid:
@@ -53,7 +55,6 @@ class AuthToken(models.Model):
 
         if validation_key == self.validation_key:
             self.valid = True
-            self.save()
             return True
         else:
             return False
