@@ -22,6 +22,101 @@ button[type=Submit] {
 
 }
 
+.uppercase{
+  text-transform: uppercase;
+}
+
+.profile{
+  margin: 15px 0;
+  overflow: hidden;
+}
+.profile .img-circle{
+  background:#eee;
+  padding: 5px;
+  max-width: 89px;
+  min-height: 89px;
+}
+.profile h3,
+.profile h4{
+  color: #8C2875;
+  font-size: 1.125em; /* 18px/16px = 1.125*/
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.profile .calories{
+  border-right:3px solid #8C2875;
+}
+
+.profile h4.title{
+  font-weight: bold;
+  font-size: 0.625em; /* 10px/16px = 0.625*/
+  opacity: 0.5;
+  text-transform: uppercase;
+}
+.profile h4.value{
+  font-weight: bold;
+  font-size: 0.875em; /* 14px/16px = 0.875*/
+}
+.profile svg{
+  margin-top: 15px;
+}
+
+
+
+.scoreResults{
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+}
+.scoreResults li{
+  width: 100%;
+  min-height: 48px;
+  color: #8C2875;
+  padding-top: 5px;
+}
+.scoreResults li:nth-child(odd) {
+  background-color: rgba(140, 40, 117, 0.05);
+}
+.scoreResults li:nth-child(even) {
+  background-color: rgba(140, 40, 117, 0.1);
+}
+.scoreResults li .badge{
+  margin: 6px 12px;
+  padding: 10px 12px;
+  background-color: rgba(140, 40, 117, 1);
+  border-radius: 50%;
+  position: relative;
+  top: -3px;
+}
+
+div[data-css-npp5qg]{
+  top: 2em;
+}
+@media only screen and (max-width : 480px){
+  div[data-css-npp5qg]{
+    max-width: 80vw;
+    left: 10vw;
+  }  
+}
+
+.toaster[data-css-k0o5uw]{
+  font-family: 'Roboto', sans-serif;
+  color: #fff;
+  background-color: #8C2875;
+  padding: 0 20px;
+  margin: 0 auto;
+}
+.toaster span{
+  opacity: 0.5;
+  display: block;
+  line-height: 48px;
+
+}
+.toaster span:hover{
+  opacity: 1;
+}
+
 #bottomnav .tabs .active path,
 #bottomnav .tabs .active g{
     fill-opacity: 1 !important;
@@ -57,13 +152,14 @@ button[type=Submit] {
    *
    * If you're not using "display: flex", you can remove this style.
    */
-  width: 99%;
+  width: 98%;
+  position: relative;
 }
 
 .CircularProgressbar .CircularProgressbar-path {
   stroke: #8C2875;
   stroke-linecap: round;
-  transition: stroke-dashoffset 1s ease 0s;
+  transition: stroke-dashoffset 1.5s ease 0s;
 }
 
 .CircularProgressbar .CircularProgressbar-trail {
@@ -71,10 +167,26 @@ button[type=Submit] {
 }
 
 .CircularProgressbar .CircularProgressbar-text {
-  fill: #8C2875;
+  display: none;
+}
+.CircularProgressbar-text {
+  color: #8C2875;
   font-size: 20px;
-  dominant-baseline: middle;
-  text-anchor: middle;
+  display: block;
+  text-align:center;
+  margin-top: 10px;
+}
+
+.CircularProgressdata .sepa{
+  border-right:3px solid #8C2875;
+  min-height: 40px;
+  margin-bottom: 10px;
+}
+
+.CircularProgressdata h4.value{
+  font-weight: bold;
+  font-size: 0.875em; /* 14px/16px = 0.875*/
+  color: #8C2875;
 }
 
 .CircularProgressbar .CircularProgressbar-background {

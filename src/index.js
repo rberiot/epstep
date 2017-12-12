@@ -16,8 +16,8 @@ import createHistory from 'history/createHashHistory';
 import registerServiceWorker from './registerServiceWorker';
 
 const baseUrl = process.env.PUBLIC_URL;
-
-const history = createHistory();  
+//const baseUrl = '.';
+const history = createHistory();
 
 ReactDOM.render(
     <Router history={history}>
@@ -30,10 +30,11 @@ ReactDOM.render(
     </Router>
 , document.getElementById('root'));
 
-
+/*
 ReactDOM.render(
     <BottomNav history={history} logged={true} />
 , document.getElementById('bottomnav'));
+*/
 
 
 registerServiceWorker();
