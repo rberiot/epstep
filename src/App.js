@@ -141,8 +141,8 @@ export class Login extends Component {
 
 
     $.ajax({           
-      url: '', 
-      data: { email: this.state.email },
+      url: '/auth', 
+      data: { email: this.state.email, nickname: this.state.nickname },
       type: 'POST',
       cache: false,           
       success: function(data) {
@@ -156,7 +156,7 @@ export class Login extends Component {
 
 
     
-    this.props.history.push("/App");
+    this.props.history.push("/Stats");
 
 
     /*
@@ -496,7 +496,7 @@ class ChangingProgressbar extends Component {
             />
           </div>
 
-          <div style={{display: 'flex', flex: 1, flexDirection: 'column', alignItems:'center', justifyContent:'space-between', width: '100%', padding: '17%', marginBottom: '50px' }} className="text-center" >
+          <div style={{display: 'flex', flex: 1, flexDirection: 'column', alignItems:'center', justifyContent:'space-between', width: '100%', padding: '17%', marginBottom: '30%' }} className="text-center" >
 
             <div>
               <h4 className="value uppercase">Fuji mont blanc top of the world</h4>
