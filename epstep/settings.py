@@ -26,7 +26,7 @@ SECRET_KEY = '#+-7n$gnxc96gee547_l+y2rfnwt&gkyg+gel42g=g^(!c6=p8'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -40,11 +40,13 @@ INSTALLED_APPS = [
     'steptracker.apps.SteptrackerConfig',
     'django_extensions',
     'django_pdb',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
