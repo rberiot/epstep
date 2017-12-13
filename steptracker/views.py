@@ -11,6 +11,7 @@ from django.views.decorators.cache import cache_page
 from steptracker.utils.email import is_email_valid
 from models import AuthToken, User
 
+
 def validate_token(request):
     email = request.GET.get('email')
 
@@ -37,7 +38,9 @@ def auth(request):
         token = AuthToken(token_string=AuthToken.gen_token_string(email_param), user=u)
         token.gen_validation_key()
         token.save()
-        #todo: send mail
+
+        token.send_validation_mail(request.META.get('HTTP_HOST', settings.PUBLIC_URL))
+
         return HttpResponse(json.dumps({'token': token.token_string, 'status': 'OK'}))
     else:  #actual auth
         token_list = AuthToken.objects.filter(token_string=token_param)
