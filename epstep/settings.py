@@ -138,6 +138,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'build/static'),
 )
 
+PUBLIC_URL = ''
 EMAILS_ENABLED = False
 try:
     from settings_local import *
