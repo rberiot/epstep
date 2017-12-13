@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 # Create your views here.
 import json
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.conf import settings
 from django.views.decorators.cache import cache_page
 from steptracker.utils.email import is_email_valid
@@ -13,13 +13,22 @@ from models import AuthToken, User
 
 
 def validate_token(request):
-    email = request.GET.get('email')
+    email_param = request.GET.get('email', None)
+    validation_key_param = request.GET.get('validation_key', None)
 
-    if email is None or not is_email_valid(email):
-        return HttpResponseBadRequest('email parameter is missing or invalid')
+    if email_param is None or validation_key_param is None:
+        return HttpResponseBadRequest('email & validation_key parameters are required')
 
-    token_string = AuthToken.gen_token()
-    return HttpResponse(json.dump({"token": token_string}))
+    token = AuthToken.objects.get(validation_key=validation_key_param)
+
+    if token.user.email != email_param:
+        return HttpResponseBadRequest('given token does not match email address')
+
+    token.validate(validation_key=validation_key_param)
+    token.save()
+
+    if token.valid:
+        return HttpResponse(status=200)
 
 
 def auth(request):
@@ -41,7 +50,7 @@ def auth(request):
 
         token.send_validation_mail(request.META.get('HTTP_HOST', settings.PUBLIC_URL))
 
-        return HttpResponse(json.dumps({'token': token.token_string, 'status': 'OK'}))
+        return JsonResponse({'token': token.token_string, 'status': 'OK'})
     else:  #actual auth
         token_list = AuthToken.objects.filter(token_string=token_param)
         if len(token_list) == 0:
@@ -61,4 +70,4 @@ def gen_token(request):
         return HttpResponseBadRequest('email parameter is missing or invalid')
 
     token_string = AuthToken.gen_token_string(email)
-    return HttpResponse(json.dumps({"token": token_string, "email": email}))
+    return JsonResponse({"token": token_string, "email": email})

@@ -66,12 +66,15 @@ class AuthToken(models.Model):
         if settings.EMAILS_ENABLED:
             send_mail(
                 'EpStep Account Validation',
-                'Here is the message. ' + public_url + 'validate_token/?token=' +
+                'Here is the message. ' + public_url + 'validate_token/?validation_key=' +
                 self.validation_key + '&email=' + self.user.email,
                 settings.EMAIL_HOST_USER,
                 [self.user.email],
                 fail_silently=False,
             )
+
+    def __str__(self):
+        return str(self.user.email) + 'valid: ' + str(self.valid) + ' token: ' + str(self.token_string)
 
 
 class UserStats(models.Model):

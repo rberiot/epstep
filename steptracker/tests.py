@@ -72,7 +72,7 @@ class AuthTokenTest(TestCase):
         auth.token = AuthToken.gen_token_string('remy.beriot@gmail.com')
         auth.gen_validation_key()
 
-        auth.send_validation_mail()
+        auth.send_validation_mail(settings.PUBLIC_URL)
         self.assertEqual(len(mail.outbox), 1, msg='is settings.EMAILS_ENABLED set to True ?')
 
 
