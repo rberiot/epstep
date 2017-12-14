@@ -64,16 +64,19 @@ def auth(request):
             return JsonResponse({'status': 'OK'})
 
 
-def get_distance(request):
-    token_param = request.GET['token']
-    if not AuthToken.is_token_valid(token_param):
-        return JsonResponse({'status': 'INVALID_TOKEN'})
+def distance(request):
+    qr1_param_id = request.GET.get('qr_id_1')
+    qr2_param_id = request.GET.get('qr_id_2')
 
-    qr1_param_id = request.GET.get('qr1')
-    qr2_param_id = request.GET.get('qr2')
     if not qr1_param_id and qr2_param_id:
-        HttpResponseBadRequest('qr1 & qr2 get parameter are needed')
+        HttpResponseBadRequest('qr_id_1 & qr_id_2 parameters are required')
 
+
+def qr_info(request):
+    qr1_param_id = request.GET.get('qr_id')
+
+    if not qr1_param_id:
+        HttpResponseBadRequest('qr_id parameter is required')
 
 
 def log_distance(request):
@@ -86,3 +89,4 @@ def profile(request):
     token_param = request.GET['token']
     if not AuthToken.is_token_valid(token_param):
         return JsonResponse({'status': 'INVALID_TOKEN'})
+

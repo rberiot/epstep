@@ -120,12 +120,12 @@ class GetDistanceViewTest(TestCase):
     def test_get_distance_view(self):
         from django.test import RequestFactory
         from django.core.urlresolvers import reverse
-        from views import get_distance
+        from views import distance
         factory = RequestFactory()
 
-        rq = factory.get(reverse('get_distance'), data={'email': 'ee@ext.europarl.europa.eu'})
+        rq = factory.get(reverse('distance'), data={'email': 'ee@ext.europarl.europa.eu'})
 
-        response = get_distance(rq)
+        response = distance(rq)
         self.assertIsNotNone(response)
         data = json.loads(response.content)
         self.assertEqual(data['email'], 'ee@ext.europarl.europa.eu')
