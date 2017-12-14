@@ -54,20 +54,35 @@ def auth(request):
     else:  #actual auth
         token_list = AuthToken.objects.filter(token_string=token_param)
         if len(token_list) == 0:
-            return HttpResponse(json.dumps({'status': 'TOKEN_NOT_FOUND'}))
+            return JsonResponse({'status': 'TOKEN_NOT_FOUND'})
 
         token = token_list[0]
 
         if token.valid is False:
-            return HttpResponse(json.dumps({'status': 'TOKEN_NOT_ACTIVATED'}))
+            return JsonResponse({'status': 'TOKEN_NOT_ACTIVATED'})
         if token.valid and email_param == token.user.email:
-            return HttpResponse(json.dumps({'status': 'OK'}))
+            return JsonResponse({'status': 'OK'})
 
-def gen_token(request):
-    email = request.GET.get('email')
 
-    if email is None or not is_email_valid(email):
-        return HttpResponseBadRequest('email parameter is missing or invalid')
+def get_distance(request):
+    token_param = request.GET['token']
+    if not AuthToken.is_token_valid(token_param):
+        return JsonResponse({'status': 'INVALID_TOKEN'})
 
-    token_string = AuthToken.gen_token_string(email)
-    return JsonResponse({"token": token_string, "email": email})
+    qr1_param_id = request.GET.get('qr1')
+    qr2_param_id = request.GET.get('qr2')
+    if not qr1_param_id and qr2_param_id:
+        HttpResponseBadRequest('qr1 & qr2 get parameter are needed')
+
+
+
+def log_distance(request):
+    token_param = request.GET['token']
+    if not AuthToken.is_token_valid(token_param):
+        return JsonResponse({'status': 'INVALID_TOKEN'})
+
+
+def profile(request):
+    token_param = request.GET['token']
+    if not AuthToken.is_token_valid(token_param):
+        return JsonResponse({'status': 'INVALID_TOKEN'})

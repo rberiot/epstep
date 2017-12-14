@@ -4,25 +4,7 @@ from __future__ import unicode_literals
 from django.db import models
 import datetime
 from epstep import settings
-
-
-class StairWell(models.Model):
-    building = models.TextField('building name ex: ASP, PHS, RMD')
-    shaft = models.TextField('a name for the specific stairwell ex: North, South, Main')
-
-
-class Level(models.Model):
-    stairwell = models.ForeignKey(StairWell, models.CASCADE)
-    floorNumber = models.IntegerField()
-    steps = models.PositiveIntegerField(default=18)
-
-
-class User(models.Model):
-    email = models.EmailField(unique=True)
-    public_name = models.TextField()
-
-    def __str__(self):
-        return str(self.email) + 'valid: ' + str(self.public_name)
+from steptracker.models import User
 
 
 class AuthToken(models.Model):
@@ -78,7 +60,7 @@ class AuthToken(models.Model):
             )
 
     @classmethod
-    def is_token_valid(cls, email, token_string):
+    def is_token_valid(cls, token_string):
         token_list = cls.objects.filter(token_string=token_string)
         if token_list:
             return token_list[0].valid
@@ -87,7 +69,3 @@ class AuthToken(models.Model):
 
     def __str__(self):
         return str(self.user.email) + 'valid: ' + str(self.valid) + ' token: ' + str(self.token_string)
-
-
-class UserStats(models.Model):
-    user = models.ForeignKey(User, models.CASCADE)
