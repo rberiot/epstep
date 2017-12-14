@@ -18,7 +18,11 @@ class Level(models.Model):
 
 
 class User(models.Model):
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
+    public_name = models.TextField()
+
+    def __str__(self):
+        return str(self.email) + 'valid: ' + str(self.public_name)
 
 
 class AuthToken(models.Model):
@@ -72,6 +76,14 @@ class AuthToken(models.Model):
                 [self.user.email],
                 fail_silently=False,
             )
+
+    @classmethod
+    def is_token_valid(cls, email, token_string):
+        token_list = cls.objects.filter(token_string=token_string)
+        if token_list:
+            return token_list[0].valid
+        else:
+            return False
 
     def __str__(self):
         return str(self.user.email) + 'valid: ' + str(self.valid) + ' token: ' + str(self.token_string)
