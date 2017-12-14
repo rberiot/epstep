@@ -18,6 +18,7 @@ button {
   border-radius: 0 !important;
   box-shadow: none !important;
 }
+
 button[type=Submit] {
 
 }
@@ -38,14 +39,14 @@ button[type=Submit] {
 }
 .profile h3,
 .profile h4{
-  color: #8C2875;
+  color: #a1197d;
   font-size: 1.125em; /* 18px/16px = 1.125*/
   font-weight: 500;
   text-transform: capitalize;
 }
 
 .profile .calories{
-  border-right:3px solid #8C2875;
+  border-right:3px solid #a1197d;
 }
 
 .profile h4.title{
@@ -72,19 +73,19 @@ button[type=Submit] {
 .scoreResults li{
   width: 100%;
   min-height: 48px;
-  color: #8C2875;
+  color: #a1197d;
   padding-top: 5px;
 }
 .scoreResults li:nth-child(odd) {
-  background-color: rgba(140, 40, 117, 0.05);
+  background-color: rgba(161, 25, 125, 0.05);
 }
 .scoreResults li:nth-child(even) {
-  background-color: rgba(140, 40, 117, 0.1);
+  background-color: rgba(161, 25, 125, 0.1);
 }
 .scoreResults li .badge{
   margin: 6px 12px;
   padding: 10px 12px;
-  background-color: rgba(140, 40, 117, 1);
+  background-color: rgba(161, 25, 125, 1);
   border-radius: 50%;
   position: relative;
   top: -3px;
@@ -92,18 +93,25 @@ button[type=Submit] {
 
 div[data-css-npp5qg]{
   top: 2em;
+  font-size: 14px;
+  font-weight: 400;
 }
 @media only screen and (max-width : 480px){
   div[data-css-npp5qg]{
     max-width: 80vw;
     left: 10vw;
-  }  
+  } 
+  .container {
+    width: 100%;
+  }
+  .container .fullwidth {
+    padding: 0;
+  }
 }
-
 .toaster[data-css-k0o5uw]{
   font-family: 'Roboto', sans-serif;
   color: #fff;
-  background-color: #8C2875;
+  background-color: #a1197d;
   padding: 0 20px;
   margin: 0 auto;
 }
@@ -111,7 +119,6 @@ div[data-css-npp5qg]{
   opacity: 0.5;
   display: block;
   line-height: 48px;
-
 }
 .toaster span:hover{
   opacity: 1;
@@ -137,7 +144,7 @@ div[data-css-npp5qg]{
 }
 
 .tabs .tab{
-  background-color: #8C2875 !important;
+  background-color: #a1197d !important;
 }
 /*
  * react-circular-progressbar styles
@@ -157,7 +164,7 @@ div[data-css-npp5qg]{
 }
 
 .CircularProgressbar .CircularProgressbar-path {
-  stroke: #8C2875;
+  stroke: #a1197d;
   stroke-linecap: round;
   transition: stroke-dashoffset 1.5s ease 0s;
 }
@@ -170,15 +177,16 @@ div[data-css-npp5qg]{
   display: none;
 }
 .CircularProgressbar-text {
-  color: #8C2875;
+  color: #a1197d;
   font-size: 20px;
+  font-weight: 500;
   display: block;
   text-align:center;
   margin-top: 10px;
 }
 
 .CircularProgressdata .sepa{
-  border-right:3px solid #8C2875;
+  border-right:3px solid #a1197d;
   min-height: 40px;
   margin-bottom: 10px;
 }
@@ -186,7 +194,7 @@ div[data-css-npp5qg]{
 .CircularProgressdata h4.value{
   font-weight: bold;
   font-size: 0.875em; /* 14px/16px = 0.875*/
-  color: #8C2875;
+  color: #a1197d;
 }
 
 .CircularProgressbar .CircularProgressbar-background {
@@ -203,7 +211,7 @@ div[data-css-npp5qg]{
  *   />
  */
 .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-background {
-  fill: #8C2875
+  fill: #a1197d
 }
 
 .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-text {

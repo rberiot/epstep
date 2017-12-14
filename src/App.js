@@ -5,10 +5,8 @@ import $ from 'jquery';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
-import {Tabs, Tab} from 'material-ui/Tabs';
 
-import { Button } from 'rmwc';
+import {Tabs, Tab} from 'material-ui/Tabs';
 
 import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
@@ -31,14 +29,14 @@ const styles = {
     color: '#ccc',
   },
   loginUnderlineStyle: {
-    borderColor: '#8C2875',
+    borderColor: '#a1197d',
   },
   loginFloatingLabelStyle: {
     color: '#ccc',
     fontWeight: 'normal',
   },
   loginFloatingLabelFocusStyle: {
-    color: '#8C2875',
+    color: '#a1197d',
   },
   fullwidth: {
     width: '100%'
@@ -48,11 +46,11 @@ const styles = {
     marginTop: '15px'
   },
   tabs: {
-    backgroundColor: '#8C2875'
+    backgroundColor: '#a1197d'
   },
   default_tab: {
     color: '#fff',
-    backgroundColor: '#8C2875',
+    backgroundColor: '#a1197d',
     fontWeight: 400,
   },
   active_tab: {
@@ -75,11 +73,6 @@ const ToastCloseButton = ({ YouCanPassAnyProps, closeToast }) => (
 );
 
 
-localStorage.setItem('loggedIn', false);
-
-
-
-
 
 export class Header extends Component {
   render() {
@@ -92,157 +85,6 @@ export class Header extends Component {
 }
 
 
-/* https://medium.com/technoetics/create-basic-login-forms-using-create-react-app-module-in-reactjs-511b9790dede */
-/* material input validation : https://www.npmjs.com/package/react-material-ui-form-validator */
-/* core input validation : https://www.npmjs.com/package/react-form-validator-core */
-export class Login extends Component {
-  
-  constructor(props){
-      super(props);
-      this.state={
-        email:'',
-        nickname:'',
-        token:''
-      }
-      this.handleChange = this.handleChange.bind(this);
-      this.handleChange2 = this.handleChange2.bind(this);
-  }
-
-  componentWillUnmount() {
-
-  }
-
-  updateState(token) {
-    this.setState({token})
-  }
-
-  handleChange(event) {
-      const email = event.target.value;
-      this.setState({ email });
-  }
-  handleChange2(event) {
-      const nickname = event.target.value;
-      this.setState({ nickname });
-  }
-
-  handleSubmit() {
-    // form submit logic
-    //const { history } = this.props;
-
-    this.setState({ error: false });
-
-    if (!(this.state.email === 'jerome.ferrier@europarl.europa.eu')) {
-      return this.setState({ error: true });
-    }
-
-    if (this.state.nickname == '') {
-      return this.setState({ error: true });
-    }
-
-
-    $.ajax({           
-      url: '/auth', 
-      data: { email: this.state.email, nickname: this.state.nickname },
-      type: 'POST',
-      cache: false,           
-      success: function(data) {
-        this.props.updateState(data);
-        localStorage.setItem('loggedIn', true);
-      }.bind(this),
-      error: function() {
-        console.log('ajax error');      
-      }.bind(this)
-    });
-
-
-    
-    this.props.history.push("/Stats");
-
-
-    /*
-    var apiBaseUrl = "http://localhost:4000/api/";
-    var self = this;
-    var payload={
-      "email":this.state.username,
-    }
-    axios.post(apiBaseUrl+'login', payload).then(function (response) {
-      console.log(response);
-      if(response.data.code == 200){
-        console.log("Login successfull");
-        var uploadScreen=[];
-        uploadScreen.push(<UploadScreen appContext={self.props.appContext}/>)
-        self.props.appContext.setState({loginPage:[],uploadScreen:uploadScreen})
-      } else if(response.data.code == 204){
-        console.log("Username do not match");
-        alert("username do not match")
-      } else{
-        console.log("Username does not exists");
-        alert("Username does not exist");
-      }
-    }).catch(function (error) {
-      console.log(error);
-    });
-    */
-
-  }
-
-  render() {
-    const { email } = this.state;
-    const { nickname } = this.state;
-    return (
-
-      <div className="container">
-        <div className="row">
-          <div className="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">
-            <Header />
-          </div>
-          <div className="col-xs-12 col-md-4 col-md-offset-4">
-            <MuiThemeProvider>
-              <ValidatorForm
-                ref="form"
-                onSubmit={this.handleSubmit}
-                instantValidate={true}
-                onError={errors => console.log(errors)}
-              >
-                <TextValidator
-                  style={styles.fullwidth}
-                  floatingLabelStyle={styles.loginFloatingLabelStyle}
-                  floatingLabelFocusStyle={styles.loginFloatingLabelFocusStyle}
-                  underlineFocusStyle={styles.loginUnderlineStyle}
-                  floatingLabelText="Enter your email"
-                  hintText="xyz.xyz@europarl.europa.eu"
-                  onChange={this.handleChange}
-                  name="email"
-                  value={email}
-                  validators={['required', 'isEmail', 'matchRegexp:^[a-z0-9](\.?[a-z0-9]){3,}@europarl\.europa\.eu|@ext\.europarl\.europa\.eu$/i']}
-                  errorMessages={['This field is required', 'Please provide a valid email address', 'Please provide a valid @europarl.europa.eu or @ext.europarl.europa.eu email address']}
-                />
-                <TextValidator
-                  style={styles.fullwidth}
-                  floatingLabelStyle={styles.loginFloatingLabelStyle}
-                  floatingLabelFocusStyle={styles.loginFloatingLabelFocusStyle}
-                  underlineFocusStyle={styles.loginUnderlineStyle}
-                  floatingLabelText="Enter your nickname"
-                  hintText="xyz"
-                  onChange={this.handleChange2}
-                  name="nickname"
-                  value={nickname}
-                  validators={['required']}
-                  errorMessages={['This field is required']}
-                />
-                <RaisedButton type="Submit" style={styles.button} label="Login" backgroundColor="#8C2875" labelColor="#fff" onClick={(event) => this.handleSubmit(event)}/>
-              </ValidatorForm>
-              
-            </MuiThemeProvider>
-          </div>
-        </div>
-      </div>
-
-    );
-  }
-}
-
-
 export class BottomNav extends Component {
 
   constructor(props){
@@ -250,9 +92,7 @@ export class BottomNav extends Component {
     this.state={
       activeTabIndex: this.props.history.location.pathname
     };
- 
     this.handleActive = this.handleActive.bind(this);
-
   }
 
   componentDidMount() {
@@ -284,15 +124,29 @@ export class BottomNav extends Component {
         <MuiThemeProvider>
           <Tabs value={this.state.activeTabIndex} onChange={this.handleChange} inkBarStyle={{background: '#fff', display: 'none'}} style={styles.tabs} className="tabs">
             
+
+            
             <Tab
               icon={
-                <svg width="20px" height="13px" viewBox="0 0 20 13" xmlns="http://www.w3.org/2000/svg">
-                  <g id="tabNavBtn1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                      <g id="Home/login" transform="translate(-36.000000, -610.000000)" fill="#FFFFFF" fillOpacity="0.5">
+                <svg width="16px" height="16px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                      <polygon id="path-1" points="7.99985 7 0 7 0 0 15.9997 0 15.9997 7"></polygon>
+                  </defs>
+                  <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                      <g id="Home/login" transform="translate(-308.000000, -607.000000)">
                           <g id="toolbar" transform="translate(0.000000, 592.000000)">
                               <g id="navbar" transform="translate(36.000000, 9.000000)">
-                                  <g id="icon_rank" transform="translate(0.000000, 9.000000)">
-                                      <path d="M14,11 L18,11 L18,7 L14,7 L14,11 Z M8,11 L12,11 L12,2 L8,2 L8,11 Z M2,11 L6,11 L6,6 L2,6 L2,11 Z M19,5 L14,5 L14,1 C14,0.448 13.552,0 13,0 L7,0 C6.448,0 6,0.448 6,1 L6,4 L1,4 C0.448,4 0,4.448 0,5 L0,12 C0,12.552 0.448,13 1,13 L7,13 L13,13 L19,13 C19.552,13 20,12.552 20,12 L20,6 C20,5.448 19.552,5 19,5 L19,5 Z"></path>
+                                  <g id="icon_user" transform="translate(272.000000, 6.000000)">
+                                      <g>
+                                          <path d="M8,2 C6.897,2 6,2.896 6,4 C6,5.103 6.897,6 8,6 C9.103,6 10,5.103 10,4 C10,2.896 9.103,2 8,2 M8,8 C5.794,8 4,6.206 4,4 C4,1.794 5.794,0 8,0 C10.206,0 12,1.794 12,4 C12,6.206 10.206,8 8,8" id="Fill-1" fill="#FFFFFF" fillOpacity="0.5"></path>
+                                          <g id="body" transform="translate(0.000000, 9.000000)">
+                                              <mask id="mask-2" fill="white">
+                                                  <use xlinkHref="#path-1"></use>
+                                              </mask>
+                                              <g id="Clip-4"></g>
+                                              <path d="M2.1587,5 L13.8417,5 C13.2427,3.192 11.0077,2 7.9997,2 C4.9917,2 2.7567,3.192 2.1587,5 L2.1587,5 Z M15.9997,7 L-0.0003,7 L-0.0003,6 C-0.0003,2.467 3.2897,0 7.9997,0 C12.7107,0 15.9997,2.467 15.9997,6 L15.9997,7 Z" id="Fill-3" fill="#FFFFFF" fillOpacity="0.5" mask="url(#mask-2)"></path>
+                                          </g>
+                                      </g>
                                   </g>
                               </g>
                           </g>
@@ -300,15 +154,13 @@ export class BottomNav extends Component {
                   </g>
                 </svg>
               }
-              /* label="Stats" */
-              value='/Stats'
-              data-route="/Stats"
+              /* label="User" */
+              value='/Login'
+              data-route="/Login"
               onActive={(event) => this.handleActive(event)}
-              className={this.state.activeTabIndex == '/Stats' ? "tab active" : "tab"}
-            >
-            
+              className={this.state.activeTabIndex === '/Login' ? "tab active" : "tab"}
+            />
 
-            </Tab>
             <Tab
               icon={
                 <svg width="20px" height="20px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -344,32 +196,21 @@ export class BottomNav extends Component {
                 </svg>
               }
               /* label="QR Scan" */
-              value='/App'
-              data-route="/App"
+              value='/Scan'
+              data-route="/Scan"
               onActive={(event) => this.handleActive(event)}
-              className={this.state.activeTabIndex == '/App' ? "tab active" : "tab"}
+              className={this.state.activeTabIndex === '/Scan' ? "tab active" : "tab"}
             />
+
             <Tab
               icon={
-                <svg width="16px" height="16px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                      <polygon id="path-1" points="7.99985 7 0 7 0 0 15.9997 0 15.9997 7"></polygon>
-                  </defs>
-                  <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                      <g id="Home/login" transform="translate(-308.000000, -607.000000)">
+                <svg width="20px" height="13px" viewBox="0 0 20 13" xmlns="http://www.w3.org/2000/svg">
+                  <g id="tabNavBtn1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                      <g id="Home/login" transform="translate(-36.000000, -610.000000)" fill="#FFFFFF" fillOpacity="0.5">
                           <g id="toolbar" transform="translate(0.000000, 592.000000)">
                               <g id="navbar" transform="translate(36.000000, 9.000000)">
-                                  <g id="icon_user" transform="translate(272.000000, 6.000000)">
-                                      <g>
-                                          <path d="M8,2 C6.897,2 6,2.896 6,4 C6,5.103 6.897,6 8,6 C9.103,6 10,5.103 10,4 C10,2.896 9.103,2 8,2 M8,8 C5.794,8 4,6.206 4,4 C4,1.794 5.794,0 8,0 C10.206,0 12,1.794 12,4 C12,6.206 10.206,8 8,8" id="Fill-1" fill="#FFFFFF" fillOpacity="0.5"></path>
-                                          <g id="body" transform="translate(0.000000, 9.000000)">
-                                              <mask id="mask-2" fill="white">
-                                                  <use xlinkHref="#path-1"></use>
-                                              </mask>
-                                              <g id="Clip-4"></g>
-                                              <path d="M2.1587,5 L13.8417,5 C13.2427,3.192 11.0077,2 7.9997,2 C4.9917,2 2.7567,3.192 2.1587,5 L2.1587,5 Z M15.9997,7 L-0.0003,7 L-0.0003,6 C-0.0003,2.467 3.2897,0 7.9997,0 C12.7107,0 15.9997,2.467 15.9997,6 L15.9997,7 Z" id="Fill-3" fill="#FFFFFF" fillOpacity="0.5" mask="url(#mask-2)"></path>
-                                          </g>
-                                      </g>
+                                  <g id="icon_rank" transform="translate(0.000000, 9.000000)">
+                                      <path d="M14,11 L18,11 L18,7 L14,7 L14,11 Z M8,11 L12,11 L12,2 L8,2 L8,11 Z M2,11 L6,11 L6,6 L2,6 L2,11 Z M19,5 L14,5 L14,1 C14,0.448 13.552,0 13,0 L7,0 C6.448,0 6,0.448 6,1 L6,4 L1,4 C0.448,4 0,4.448 0,5 L0,12 C0,12.552 0.448,13 1,13 L7,13 L13,13 L19,13 C19.552,13 20,12.552 20,12 L20,6 C20,5.448 19.552,5 19,5 L19,5 Z"></path>
                                   </g>
                               </g>
                           </g>
@@ -377,12 +218,13 @@ export class BottomNav extends Component {
                   </g>
                 </svg>
               }
-              /* label="User" */
-              value='/Login'
-              data-route="/Login"
+              /* label="Stats" */
+              value='/Stats'
+              data-route="/Stats"
               onActive={(event) => this.handleActive(event)}
-              className={this.state.activeTabIndex == '/Login' ? "tab active" : "tab"}
+              className={this.state.activeTabIndex === '/Stats' ? "tab active" : "tab"}
             />
+            
           </Tabs>
         </MuiThemeProvider>
       </footer>
@@ -397,16 +239,15 @@ export class BottomNav extends Component {
 }
 
 
-
-export class App extends Component {
+export class Scan extends Component {
   constructor(props){
     super(props)
     this.state = {
-      delay: 300,
+      delay: 200,
       result: 'No result'
     }
     this.handleScan = this.handleScan.bind(this);
-    this.history;
+
   }
 
   handleScan(data){
@@ -423,10 +264,9 @@ export class App extends Component {
 
   handleLogout(event){
     const { history } = this.props;
-    localStorage.setItem('loggedIn', false);
+    alert(localStorage.getItem('token'));
     history.push(baseUrl + "/Login");
   }
-
 
 
   render(){
@@ -434,21 +274,24 @@ export class App extends Component {
     return(
 
       <div className="container">
-        <h3 className="overallTitle">SCAN A QR CODE</h3>
-        <QrReader
-          delay={this.state.delay}
-          onError={this.handleError}
-          onScan={this.handleScan}
-          style={{ width: '100%' }}
-        />
+        <div className="row">
+          <h3 className="overallTitle">SCAN A QR CODE</h3>
+          <QrReader
+            delay={this.state.delay}
+            onError={this.handleError}
+            onScan={this.handleScan}
+            style={{ width: '100%' }}
+          />
+          <div className="col-xs-12">
+            <p>{this.state.result}</p>
+          
+            <MuiThemeProvider>
+              <RaisedButton label="Logout" style={styles.fullwidth} backgroundColor="#a1197d" labelColor="#fff" rippleStyle={styles.button} onClick={(event) => this.handleLogout(event)} />
+            </MuiThemeProvider>
+          </div>
 
-        <p>{this.state.result}</p>
-      
-        <MuiThemeProvider>
-          <RaisedButton label="Logout" style={styles.fullwidth} backgroundColor="#8C2875" labelColor="#fff" rippleStyle={styles.button} onClick={(event) => this.handleLogout(event)} />
-        </MuiThemeProvider>
-
-        <BottomNav history={this.props.history} logged={true} />
+          <BottomNav history={this.props.history} logged={true} />
+        </div>
 
       </div>
     )
@@ -479,7 +322,7 @@ class ChangingProgressbar extends Component {
     return (
       <div className="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4" >
 
-        <div style={{ position: 'relative', width: '100%', height: '100%', marginBottom: '40%' }} className="CircularProgressdata">
+        <div style={{ position: 'relative', width: '100%', height: '100%'}} className="CircularProgressdata">
           <div style={{ position: 'absolute', width: '100%' }}>
             <CircularProgressbar className="" {...this.props} percentage={this.props.percentages} initialAnimation={true} strokeWidth={5} />
             <CountUp
@@ -507,8 +350,8 @@ class ChangingProgressbar extends Component {
                 <g transform="translate(-157.000000, -155.000000)">
                   <g transform="translate(0.000000, -110.000000)">
                     <g transform="translate(158.000000, 267.000000)">
-                        <polygon fillOpacity="0.5" fill="#8C2875" points="19.618 23.2361 23.618 29.2361 30.618 25.2361 36.618 29.2361 43.618 44.2361 1.618 44.2361 9.618 27.2361"></polygon>
-                        <polygon stroke="#8C2875" strokeWidth="2" points="0.618 44.2361 44.618 44.2361 22.618 0.2361"></polygon>
+                        <polygon fillOpacity="0.5" fill="#a1197d" points="19.618 23.2361 23.618 29.2361 30.618 25.2361 36.618 29.2361 43.618 44.2361 1.618 44.2361 9.618 27.2361"></polygon>
+                        <polygon stroke="#a1197d" strokeWidth="2" points="0.618 44.2361 44.618 44.2361 22.618 0.2361"></polygon>
                     </g>
                   </g>
                 </g>
@@ -528,7 +371,7 @@ class ChangingProgressbar extends Component {
           <div className="col-xs-12 text-center">
             <svg width="20px" height="13px" viewBox="0 0 20 13" xmlns="http://www.w3.org/2000/svg" style={{marginLeft: '-3px'}}>
               <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                  <g transform="translate(-36.000000, -610.000000)" fill="#8C2875">
+                  <g transform="translate(-36.000000, -610.000000)" fill="#a1197d">
                       <g transform="translate(0.000000, 592.000000)">
                           <g transform="translate(36.000000, 9.000000)">
                               <g transform="translate(0.000000, 9.000000)">
@@ -563,7 +406,7 @@ class ChangingProgressbar extends Component {
         <div className="col-xs-12 text-center">
           <svg width="20px" height="13px" viewBox="0 0 20 13" xmlns="http://www.w3.org/2000/svg" transform="translate(-2.000000, 5)">
             <g id="tabNavBtn1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd" >
-                <g id="Home/login" fill="#8C2875" fillOpacity="1">
+                <g id="Home/login" fill="#a1197d" fillOpacity="1">
                     <g id="icon_rank" >
                         <path d="M14,11 L18,11 L18,7 L14,7 L14,11 Z M8,11 L12,11 L12,2 L8,2 L8,11 Z M2,11 L6,11 L6,6 L2,6 L2,11 Z M19,5 L14,5 L14,1 C14,0.448 13.552,0 13,0 L7,0 C6.448,0 6,0.448 6,1 L6,4 L1,4 C0.448,4 0,4.448 0,5 L0,12 C0,12.552 0.448,13 1,13 L7,13 L13,13 L19,13 C19.552,13 20,12.552 20,12 L20,6 C20,5.448 19.552,5 19,5 L19,5 Z"></path>
                     </g>
@@ -594,7 +437,7 @@ export class Stats extends Component {
       scoreResults: [],
       profileResults: []
     };
-    this.history;
+
   }
 
   min = 1;
@@ -605,7 +448,6 @@ export class Stats extends Component {
     this.handleToast()
     var query    = "Hallyday";
     var category = "song";
-    var limit = 1 + Math.floor((Math.random() * (10)));
     var URL1      = 'https://itunes.apple.com/search?term=' + query +'&country=us&limit=50&entity=' + category;
     var URL2 = "https://randomuser.me/api/";
     this.scoreSearch(URL1)
@@ -655,7 +497,7 @@ export class Stats extends Component {
 
   handleToast(tab) {
     setTimeout(() => {
-      toast("Happy to see you again!");
+      toast("Happy to see you again "+localStorage.getItem('nickname')+"!");
     }, 3500);
   }
 
@@ -665,12 +507,12 @@ export class Stats extends Component {
         this.state.profileResults.length > 0 ?
           <div className="container">
             <div className="row">
-                <ProfileResults profileResults={this.state.profileResults}  />
-                <ChangingProgressbar percentages={this.state.random} />
-                <ScoreResults scoreResults={this.state.scoreResults} />
-                <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'toaster'} autoClose={false} closeButton={<ToastCloseButton YouCanPassAnyProps="foo" />} />
+              <ProfileResults profileResults={this.state.profileResults}  />
+              <ChangingProgressbar percentages={this.state.random} />
+              <ScoreResults scoreResults={this.state.scoreResults} />
+              <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'toaster'} autoClose={false} closeButton={<ToastCloseButton YouCanPassAnyProps="foo" />} />
+              <BottomNav history={this.props.history} logged={true} />
             </div>
-            <BottomNav history={this.props.history} logged={true} />
           </div>  
         :
           <div className="container">
@@ -726,7 +568,7 @@ export class ProfileResultItem extends Component {
                     <div className="col-xs-4">
                       <svg width="17px" height="24px" viewBox="0 0 17 24" xmlns="http://www.w3.org/2000/svg" style={{position: 'relative', left: '5px'}}>
                           <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                              <g id="User-Dashboard" transform="translate(-56.000000, -178.000000)" fill="#8C2875">
+                              <g id="User-Dashboard" transform="translate(-56.000000, -178.000000)" fill="#a1197d">
                                   <g id="icon_calories" transform="translate(56.000000, 178.000000)">
                                       <path d="M8.34125764,0 C8.52825764,1.515 8.91425764,2.977 8.92925764,4.542 C8.94725764,6.387 8.72625764,8.293 8.09725764,10.024 C7.80225764,10.836 7.39125764,12.228 6.31925764,12.228 C6.30825764,12.228 6.29725764,12.228 6.28625764,12.228 C4.72625764,12.187 5.20125764,9.498 5.20125764,8.487 C2.12125764,9.891 -0.0837423621,13.615 0.766257638,17.732 C1.40325764,20.818 3.81625764,23.272 6.78125764,23.857 C7.28025764,23.956 7.78725764,24.003 8.29525764,24.003 C10.9282576,24.003 13.5602576,22.711 15.0612576,20.491 C17.2072576,17.315 16.4682576,12.515 15.1662576,9.164 C13.9782576,6.105 11.9112576,3.791 9.76925764,1.436 C9.31225764,0.933 8.72825764,0.575 8.34125764,0 M10.9052576,5.813 C11.8672576,7.054 12.7172576,8.385 13.3022576,9.888 C14.3982576,12.709 15.0832576,16.886 13.4032576,19.371 C12.3062576,20.995 10.3482576,22.003 8.29525764,22.003 C7.91225764,22.003 7.53325764,21.967 7.16825764,21.895 C4.98525764,21.464 3.19925764,19.629 2.72525764,17.328 C2.33925764,15.46 2.75425764,13.778 3.57625764,12.49 C3.71025764,12.769 3.88125764,13.033 4.10025764,13.272 C4.64425764,13.866 5.40225764,14.205 6.23425764,14.227 L6.29325764,14.228 L6.31925764,14.228 C8.72625764,14.228 9.56025764,11.88 9.91625764,10.877 L9.97725764,10.707 C10.5072576,9.248 10.8182576,7.606 10.9052576,5.813"></path>
                                   </g>
@@ -785,7 +627,7 @@ export class ProfileResultItem extends Component {
                                               <use xlinkHref="#path-1"></use>
                                           </mask>
                                           <g id="Clip-2"></g>
-                                          <path d="M22.0005,0 L15.9995,0 C14.8955,0 14.0005,0.896 14.0005,2 L14.0005,7 L9.0005,7 C7.8965,7 7.0005,7.896 7.0005,9.001 L7.0005,14 L1.9995,14 C0.8955,14 0.0005,14.896 0.0005,16 L0.0005,21 C0.0005,22.104 0.8955,23 1.9995,23 L22.0005,23 C23.1045,23 24.0005,22.104 24.0005,21 L24.0005,2 C24.0005,0.896 23.1045,0 22.0005,0 M22.0005,2 L22.0005,2 L22.0005,21 L2.0005,21 L1.9995,16 L7.0005,16 L9.0005,16 L9.0005,14 L9.0005,9 L14.0005,9 L16.0005,9 L16.0005,7 L15.9995,2 L22.0005,2" id="Fill-1" fill="#8C2875" mask="url(#mask-2)"></path>
+                                          <path d="M22.0005,0 L15.9995,0 C14.8955,0 14.0005,0.896 14.0005,2 L14.0005,7 L9.0005,7 C7.8965,7 7.0005,7.896 7.0005,9.001 L7.0005,14 L1.9995,14 C0.8955,14 0.0005,14.896 0.0005,16 L0.0005,21 C0.0005,22.104 0.8955,23 1.9995,23 L22.0005,23 C23.1045,23 24.0005,22.104 24.0005,21 L24.0005,2 C24.0005,0.896 23.1045,0 22.0005,0 M22.0005,2 L22.0005,2 L22.0005,21 L2.0005,21 L1.9995,16 L7.0005,16 L9.0005,16 L9.0005,14 L9.0005,9 L14.0005,9 L16.0005,9 L16.0005,7 L15.9995,2 L22.0005,2" id="Fill-1" fill="#a1197d" mask="url(#mask-2)"></path>
                                       </g>
                                   </g>
                               </g>
@@ -810,7 +652,7 @@ export class ScoreResults extends Component {
           return <ScoreResultItem key={index} trackName={result.trackName} index={index+1} />
       });
       return(
-          <div className="col-xs-12">
+          <div className="col-xs-12 fullwidth">
             <ul className="scoreResults">
                 {resultItems}
             </ul>

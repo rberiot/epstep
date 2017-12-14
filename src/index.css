@@ -10,6 +10,7 @@ body {
 }
 footer {  
     position: fixed;
+    z-index: 9999;
     margin: 20px 0 0 0;
     padding: 0;
     left: 0;
