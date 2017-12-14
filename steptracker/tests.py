@@ -115,19 +115,49 @@ class AuthViewTest(TestCase):
         self.assertEqual(data['status'], 'OK')
 
 
-class GenTokenViewTest(TestCase):
+class GetDistanceViewTest(TestCase):
 
-    def test_gen_token_view(self):
+    def test_get_distance_view(self):
         from django.test import RequestFactory
         from django.core.urlresolvers import reverse
-        from views import gen_token
+        from views import get_distance
         factory = RequestFactory()
 
-        rq = factory.get(reverse('gen_token'), data={'email': 'ee@ext.europarl.europa.eu'})
+        rq = factory.get(reverse('get_distance'), data={'email': 'ee@ext.europarl.europa.eu'})
 
-        response = gen_token(rq)
+        response = get_distance(rq)
         self.assertIsNotNone(response)
         data = json.loads(response.content)
         self.assertEqual(data['email'], 'ee@ext.europarl.europa.eu')
 
 
+class LogDistanceViewTest(TestCase):
+
+    def test_log_distance_view(self):
+        from django.test import RequestFactory
+        from django.core.urlresolvers import reverse
+        from views import log_distance
+        factory = RequestFactory()
+
+        rq = factory.get(reverse('log_distance'), data={'email': 'ee@ext.europarl.europa.eu'})
+
+        response = log_distance(rq)
+        self.assertIsNotNone(response)
+        data = json.loads(response.content)
+        self.assertEqual(data['email'], 'ee@ext.europarl.europa.eu')
+
+
+class ProfileViewTest(TestCase):
+
+    def test_log_distance_view(self):
+        from django.test import RequestFactory
+        from django.core.urlresolvers import reverse
+        from views import profile
+        factory = RequestFactory()
+
+        rq = factory.get(reverse('profile'), data={'email': 'ee@ext.europarl.europa.eu'})
+
+        response = profile(rq)
+        self.assertIsNotNone(response)
+        data = json.loads(response.content)
+        self.assertEqual(data['email'], 'ee@ext.europarl.europa.eu')
