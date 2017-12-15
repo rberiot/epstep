@@ -13,7 +13,7 @@ from models import AuthToken, User
 
 
 def validate_token(request):
-    email_param = request.GET.get('email', None)
+    email_param = request.GET.get('email')
     validation_key_param = request.GET.get('validation_key', None)
 
     if email_param is None or validation_key_param is None:
@@ -32,7 +32,7 @@ def validate_token(request):
 
 
 def auth(request):
-    token_param = request.GET.get('token', None)
+    token_param = request.GET.get('token')
     email_param = request.GET['email']
 
     if token_param is None:  # register new token
@@ -71,6 +71,8 @@ def distance(request):
     if not qr1_param_id and qr2_param_id:
         HttpResponseBadRequest('qr_id_1 & qr_id_2 parameters are required')
 
+    return JsonResponse({'status': 'OK', 'distance': '25.5'})
+
 
 def qr_info(request):
     qr1_param_id = request.GET.get('qr_id')
@@ -78,15 +80,40 @@ def qr_info(request):
     if not qr1_param_id:
         HttpResponseBadRequest('qr_id parameter is required')
 
+    return JsonResponse({'status': 'OK',
+                         'id': qr1_param_id,
+                         'building': 'ASP',
+                         'level': '5',
+                         'stairwell': 'south-east1'})
+
 
 def log_distance(request):
-    token_param = request.GET['token']
-    if not AuthToken.is_token_valid(token_param):
+    token_param = request.GET.get('token')
+    if not AuthToken.is_token_valid(token_param) and settings.DEBUG is False:
         return JsonResponse({'status': 'INVALID_TOKEN'})
+
+    distance = request.GET.get('distance')
+    if distance:
+        return JsonResponse({'status': 'ok'})
+
+    return HttpResponseBadRequest('distance parameter is missing')
 
 
 def profile(request):
-    token_param = request.GET['token']
-    if not AuthToken.is_token_valid(token_param):
+    token_param = request.GET.get('token')
+    if not AuthToken.is_token_valid(token_param) and settings.DEBUG is False:
         return JsonResponse({'status': 'INVALID_TOKEN'})
 
+    return JsonResponse({'status': 'OK',
+                         'nick_name': 'Johnny H',
+                         'total_calories': '4852',
+                         'total_steps': '74165',
+                         'total_meters': '154',
+                         'current_challenge': {
+                             'id': '1',
+                             'name': 'Atomium',
+                             'total_steps': '1000',
+                             'current_steps': '500',
+                             'current_percent': '0.5',
+                         },
+                         })

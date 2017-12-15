@@ -61,6 +61,9 @@ class AuthToken(models.Model):
 
     @classmethod
     def is_token_valid(cls, token_string):
+        if token_string is None:
+            return False
+
         token_list = cls.objects.filter(token_string=token_string)
         if token_list:
             return token_list[0].valid
