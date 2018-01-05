@@ -1,0 +1,12 @@
+<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+    <g transform="translate(-157.000000, -155.000000)">
+      <g transform="translate(0.000000, -110.000000)">
+        <g transform="translate(158.000000, 267.000000)">
+            <polygon fillOpacity="0.5" fill="#a1197d" points="19.618 23.2361 23.618 29.2361 30.618 25.2361 36.618 29.2361 43.618 44.2361 1.618 44.2361 9.618 27.2361"></polygon>
+            <polygon stroke="#a1197d" strokeWidth="2" points="0.618 44.2361 44.618 44.2361 22.618 0.2361"></polygon>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

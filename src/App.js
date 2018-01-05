@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import VisibilitySensor from 'react-visibility-sensor';
+
 import QrReader from 'react-qr-reader';
 
 import $ from 'jquery'; 
@@ -8,21 +11,34 @@ import RaisedButton from 'material-ui/RaisedButton';
 
 import {Tabs, Tab} from 'material-ui/Tabs';
 
-import { ValidatorForm } from 'react-form-validator-core';
-import { TextValidator} from 'react-material-ui-form-validator';
-
 import CircularProgressbar from 'react-circular-progressbar';
 import CountUp from 'react-countup';
 
 import { ToastContainer, toast } from 'react-toastify';
 
+import { BarChart } from 'react-easy-chart';
+import ContainerDimensions from 'react-container-dimensions'
+
+import Confetti from 'react-dom-confetti';
+
 import './App.css';
+import './Loader.css';
+
+
+import {IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, Placeholder, IconUserEdit, IconStats, Star} from './SVGicon';
+
+import SVGInline from "react-svg-inline"
+import icon_rank from './icon_rank.svg'
 
 import logo from './logo.png';
 import '../node_modules/material-components-web/dist/material-components-web.css';
 
+
 /* for correct path after build */
 const baseUrl = process.env.PUBLIC_URL;
+
+//const wsbaseurl = "http://localhost:8000";
+let wsbaseurl = "https://90dadbd1.ngrok.io";
 
 const styles = {
   loginErrorStyle: {
@@ -68,10 +84,62 @@ const styles = {
 };
 
 
+function getAllUrlParams(url) {
+  // get query string from url (optional) or window
+  var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
+  // we'll store the parameters here
+  var obj = {};
+  // if query string exists
+  if (queryString) {
+    // stuff after # is not part of query string, so get rid of it
+    queryString = queryString.split('#')[0];
+    // split our query string into its component parts
+    var arr = queryString.split('&');
+    for (var i=0; i<arr.length; i++) {
+      // separate the keys and the values
+      var a = arr[i].split('=');
+      // in case params look like: list[]=thing1&list[]=thing2
+      var paramNum = undefined;
+      var paramName = a[0].replace(/\[\d*\]/, function(v) {
+        paramNum = v.slice(1,-1);
+        return '';
+      });
+      // set parameter value (use 'true' if empty)
+      var paramValue = typeof(a[1])==='undefined' ? true : a[1];
+      // (optional) keep case consistent
+      paramName = paramName.toLowerCase();
+      paramValue = paramValue.toLowerCase();
+      // if parameter name already exists
+      if (obj[paramName]) {
+        // convert value to array (if still string)
+        if (typeof obj[paramName] === 'string') {
+          obj[paramName] = [obj[paramName]];
+        }
+        // if no array index number specified...
+        if (typeof paramNum === 'undefined') {
+          // put the value on the end of the array
+          obj[paramName].push(paramValue);
+        }
+        // if array index number specified...
+        else {
+          // put the value at that index number
+          obj[paramName][paramNum] = paramValue;
+        }
+      }
+      // if param name doesn't exist yet, set it
+      else {
+        obj[paramName] = paramValue;
+      }
+    }
+  }
+  return obj;
+}
+
+
+const toastId = null;
 const ToastCloseButton = ({ YouCanPassAnyProps, closeToast }) => (
   <span onClick={closeToast}>CLOSE</span>
 );
-
 
 
 export class Header extends Component {
@@ -124,36 +192,8 @@ export class BottomNav extends Component {
         <MuiThemeProvider>
           <Tabs value={this.state.activeTabIndex} onChange={this.handleChange} inkBarStyle={{background: '#fff', display: 'none'}} style={styles.tabs} className="tabs">
             
-
-            
             <Tab
-              icon={
-                <svg width="16px" height="16px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                      <polygon id="path-1" points="7.99985 7 0 7 0 0 15.9997 0 15.9997 7"></polygon>
-                  </defs>
-                  <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                      <g id="Home/login" transform="translate(-308.000000, -607.000000)">
-                          <g id="toolbar" transform="translate(0.000000, 592.000000)">
-                              <g id="navbar" transform="translate(36.000000, 9.000000)">
-                                  <g id="icon_user" transform="translate(272.000000, 6.000000)">
-                                      <g>
-                                          <path d="M8,2 C6.897,2 6,2.896 6,4 C6,5.103 6.897,6 8,6 C9.103,6 10,5.103 10,4 C10,2.896 9.103,2 8,2 M8,8 C5.794,8 4,6.206 4,4 C4,1.794 5.794,0 8,0 C10.206,0 12,1.794 12,4 C12,6.206 10.206,8 8,8" id="Fill-1" fill="#FFFFFF" fillOpacity="0.5"></path>
-                                          <g id="body" transform="translate(0.000000, 9.000000)">
-                                              <mask id="mask-2" fill="white">
-                                                  <use xlinkHref="#path-1"></use>
-                                              </mask>
-                                              <g id="Clip-4"></g>
-                                              <path d="M2.1587,5 L13.8417,5 C13.2427,3.192 11.0077,2 7.9997,2 C4.9917,2 2.7567,3.192 2.1587,5 L2.1587,5 Z M15.9997,7 L-0.0003,7 L-0.0003,6 C-0.0003,2.467 3.2897,0 7.9997,0 C12.7107,0 15.9997,2.467 15.9997,6 L15.9997,7 Z" id="Fill-3" fill="#FFFFFF" fillOpacity="0.5" mask="url(#mask-2)"></path>
-                                          </g>
-                                      </g>
-                                  </g>
-                              </g>
-                          </g>
-                      </g>
-                  </g>
-                </svg>
-              }
+              icon={<IconUserTab />}
               /* label="User" */
               value='/Login'
               data-route="/Login"
@@ -162,39 +202,7 @@ export class BottomNav extends Component {
             />
 
             <Tab
-              icon={
-                <svg width="20px" height="20px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                  <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                      <g id="Home/login" transform="translate(-172.000000, -604.000000)">
-                          <g id="toolbar" transform="translate(0.000000, 592.000000)">
-                              <g id="navbar" transform="translate(36.000000, 9.000000)">
-                                  <g id="qr-code" transform="translate(134.000000, 0.000000)">
-                                      <g>
-                                          <g id="Frame_-_24px">
-                                              <rect id="Rectangle-path" x="0" y="0.999" width="24" height="24"></rect>
-                                          </g>
-                                          <g id="Line_Icons" transform="translate(2.000000, 2.000000)" fillRule="nonzero" fill="#FFFFFF" fillOpacity="0.5">
-                                              <g id="Group">
-                                                  <polygon id="Shape" points="10 8.999 8 8.999 8 4.999 12 4.999 12 6.999 10 6.999"></polygon>
-                                                  <polygon id="Shape" points="9 13.999 4 13.999 4 8.999 6 8.999 6 11.999 9 11.999"></polygon>
-                                                  <rect id="Rectangle-path" x="10" y="9.999" width="2" height="4"></rect>
-                                                  <polygon id="Shape" points="16 12.999 14 12.999 14 10.999 13 10.999 13 8.999 16 8.999"></polygon>
-                                                  <path d="M18,20.999 L2,20.999 C0.897,20.999 0,20.103 0,18.999 L0,2.999 C0,1.895 0.897,0.999 2,0.999 L18,0.999 C19.103,0.999 20,1.895 20,2.999 L20,18.999 C20,20.103 19.103,20.999 18,20.999 Z M2,2.999 L2,18.999 L18.001,18.999 L18,2.999 L2,2.999 Z" id="Shape"></path>
-                                                  <rect id="Rectangle-path" x="4" y="4.999" width="3" height="3"></rect>
-                                                  <rect id="Rectangle-path" x="13" y="13.999" width="3" height="3"></rect>
-                                                  <rect id="Rectangle-path" x="13" y="4.999" width="3" height="3"></rect>
-                                                  <rect id="Rectangle-path" x="7" y="14.999" width="5" height="2"></rect>
-                                                  <rect id="Rectangle-path" x="4" y="14.999" width="2" height="2"></rect>
-                                              </g>
-                                          </g>
-                                      </g>
-                                  </g>
-                              </g>
-                          </g>
-                      </g>
-                  </g>
-                </svg>
-              }
+              icon={<QrcodeTab />}
               /* label="QR Scan" */
               value='/Scan'
               data-route="/Scan"
@@ -203,21 +211,7 @@ export class BottomNav extends Component {
             />
 
             <Tab
-              icon={
-                <svg width="20px" height="13px" viewBox="0 0 20 13" xmlns="http://www.w3.org/2000/svg">
-                  <g id="tabNavBtn1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                      <g id="Home/login" transform="translate(-36.000000, -610.000000)" fill="#FFFFFF" fillOpacity="0.5">
-                          <g id="toolbar" transform="translate(0.000000, 592.000000)">
-                              <g id="navbar" transform="translate(36.000000, 9.000000)">
-                                  <g id="icon_rank" transform="translate(0.000000, 9.000000)">
-                                      <path d="M14,11 L18,11 L18,7 L14,7 L14,11 Z M8,11 L12,11 L12,2 L8,2 L8,11 Z M2,11 L6,11 L6,6 L2,6 L2,11 Z M19,5 L14,5 L14,1 C14,0.448 13.552,0 13,0 L7,0 C6.448,0 6,0.448 6,1 L6,4 L1,4 C0.448,4 0,4.448 0,5 L0,12 C0,12.552 0.448,13 1,13 L7,13 L13,13 L19,13 C19.552,13 20,12.552 20,12 L20,6 C20,5.448 19.552,5 19,5 L19,5 Z"></path>
-                                  </g>
-                              </g>
-                          </g>
-                      </g>
-                  </g>
-                </svg>
-              }
+              icon={<IconRankTab />}
               /* label="Stats" */
               value='/Stats'
               data-route="/Stats"
@@ -240,21 +234,72 @@ export class BottomNav extends Component {
 
 
 export class Scan extends Component {
+
   constructor(props){
     super(props)
     this.state = {
-      delay: 200,
-      result: 'No result'
+      message: 'SCAN A QR CODE',
+      delay: 1000,
+      result: 'No result',
+      qrcode_in: null,
+      qrcode_out: null,
+      loading: false
     }
+    
+    localStorage.removeItem('qrcode_in')
     this.handleScan = this.handleScan.bind(this);
-
   }
 
   handleScan(data){
+   
     if(data){
       this.setState({
         result: data,
+        message: 'NOW, PLEASE TAKE THE STAIRS...',
+        loading: true
       })
+
+      if(localStorage.getItem('qrcode_in') !== null){
+
+        this.setState({
+            qrcode_in: localStorage.getItem('qrcode_in'),
+            qrcode_out: getAllUrlParams(this.state.result).qr_id_2,
+            loading: false
+        })
+
+        alert(this.state.qrcode_in +' / '+ this.state.qrcode_out)
+
+        $.ajax({
+            url: wsbaseurl+'/distance',
+            type: "GET",
+            dataType: 'json',
+            data: { qr_id_1: this.state.qrcode_in, qr_id_2: this.state.qrcode_out },
+            success: function(data){
+              if (data && data.status === "OK") {
+                alert(data.distance);
+              }
+            }.bind(this),
+            complete: function(){
+              this.setState({
+                  message: 'THANK YOU, CHECK YOUR STATS !'
+              })
+              localStorage.removeItem('qrcode_in')
+            }.bind(this),
+            error: function(xhr, ajaxOptions, thrownError) {
+              alert(thrownError);      
+            }
+        });
+        
+
+      } else{
+ 
+        this.setState({
+            qrcode_in: getAllUrlParams(this.state.result).qr_id_1
+        })
+        localStorage.setItem('qrcode_in', this.state.qrcode_in)
+      }
+      
+
     }
   }
 
@@ -275,7 +320,21 @@ export class Scan extends Component {
 
       <div className="container">
         <div className="row">
-          <h3 className="overallTitle">SCAN A QR CODE</h3>
+          <h3 className="overallTitle">{this.state.message}</h3>
+          
+          {this.state.loading &&
+          <div className="overallLoader">
+            <div className="loader">
+              <div className="loader__bar"></div>
+              <div className="loader__bar"></div>
+              <div className="loader__bar"></div>
+              <div className="loader__bar"></div>
+              <div className="loader__bar"></div>
+              <div className="loader__ball"></div>
+            </div>
+          </div>
+          }
+
           <QrReader
             delay={this.state.delay}
             onError={this.handleError}
@@ -298,27 +357,60 @@ export class Scan extends Component {
   }
 }
 
+
+
 /* https://github.com/iqnivek/react-circular-progressbar/tree/c3796f26d82cc5da81714cfec5b2bf9b9ffb4b96 */
 class ChangingProgressbar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPercentageIndex: 0,
+      next_level_access: false,
     };
   }
 
-  componentDidMount() {
-    /*
-    setInterval(() => {
-      this.setState({
-        currentPercentageIndex: (this.state.currentPercentageIndex + 1) % this.props.percentages.length
-      });
-    }, this.props.interval);
-    */
-    
+  componentDidMount(){
+    setTimeout(() => {
+      this.setState({next_level_access: true});
+    }, 5000);
   }
 
   render() {
+
+    const confetti_config = {
+      angle: 90,
+      spread: 40,
+      startVelocity: 25,
+      elementCount: 60,
+      decay: 0.93
+    };
+
+    let challenge_icon = null;
+    let challenge_icon_location = null;
+    let challenge_star = null;
+
+    if (this.props.challenge_name === "Atomium") {
+      challenge_icon = <Atomium />
+      challenge_icon_location = <small>Brussels, Belgium</small>
+    } else if (this.props.challenge_name === "MONT EUROPA") {
+      challenge_icon = <MontEuropa />
+      challenge_icon_location = <small>Brussels, Belgium</small>
+    } else {
+      challenge_icon = <Montain />;
+      challenge_icon_location = <small>Alpes, France</small>
+    }
+
+    if (this.props.total_meters <= 1000) {
+      challenge_star = <Star />
+    } else if (this.props.total_meters <= 2000){
+      challenge_star = <div><Star /><Star /></div>
+    } else if (this.props.total_meters <= 3000){
+      challenge_star = <div><Star /><Star /><Star /></div>
+    } else if (this.props.total_meters <= 4000){
+      challenge_star = <div><Star /><Star /><Star /><Star /></div>
+    } else if (this.props.total_meters <= 5000){
+      challenge_star = <div><Star /><Star /><Star /><Star /><Star /></div>
+    }
+    
     return (
       <div className="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4" >
 
@@ -339,82 +431,28 @@ class ChangingProgressbar extends Component {
             />
           </div>
 
-          <div style={{display: 'flex', flex: 1, flexDirection: 'column', alignItems:'center', justifyContent:'space-between', width: '100%', padding: '17%', marginBottom: '30%' }} className="text-center" >
+          <div style={{ width: '100%', padding: '17%', marginBottom: '30%' }} className="text-center progress_ctn" >
 
-            <div>
-              <h4 className="value uppercase">Fuji mont blanc top of the world</h4>
+            <div className="challenge_title">
+              <h4 className="value uppercase">{this.props.challenge_name}</h4>
+              {challenge_icon_location}
             </div>
-          
-            <svg width="45%" height="45%" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg">
-              <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                <g transform="translate(-157.000000, -155.000000)">
-                  <g transform="translate(0.000000, -110.000000)">
-                    <g transform="translate(158.000000, 267.000000)">
-                        <polygon fillOpacity="0.5" fill="#a1197d" points="19.618 23.2361 23.618 29.2361 30.618 25.2361 36.618 29.2361 43.618 44.2361 1.618 44.2361 9.618 27.2361"></polygon>
-                        <polygon stroke="#a1197d" strokeWidth="2" points="0.618 44.2361 44.618 44.2361 22.618 0.2361"></polygon>
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </svg>
 
-            <div>
-              <h4 className="value">3217m</h4>
+            <div className="challenge_icon">
+              {challenge_icon}
             </div>
+
+            {challenge_star}
+
+            <div className="challenge_meters">
+              <h4 className="value">{this.props.total_meters}m</h4>
+            </div>
+
+            <Confetti active={ this.state.next_level_access } config={ confetti_config } />
 
           </div>
 
-          
-          <div className="col-xs-6 sepa"></div>
-          <div className="col-xs-6"></div>
-
-          <div className="col-xs-12 text-center">
-            <svg width="20px" height="13px" viewBox="0 0 20 13" xmlns="http://www.w3.org/2000/svg" style={{marginLeft: '-3px'}}>
-              <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                  <g transform="translate(-36.000000, -610.000000)" fill="#a1197d">
-                      <g transform="translate(0.000000, 592.000000)">
-                          <g transform="translate(36.000000, 9.000000)">
-                              <g transform="translate(0.000000, 9.000000)">
-                                  <path d="M14,11 L18,11 L18,7 L14,7 L14,11 Z M8,11 L12,11 L12,2 L8,2 L8,11 Z M2,11 L6,11 L6,6 L2,6 L2,11 Z M19,5 L14,5 L14,1 C14,0.448 13.552,0 13,0 L7,0 C6.448,0 6,0.448 6,1 L6,4 L1,4 C0.448,4 0,4.448 0,5 L0,12 C0,12.552 0.448,13 1,13 L7,13 L13,13 L19,13 C19.552,13 20,12.552 20,12 L20,6 C20,5.448 19.552,5 19,5 L19,5 Z"></path>
-                              </g>
-                          </g>
-                      </g>
-                  </g>
-              </g>
-            </svg>
-          </div>
-
-          <svg width="20px" height="13px" viewBox="0 0 20 13" xmlns="http://www.w3.org/2000/svg">
-                  <g id="tabNavBtn1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                      <g id="Home/login" transform="translate(-36.000000, -610.000000)" fill="#FFFFFF" fillOpacity="0.5">
-                          <g id="toolbar" transform="translate(0.000000, 592.000000)">
-                              <g id="navbar" transform="translate(36.000000, 9.000000)">
-                                  <g id="icon_rank" transform="translate(0.000000, 9.000000)">
-                                      <path d="M14,11 L18,11 L18,7 L14,7 L14,11 Z M8,11 L12,11 L12,2 L8,2 L8,11 Z M2,11 L6,11 L6,6 L2,6 L2,11 Z M19,5 L14,5 L14,1 C14,0.448 13.552,0 13,0 L7,0 C6.448,0 6,0.448 6,1 L6,4 L1,4 C0.448,4 0,4.448 0,5 L0,12 C0,12.552 0.448,13 1,13 L7,13 L13,13 L19,13 C19.552,13 20,12.552 20,12 L20,6 C20,5.448 19.552,5 19,5 L19,5 Z"></path>
-                                  </g>
-                              </g>
-                          </g>
-                      </g>
-                  </g>
-                </svg>
-          
-
         </div>
-
-        
-        {/*
-        <div className="col-xs-12 text-center">
-          <svg width="20px" height="13px" viewBox="0 0 20 13" xmlns="http://www.w3.org/2000/svg" transform="translate(-2.000000, 5)">
-            <g id="tabNavBtn1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd" >
-                <g id="Home/login" fill="#a1197d" fillOpacity="1">
-                    <g id="icon_rank" >
-                        <path d="M14,11 L18,11 L18,7 L14,7 L14,11 Z M8,11 L12,11 L12,2 L8,2 L8,11 Z M2,11 L6,11 L6,6 L2,6 L2,11 Z M19,5 L14,5 L14,1 C14,0.448 13.552,0 13,0 L7,0 C6.448,0 6,0.448 6,1 L6,4 L1,4 C0.448,4 0,4.448 0,5 L0,12 C0,12.552 0.448,13 1,13 L7,13 L13,13 L19,13 C19.552,13 20,12.552 20,12 L20,6 C20,5.448 19.552,5 19,5 L19,5 Z"></path>
-                    </g>
-                </g>
-            </g>
-          </svg>
-        </div>
-        */}
 
       </div>
 
@@ -422,9 +460,7 @@ class ChangingProgressbar extends Component {
       );
   }
 }
-ChangingProgressbar.defaultProps = {
-  interval: 1500,
-}
+
 
 /* https://fkhadra.github.io/react-toastify/ */
 /* https://github.com/glennreyes/react-countup */
@@ -433,9 +469,14 @@ export class Stats extends Component {
   constructor(props){
     super(props);
     this.state = {
+      challenge_name: null,
+      total_meters: null,
+      current_percent: null,
       random: null,
       scoreResults: [],
-      profileResults: []
+      profileResults: [],
+      avatar: null,
+      profileLoaded: false
     };
 
   }
@@ -444,34 +485,78 @@ export class Stats extends Component {
   max = 100;
 
   componentDidMount(){
-    this.setState({random: this.min + Math.floor((Math.random() * (this.max - this.min)))});
-    this.handleToast()
+    this.setState({random: this.min + Math.floor((Math.random() * (this.max - this.min))), profileResults: false});
+    this.handleToast();
     var query    = "Hallyday";
     var category = "song";
-    var URL1      = 'https://itunes.apple.com/search?term=' + query +'&country=us&limit=50&entity=' + category;
-    var URL2 = "https://randomuser.me/api/";
+    //var URL1      = 'https://itunes.apple.com/search?term=' + query +'&country=us&limit=50&entity=' + category;
+    var URL1 = 'https://randomuser.me/api/?inc=name&results=50';
     this.scoreSearch(URL1)
-    this.profileSearch(URL2)
+    //var URL2 = "https://randomuser.me/api/";
+    //this.profileSearch(URL2)
+    this.getStatsData()
   }
  
   showScoreResults(response){
-
     function shuffle(a) {
       for (let i = a.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [a[i], a[j]] = [a[j], a[i]];
       }
-      return a.slice(0, 5);
+      return a.slice(0, 10);
     }
-
     this.setState({
         scoreResults: shuffle(response.results)
     })
   }
-  showProfileResults(response){
+
+  // showProfileResults(response){
+  //   alert(response)
+  //   this.setState({
+  //       profileResults: response.results
+  //   })
+  // }
+
+  showStatsResults(response){
     this.setState({
-        profileResults: response.results
+        profileResults: response
     })
+  }
+
+  getStatsData() {
+    $.ajax({
+      url: wsbaseurl+'/profile',
+      dataType : 'json',
+      data: { email: null, token: null },
+      type: "GET",
+      cache: false, 
+      success: function (data) {
+        if (data && data.status === "OK") {
+
+          this.setState({
+              challenge_name: data.current_challenge.name,
+              current_percent: data.current_challenge.current_percent,
+              nick_name: data.nick_name,
+              total_calories: data.total_calories,
+              total_steps: data.total_steps,
+              total_meters: data.total_meters
+          })
+
+          //this.showStatsResults(basicObj);
+        }
+        this.setState({
+          avatar: "https://randomuser.me/api/portraits/men/"+Math.floor((Math.random() * (this.max - this.min)))+".jpg",
+        });
+      }.bind(this),
+      complete: function () {
+        this.setState({
+            profileLoaded: true,
+        })
+      }.bind(this),
+      error: function(xhr, ajaxOptions, thrownError) {
+        console.log(thrownError);      
+      }
+    });
   }
 
   scoreSearch(URL){
@@ -484,189 +569,489 @@ export class Stats extends Component {
         }.bind(this)
     });
   }
-  profileSearch(URL){
-    $.ajax({
-        type: "GET",
-        dataType: 'jsonp',
-        url: URL,
-        success: function(response){
-            this.showProfileResults(response);
-        }.bind(this)
-    });
-  }
+  // profileSearch(URL){
+  //   $.ajax({
+  //       type: "GET",
+  //       dataType: 'jsonp',
+  //       url: URL,
+  //       success: function(response){
+  //           this.showProfileResults(response);
+  //       }.bind(this)
+  //   });
+  // }
 
   handleToast(tab) {
     setTimeout(() => {
-      toast("Happy to see you again "+localStorage.getItem('nickname')+"!");
+      if (! toast.isActive(this.toastId)) {
+        this.toastId = toast("Happy to see you again "+localStorage.getItem('nickname')+"!");
+      }
     }, 3500);
   }
 
   render(){
-
-      return(
-        this.state.profileResults.length > 0 ?
-          <div className="container">
-            <div className="row">
-              <ProfileResults profileResults={this.state.profileResults}  />
-              <ChangingProgressbar percentages={this.state.random} />
-              <ScoreResults scoreResults={this.state.scoreResults} />
-              <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'toaster'} autoClose={false} closeButton={<ToastCloseButton YouCanPassAnyProps="foo" />} />
-              <BottomNav history={this.props.history} logged={true} />
-            </div>
-          </div>  
-        :
-          <div className="container">
-            <div className="row text-center">Loading...</div>
+    //alert(this.state.imageStatus)
+    return(
+      this.state.profileLoaded ?
+        <div className="container">
+          <div className="row">
+            <ProfileResult nick_name={this.state.nick_name} total_calories={this.state.total_calories} total_steps={this.state.total_steps} total_meters={this.state.total_meters} avatar={this.state.avatar} />
+            <ChangingProgressbar percentages={this.state.current_percent*100} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} />
+            <Graph />
+            <ScoreResults scoreResults={this.state.scoreResults} />
+            <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'helloToast'} autoClose={false} closeButton={<ToastCloseButton YouCanPassAnyProps="foo" />} />
             <BottomNav history={this.props.history} logged={true} />
           </div>
-      )
-
+        </div>  
+      :
+        <div className="container">
+          <div className="row text-center">
+            <div className="loader">
+              <div className="loader__bar"></div>
+              <div className="loader__bar"></div>
+              <div className="loader__bar"></div>
+              <div className="loader__bar"></div>
+              <div className="loader__bar"></div>
+              <div className="loader__ball"></div>
+            </div>
+          </div>
+          <BottomNav history={this.props.history} logged={true} />
+        </div>
+    )
   }
-
 }
 
-export class ProfileResults extends Component {
-  render(){
-      var resultItems = this.props.profileResults.map(function(result, index) {
-          return <ProfileResultItem key={index} picture={result.picture.large} firstName={result.name.first} lastName={result.name.last} />
-      });
-      return resultItems;
-  }
-};
 
-export class ProfileResultItem extends Component {
-  
+export class ProfileResult extends Component {
 
   constructor(props){
     super(props);
     this.state = {
-      randomCal: null,
-      randomSte: null
+      nick_name: null,
+      total_calories: null,
+      total_steps: null,
+      total_meters: null,
+      avatar: null
     };
   }
 
   componentDidMount(){
     this.setState({
-      randomCal: this.min + Math.floor((Math.random() * (this.max - this.min))),
-      randomSte: this.min + Math.floor((Math.random() * (this.max - this.min))*10),
+      nick_name: this.props.nick_name,
+      total_calories: this.props.total_calories,
+      total_steps: this.props.total_steps,
+      total_meters: this.props.total_meters,
+      avatar: this.props.avatar
     });
+    
   }
 
-  min = 10;
-  max = 1000;
+  render(){
+    return (
+      <div className="col-xs-12 col-sm-6 col-sm-offset-3">
 
-    render(){
-        return (
-          <div className="col-xs-12 col-sm-6 col-sm-offset-3">
-            <div className="row profile text-center">
-              <img src={this.props.picture} alt="" className="img-circle" />
-              <h3>{this.props.firstName} {this.props.lastName}</h3>
-             
-                <div className="col-xs-6 calories">
-                  <div className="row">
-                    
-                    <div className="col-xs-4">
-                      <svg width="17px" height="24px" viewBox="0 0 17 24" xmlns="http://www.w3.org/2000/svg" style={{position: 'relative', left: '5px'}}>
-                          <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                              <g id="User-Dashboard" transform="translate(-56.000000, -178.000000)" fill="#a1197d">
-                                  <g id="icon_calories" transform="translate(56.000000, 178.000000)">
-                                      <path d="M8.34125764,0 C8.52825764,1.515 8.91425764,2.977 8.92925764,4.542 C8.94725764,6.387 8.72625764,8.293 8.09725764,10.024 C7.80225764,10.836 7.39125764,12.228 6.31925764,12.228 C6.30825764,12.228 6.29725764,12.228 6.28625764,12.228 C4.72625764,12.187 5.20125764,9.498 5.20125764,8.487 C2.12125764,9.891 -0.0837423621,13.615 0.766257638,17.732 C1.40325764,20.818 3.81625764,23.272 6.78125764,23.857 C7.28025764,23.956 7.78725764,24.003 8.29525764,24.003 C10.9282576,24.003 13.5602576,22.711 15.0612576,20.491 C17.2072576,17.315 16.4682576,12.515 15.1662576,9.164 C13.9782576,6.105 11.9112576,3.791 9.76925764,1.436 C9.31225764,0.933 8.72825764,0.575 8.34125764,0 M10.9052576,5.813 C11.8672576,7.054 12.7172576,8.385 13.3022576,9.888 C14.3982576,12.709 15.0832576,16.886 13.4032576,19.371 C12.3062576,20.995 10.3482576,22.003 8.29525764,22.003 C7.91225764,22.003 7.53325764,21.967 7.16825764,21.895 C4.98525764,21.464 3.19925764,19.629 2.72525764,17.328 C2.33925764,15.46 2.75425764,13.778 3.57625764,12.49 C3.71025764,12.769 3.88125764,13.033 4.10025764,13.272 C4.64425764,13.866 5.40225764,14.205 6.23425764,14.227 L6.29325764,14.228 L6.31925764,14.228 C8.72625764,14.228 9.56025764,11.88 9.91625764,10.877 L9.97725764,10.707 C10.5072576,9.248 10.8182576,7.606 10.9052576,5.813"></path>
-                                  </g>
-                              </g>
-                          </g>
-                      </svg>
-                    </div>
-
-                    <div className="col-xs-8 pull-right">
-                      <h4 className="title text-right">CALORIES</h4>
-                      <h4 className="value text-right">
-                      <CountUp
-                        className="account-balance"
-                        start={0}
-                        end={this.state.randomCal}
-                        duration={1.5}
-                        useEasing={true}
-                        useGrouping={true}
-                        separator=" "
-                        decimals={0}
-                        decimal=","
-                      />
-                      </h4>
-                    </div>
-                  </div>
-
-                </div>
        
-                <div className="col-xs-6 steps">
-                  <div className="row">
-                    <div className="col-xs-8 pull-left">
-                      <h4 className="title text-left">STEPS</h4>
-                      <h4 className="value text-left">
-                      <CountUp
-                        start={0}
-                        end={this.state.randomSte}
-                        duration={1.5}
-                        useEasing={true}
-                        useGrouping={true}
-                        separator=""
-                        decimals={0}
-                      />
-                      </h4>
-                    </div>
 
-                    <div className="col-xs-4">
-                      <svg width="24px" height="23px" viewBox="0 0 24 23" xmlns="http://www.w3.org/2000/svg" style={{position: 'relative', right: '5px'}}>
-                          <defs>
-                              <polygon id="path-1" points="12.00025 0 24 0 24 23 12.00025 23 0.0005 23 0.0005 0"></polygon>
-                          </defs>
-                          <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                              <g id="User-Dashboard" transform="translate(-289.000000, -181.000000)">
-                                  <g id="icon_steps" transform="translate(289.000000, 181.000000)">
-                                      <g>
-                                          <mask id="mask-2" fill="white">
-                                              <use xlinkHref="#path-1"></use>
-                                          </mask>
-                                          <g id="Clip-2"></g>
-                                          <path d="M22.0005,0 L15.9995,0 C14.8955,0 14.0005,0.896 14.0005,2 L14.0005,7 L9.0005,7 C7.8965,7 7.0005,7.896 7.0005,9.001 L7.0005,14 L1.9995,14 C0.8955,14 0.0005,14.896 0.0005,16 L0.0005,21 C0.0005,22.104 0.8955,23 1.9995,23 L22.0005,23 C23.1045,23 24.0005,22.104 24.0005,21 L24.0005,2 C24.0005,0.896 23.1045,0 22.0005,0 M22.0005,2 L22.0005,2 L22.0005,21 L2.0005,21 L1.9995,16 L7.0005,16 L9.0005,16 L9.0005,14 L9.0005,9 L14.0005,9 L16.0005,9 L16.0005,7 L15.9995,2 L22.0005,2" id="Fill-1" fill="#a1197d" mask="url(#mask-2)"></path>
-                                      </g>
-                                  </g>
-                              </g>
-                          </g>
-                      </svg>
-                    </div>
+        <div className="row profile text-center">
 
-                  </div>
+          <img src={this.state.avatar} alt=""  className="img-circle" />
 
+          <h3>{this.state.nick_name}</h3>
+         
+            <div className="col-xs-6 calories">
+              <div className="row">
+                
+                <div className="col-xs-4">
+                  <IconCalories />
                 </div>
 
-              
-            </div>  
-          </div> 
-        );
-    }
+                <div className="col-xs-8 pull-right">
+                  <h4 className="title text-right">CALORIES</h4>
+                  <h4 className="value text-right">
+                  <CountUp
+                    className="account-balance"
+                    start={0}
+                    end={this.state.total_calories}
+                    duration={1.5}
+                    useEasing={true}
+                    useGrouping={true}
+                    separator=" "
+                    decimals={0}
+                    decimal=","
+                  />
+                  </h4>
+                </div>
+              </div>
+
+            </div>
+   
+            <div className="col-xs-6 steps">
+              <div className="row">
+                <div className="col-xs-8 pull-left">
+                  <h4 className="title text-left">STEPS</h4>
+                  <h4 className="value text-left">
+                  <CountUp
+                    start={0}
+                    end={this.state.total_steps}
+                    duration={1.5}
+                    useEasing={true}
+                    useGrouping={true}
+                    separator=""
+                    decimals={0}
+                  />
+                  </h4>
+                </div>
+
+                <div className="col-xs-4">
+                  <IconSteps />
+                </div>
+              </div>
+            </div>
+        </div>  
+      </div> 
+    );
+  }
 };
 
 export class ScoreResults extends Component {
   render(){
       var resultItems = this.props.scoreResults.map(function(result, index) {
-          return <ScoreResultItem key={index} trackName={result.trackName} index={index+1} />
+          return <ScoreResultItem key={index.toString()} nickname={result.name.first} index={index+1} />
       });
       return(
-          <div className="col-xs-12 fullwidth">
-            <ul className="scoreResults">
-                {resultItems}
-            </ul>
+          <div className="wallOfFame">
+
+            <div className="col-xs-6 sepa"></div>
+            <div className="col-xs-6"></div>
+
+            <div className="col-xs-12 text-center">
+              <SVGInline svg={ icon_rank } style={{marginLeft: '-3px'}} />
+            </div>
+
+            <div className="col-xs-12">
+              <h4>Wall of fame</h4>
+            </div>
+            <div className="col-xs-12 fullwidth">
+              <div className="scoreResultsTitle">
+                  <span className="nick_name">Nickname</span>
+                  <span className="stars">Prestige</span>
+                  <span className="total_meters">Steps</span>
+              </div>
+              <ul className="scoreResults">
+                  {resultItems}
+              </ul>
+            </div>   
+          </div>     
+      );
+  }
+};
+
+export class ScoreResultItem extends Component {
+
+  constructor(props){
+    super(props);
+    this.state = {
+      wof_meters: null,
+      wof_stars: null
+    };
+  }
+
+  componentDidMount(){
+    let wof_value = Math.floor(Math.random() * 5000)
+    this.setState({
+      wof_meters: wof_value,
+      wof_stars: Math.floor(wof_value/1000)
+    });
+  }
+
+  getStars(){
+    var stars=[];
+    for(var i=0;i<this.state.wof_stars;i++ ){
+      stars.push(<Star key={i} />);
+    }
+    return stars;
+  }
+
+  render(){
+      return (
+        <li>
+          <span className="badge"><span>{this.props.index}</span></span>
+          <span className="nick_name">{this.props.nickname}</span>
+          <span className="stars">{this.getStars()}</span>
+          <span className="total_meters">{this.state.wof_meters}</span>
+        </li>
+      );
+  }
+};
+
+
+
+export class History extends React.Component {
+
+  constructor(props){
+    super(props);
+    this.state = {
+
+    };
+  }
+
+  render(){
+
+      return(
+
+          <div className="col-xs-12 history">
+
+            <div className="col-xs-6 sepa"></div>
+            <div className="col-xs-6"></div>
+
+            <div className="col-xs-12 text-center">
+              <SVGInline svg={ icon_rank } style={{marginLeft: '-3px'}} />
+            </div>
+
+
+            <h4>History</h4>
+
+            <ContainerDimensions> 
+            { ({ width, height }) => 
+
+            <BarChart
+              
+              axes={(this.state.componentWidth) > 400 ? true : true}
+              yAxisOrientRight
+              yTickNumber={5}
+              colorBars
+              grid
+              width={width - 20}
+              height={width / 1.7 }
+              barWidth={30}
+
+              xType={'time'}
+              xDomainRange={['18-Dec-17', '26-Dec-17']}
+              yDomainRange={[50, 500]}
+              data={[
+                { x: '18-Dec-17', y: 200, color: '#a1197d' },
+                { x: '19-Dec-17', y: 160, color: '#f5e8f2' },
+                { x: '20-Dec-17', y: 350, color: '#a1197d' }
+              ]}
+            />
+            }
+            </ContainerDimensions> 
+
           </div>        
       );
   }
 };
-export class ScoreResultItem extends Component {
-    render(){
-        return (
-          <li><span className="badge">{this.props.index}</span> {this.props.trackName}</li>
-        );
+
+
+function getRandomInt(min, max) {  
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function compareNumbers(a, b) {  
+  return a - b;
+}
+
+/* https://codepen.io/maydie/pen/WvpzPG */
+export class Graph extends React.Component {
+
+
+  constructor(props){
+    super(props);
+    this.state = {
+      data: [],
+      series: [],
+      labels: [],
+      colors: []
+    };
+
+
+    this.onChange = this.onChange.bind(this);
+
+  }
+
+
+
+  componentDidMount(){
+
+    
+    //setInterval(this.populateArray, 2000);
+
+    this.setState({
+      //data: [],
+      series: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
+      labels: ['Day steps', 'Maximum weekly steps'],
+      colors: ['#A1197D', '#F5E8F1']
+    });
+  }
+
+  populateArray(){
+    var data = [[72], [215], [142], [49], [0]],
+        series = 5
+
+    // for (var i = series; i--; ) {
+    //   var tmp = [];
+    //   tmp.push(getRandomInt(0, 300));
+    //   data.push(tmp);     
+    // }
+    this.setState({ data: data });
+    
+  }
+
+  onChange(isVisible) {
+    console.log('Element is now %s', isVisible ? 'visible' : 'hidden');
+
+    if(isVisible){
+      this.populateArray();
     }
+   
+  };
+
+  render() {
+    return (
+
+      
+
+      <div className="col-xs-12 history">
+
+        <div className="col-xs-6 sepa"></div>
+        <div className="col-xs-6"></div>
+
+        <div className="col-xs-12 text-center">
+          <IconStats />
+        </div>
+
+        <div className="col-xs-12">
+          <h4>History</h4>
+          <section>
+    
+            <VisibilitySensor
+              delayedCall={true}
+              partialVisibility='bottom'
+              offset={{bottom:150}}
+              onChange={this.onChange}
+            >
+
+              <Charts
+                data={ this.state.data }
+                labels={ this.state.series }
+                colors={ this.state.colors }
+                height={ 150 }
+                opaque={ true }
+              />
+            
+            </VisibilitySensor>
+            
+          
+            <Legend labels={ this.state.labels } colors={ this.state.colors } />
+          </section>
+        </div>
+      </div>
+      
+    );
+  }
 };
+
+
+class Legend extends React.Component {
+
+  render() {
+    var labels = this.props.labels,
+      colors = this.props.colors;
+
+    return (
+      <div className="Legend">
+        { labels.map(function(label, labelIndex) {
+          return (
+          <div key={labelIndex}>
+            <span className="Legend--color" style={{ backgroundColor: colors[labelIndex % colors.length]  }} />
+            <span className="Legend--label">{ label }</span>
+          </div>
+          );
+        }) }
+      </div>
+    );
+  }
+};
+
+class Charts extends React.Component { 
+
+  render() {
+
+    //alert(this.props.data)
+
+    var self = this,
+      data = this.props.data,
+      layered = this.props.grouping === 'layered' ? true : false,
+      stacked = this.props.grouping === 'stacked' ? true : false,
+      opaque = this.props.opaque,
+      max = 0;
+
+    for (var i = data.length; i--; ) {
+      for (var j = data[i].length; j--; ) {
+        if (data[i][j] > max) {
+          max = data[i][j];
+        }
+      }
+    }
+
+
+    return (
+      
+      <div className={ 'Charts' + (this.props.horizontal ? ' horizontal' : '' ) }>
+        { data.map(function (serie, serieIndex) {
+          var sortedSerie = serie.slice(0),
+            sum;
+
+          sum = serie.reduce(function (carry, current) {
+            return carry + current;
+          }, 0);
+          sortedSerie.sort(compareNumbers);           
+
+          return (
+            <div className={ 'Charts--serie ' + (self.props.grouping) }
+              key={ serieIndex }
+              style={{ height: self.props.height ? self.props.height: 'auto' }}
+            >
+            <label>{ self.props.labels[serieIndex] }</label>
+            { serie.map(function (item, itemIndex) {
+
+              var color = self.props.colors[itemIndex], 
+                style,
+                size = item / (stacked ? sum : max) * 100;
+
+              style = {
+                backgroundColor: color,
+                opacity: opaque ? 1 : (item/max + .05)
+              };
+
+              if (self.props.horizontal) {
+                style['width'] = size + '%';
+              } else {                
+                style['height'] = size + '%';           
+              }
+
+
+
+
+              return (
+               <div
+                className={ 'Charts--item ' + (self.props.grouping) }
+                style={ style }
+                key={ itemIndex }
+              >
+                <b style={{ color: color }}>{ item }</b>
+               </div>
+               
+            );
+            }) }
+            </div>
+          );
+        }) }
+      </div>
+      
+    );
+  }
+};
+
 
 
 

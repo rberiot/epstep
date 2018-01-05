@@ -13,6 +13,9 @@ select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset;
   transition: background-color 5000s ease-in-out 0s;
 }
+:focus {
+    outline: none;
+}
 
 button {
   border-radius: 0 !important;
@@ -26,6 +29,27 @@ button[type=Submit] {
 .uppercase{
   text-transform: uppercase;
 }
+.account{
+  margin: 5px auto;
+}
+.account span{
+  color: #a1197d;
+  font-weight: bold;
+  font-size: 0.625em; /* 10px/16px = 0.625*/
+  text-transform: uppercase;
+  margin-right: 8px;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+.account svg{
+  vertical-align: middle;
+  margin-top: -6px;
+}
+.account .sepa{
+  border-right:3px solid #a1197d;
+  min-height: 20px;
+}
 
 .profile{
   margin: 15px 0;
@@ -34,9 +58,11 @@ button[type=Submit] {
 .profile .img-circle{
   background:#eee;
   padding: 5px;
-  max-width: 89px;
-  min-height: 89px;
+  max-width: 94px;
+  min-height: 94px;
 }
+
+
 .profile h3,
 .profile h4{
   color: #a1197d;
@@ -58,7 +84,9 @@ button[type=Submit] {
 .profile h4.value{
   font-weight: bold;
   font-size: 0.875em; /* 14px/16px = 0.875*/
+  margin-bottom: 0px;
 }
+
 .profile svg{
   margin-top: 15px;
 }
@@ -68,13 +96,22 @@ button[type=Submit] {
 .scoreResults{
   list-style: none;
   padding: 0;
-  margin-top: 15px;
 }
+
 .scoreResults li{
   width: 100%;
   min-height: 48px;
   color: #a1197d;
-  padding-top: 5px;
+  display: flex;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.scoreResultsTitle span,
+.scoreResults li > span{
+  flex-wrap: wrap;
+  width: 20%;
 }
 .scoreResults li:nth-child(odd) {
   background-color: rgba(161, 25, 125, 0.05);
@@ -82,14 +119,67 @@ button[type=Submit] {
 .scoreResults li:nth-child(even) {
   background-color: rgba(161, 25, 125, 0.1);
 }
+.scoreResultsTitle{
+  margin-top: 15px;
+  width: 100%;
+  color: rgba(161, 25, 125, 0.5);
+  display: flex;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.scoreResultsTitle .badge{
+  margin: 6px 12px;
+  width: 33px;
+}
+.scoreResultsTitle .nick_name{
+  width: calc(70% - 57px);
+  margin-left: 57px;
+}
+.scoreResultsTitle .stars{
+  width: 15%;
+}
+.scoreResultsTitle .total_meters{
+  width: calc(15% - 12px);
+  text-align: right;
+  margin-right: 12px;
+}
+
 .scoreResults li .badge{
   margin: 6px 12px;
-  padding: 10px 12px;
+  padding: 10px;
   background-color: rgba(161, 25, 125, 1);
   border-radius: 50%;
   position: relative;
-  top: -3px;
+  max-width: 33px;
+  max-height: 33px;
+  flex: 1;
 }
+
+.scoreResults li .nick_name{
+  width: calc(70% - 57px);
+  text-transform: capitalize;
+}
+
+.scoreResults li .stars{
+  width: 15%;
+}
+.scoreResults li .total_meters{
+  width: calc(15% - 12px);
+  text-align: right;
+  margin-right: 12px;
+}
+
+
+
+.label{
+  fill: #a1197d;
+}
+ 
 
 div[data-css-npp5qg]{
   top: 2em;
@@ -108,21 +198,47 @@ div[data-css-npp5qg]{
     padding: 0;
   }
 }
-.toaster[data-css-k0o5uw]{
+.helloToast[data-css-k0o5uw]{
   font-family: 'Roboto', sans-serif;
   color: #fff;
   background-color: #a1197d;
   padding: 0 20px;
   margin: 0 auto;
 }
-.toaster span{
+.helloToast span{
   opacity: 0.5;
   display: block;
   line-height: 48px;
 }
-.toaster span:hover{
+.helloToast span:hover{
   opacity: 1;
 }
+
+.cookieToast{
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+  background-color: #fff;
+  padding: 0 20px;
+  margin: 0 auto;
+  box-shadow: 0 1px 10px 0 rgba(0, 0, 0, .3), 0 4px 20px 0 rgba(0, 0, 0, .4);
+}
+.cookieToast > div{
+  margin-bottom: 20px;
+}
+.cookieToast h2,
+.cookieToast p{
+  color: #333;
+}
+.cookieToast button{
+  color: #a1197d;
+  text-transform: uppercase;
+  float: right;
+  margin-top: 10px;
+  margin-left: 20px;
+  border:none;
+  background: none;
+}
+
 
 #bottomnav .tabs .active path,
 #bottomnav .tabs .active g{
@@ -137,10 +253,17 @@ div[data-css-npp5qg]{
 .overallTitle{
   position: absolute;
   z-index: 9999999;
-  width: calc(100% - 30px);
+  width: calc(100% - 0px);
   text-align: center;
   color: #fff;
   font-size: 14px;
+}
+.overallLoader{
+  position: absolute;
+  top: calc(50% - 100px);
+  z-index: 9999999;
+  width: calc(100% - 0px);
+
 }
 
 .tabs .tab{
@@ -185,7 +308,8 @@ div[data-css-npp5qg]{
   margin-top: 10px;
 }
 
-.CircularProgressdata .sepa{
+.wallOfFame .sepa,
+.history .sepa{
   border-right:3px solid #a1197d;
   min-height: 40px;
   margin-bottom: 10px;
@@ -193,10 +317,24 @@ div[data-css-npp5qg]{
 
 .CircularProgressdata h4.value{
   font-weight: bold;
-  font-size: 0.875em; /* 14px/16px = 0.875*/
   color: #a1197d;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size:110%;
 }
 
+.CircularProgressdata .challenge_title small{
+  font-weight: 300;
+  font-style: italic;
+  font-size: 0.5em; /* 8px/16px = 0.5*/
+  font-size:50%;
+  color: #a1197d;
+  position: relative;
+  top: -7px;
+}
+.CircularProgressdata .challenge_meters h4.value{
+  margin-top: 0;
+}
 .CircularProgressbar .CircularProgressbar-background {
   fill: #d6d6d6;
 }
@@ -226,7 +364,29 @@ div[data-css-npp5qg]{
   stroke: transparent;
 }
 
+.progress_ctn {
+  display: flex;
 
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+}
+
+.progress_ctn > div.challenge_title{
+  flex: 0;
+  justify-content: flex-start;
+}
+.progress_ctn > div.challenge_icon{
+  width: 50%; 
+  padding-bottom: 55%; 
+  height: 1px; 
+  overflow: visible 
+}
+.progress_ctn > div.challenge_meters{
+  flex: 0;
+  justify-content: flex-end;
+}
 
 @media all and (min-width: 480px) {
   .Login {
@@ -236,5 +396,114 @@ div[data-css-npp5qg]{
   .Login form {
     margin: 0 auto;
     max-width: 320px;
+  }
+}
+
+
+
+
+.Charts {
+  margin: 0 auto;
+  background-color: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+  padding: 0 0 30px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.Charts--serie {
+  height: 100%;
+  margin: 0 30px 0 0;
+  display: inline-block;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+  -webkit-transform-origin: 0 100%;
+          transform-origin: 0 100%;
+  -webkit-animation: slideUp .9s;
+          animation: slideUp .9s;
+  position: relative;
+  background: #F5E8F1;
+  /*border-bottom: 1px solid #c2c2c2;*/
+}
+.Charts--serie:last-child {
+  margin: 0;
+}
+.Charts--serie.stacked {
+  display: block;
+}
+.Charts--serie label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -25px;
+  font-size: 10px;
+  font-weight: bold;
+  text-align: center;
+  color: #A1197D;
+}
+.Charts--item {
+  background-color: #43A19E;
+  display: inline-block;
+  margin: 0;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  -webkit-transition: height 1s ease-out, width 1s ease-out;
+  transition: height 1s ease-out, width 1s ease-out;
+  position: relative;
+  text-align: center;
+  border-radius: 2px 2px 0 0;
+}
+.Charts--item b {
+  position: relative;
+  font-family: Helvetica, sans-serif;
+  font-size: 10px;
+  top: -20px;
+  color: #43A19E;
+}
+.Legend--color {
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 2px;
+  width: 16px;
+  height: 16px;
+}
+.Legend--label {
+  display: inline-block;
+  vertical-align: middle;
+  font-family: Helvetica, sans-serif;
+  font-size: 12px;
+  margin: 0 0 0 5px;
+}
+@-webkit-keyframes slideUp {
+  from {
+    -webkit-transform: scaleY(0);
+            transform: scaleY(0);
+  }
+  to {
+    -webkit-transform: scaleY(1);
+            transform: scaleY(1);
+  }
+}
+@keyframes slideUp {
+  from {
+    -webkit-transform: scaleY(0);
+            transform: scaleY(0);
+  }
+  to {
+    -webkit-transform: scaleY(1);
+            transform: scaleY(1);
   }
 }

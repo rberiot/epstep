@@ -18,3 +18,13 @@ footer {
     height: 48px;
     width: 100%;
 }
+
+
+.cookieToast{
+  font-family: 'Roboto', sans-serif;
+  color: #fff;
+  background-color: #bed000;
+  padding: 0 20px;
+  margin: 0 auto;
+}
+ 
