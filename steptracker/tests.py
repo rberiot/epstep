@@ -121,9 +121,23 @@ class GetDistanceViewTest(TestCase):
         from django.test import RequestFactory
         from django.core.urlresolvers import reverse
         from views import distance
+        from models import Level, StairWell
         factory = RequestFactory()
+        well = StairWell(building='ASP', shaft='South-East')
+        well.save()
 
-        rq = factory.get(reverse('distance'), data={'qr_id_1': '1234', 'qr_id_2': '5678'})
+        L0 = Level(stairwell=well, floorNumber=0, steps=0) #steps for this one should never matter.
+        L0.save()
+        L1 = Level(stairwell=well, floorNumber=1)
+        L1.save()
+        L2 = Level(stairwell=well, floorNumber=2)
+        L2.save()
+        L3 = Level(stairwell=well, floorNumber=3)
+        L3.save()
+        L8 = Level(stairwell=well, floorNumber=8)
+        L8.save()
+
+        rq = factory.get(reverse('distance'), data={'qr_id_1': L0.pk, 'qr_id_2': L3.pk})
 
         response = distance(rq)
         self.assertIsNotNone(response)
@@ -139,7 +153,7 @@ class LogDistanceViewTest(TestCase):
         from views import log_distance
         factory = RequestFactory()
 
-        rq = factory.get(reverse('log_distance'), data={'token': '01234'})
+        rq = factory.get(reverse('log_distance'), data={'token': '01234', 'distance': 25})
 
         response = log_distance(rq)
         self.assertIsNotNone(response)
@@ -161,3 +175,132 @@ class ProfileViewTest(TestCase):
         self.assertIsNotNone(response)
         data = json.loads(response.content)
         #self.assertEqual(data['email'], 'ee@ext.europarl.europa.eu')
+
+
+class UserStatsTest(TestCase):
+
+    def test_add(self):
+        from models import UserStats
+        import datetime
+        today = datetime.datetime(2017, 10, 20)
+
+        monday = today - datetime.timedelta(days=today.weekday())
+        tuesday = monday + datetime.timedelta(days=1)
+        wednesday = monday + datetime.timedelta(days=2)
+        thursday = monday + datetime.timedelta(days=3)
+        friday = monday + datetime.timedelta(days=4)
+
+        s = UserStats()
+        self.assertEqual(s.monday_steps, 0)
+        s.add(25, monday)
+        self.assertEqual(s.monday_steps, 25)
+        s.add(25, monday)
+        self.assertEqual(s.monday_steps, 50)
+
+        s.add(7, tuesday)
+        self.assertEqual(s.tuesday_steps, 7)
+        s.add(89, wednesday)
+        self.assertEqual(s.wednesday_steps, 89)
+        s.add(2, thursday)
+        self.assertEqual(s.thursday_steps, 2)
+        s.add(3, friday)
+        self.assertEqual(s.friday_steps, 3)
+
+    def test_total_steps(self):
+        from models import UserStats
+        import datetime
+        today = datetime.datetime(2017, 10, 20)
+
+        monday = today - datetime.timedelta(days=today.weekday())
+        tuesday = monday + datetime.timedelta(days=1)
+        wednesday = monday + datetime.timedelta(days=2)
+        thursday = monday + datetime.timedelta(days=3)
+        friday = monday + datetime.timedelta(days=4)
+        saturday = monday + datetime.timedelta(days=5)
+        sunday = monday + datetime.timedelta(days=6)
+
+        s = UserStats()
+        s.add(25, monday)
+        s.add(25, monday)
+
+        s.add(7, tuesday)
+        s.add(89, wednesday)
+        s.add(2, thursday)
+        s.add(3, friday)
+        s.add(5, saturday)
+        s.add(9, sunday)
+
+        self.assertEqual(s.total_steps(), 25+25+7+89+2+3+5+9)
+
+
+class UserProfileViewTest(TestCase):
+    def test_update_profile(self):
+        from models import User, AuthToken
+        from django.test import RequestFactory
+        from django.core.urlresolvers import reverse
+        from views import update_profile
+
+        u = User()
+        u.email = 'test@test.com'
+        u.public_name = 'TEST'
+        u.save()
+
+        auth = AuthToken()
+        auth.token_string = AuthToken.gen_token_string('test@test.com')
+        auth.user = u
+        auth.valid = True
+        auth.save()
+
+        factory = RequestFactory()
+
+        rq = factory.post(reverse('update_profile'), data={'token': auth.token_string, 'nickname': 'El Nicknamo'})
+        response = update_profile(rq)
+        data = json.loads(response.content)
+        self.assertEqual(data['status'], 'OK')
+        u = User.objects.get(pk=u.pk)
+        self.assertEqual(u.public_name, 'El Nicknamo')
+
+class UserLogDistanceViewTest(TestCase):
+    def test_log_distance(self):
+        from models import User, AuthToken, Level, StairWell, UserStats
+        from django.test import RequestFactory
+        from django.core.urlresolvers import reverse
+        from views import log_distance, distance, profile
+
+        u = User()
+        u.email = 'test@test.com'
+        u.public_name = 'TEST'
+        u.save()
+
+        auth = AuthToken()
+        auth.token_string = AuthToken.gen_token_string('test@test.com')
+        auth.user = u
+        auth.valid = True
+        auth.save()
+
+        sw = StairWell(building='ASP', shaft='south')
+        sw.save()
+        level1 = Level(stairwell=sw, floorNumber=1)
+        level1.save()
+        level2 = Level(stairwell=sw, floorNumber=2)
+        level2.save()
+
+        factory = RequestFactory()
+
+        rq = factory.get(reverse('distance'), data={'qr_id_1': level1.pk, 'qr_id_2': level2.pk})
+
+        response = distance(rq)
+
+        data = json.loads(response.content)
+        self.assertEqual(data['distance'], 18)
+
+        rq = factory.post(reverse('log_distance'), data={'token': auth.token_string, 'steps': 18})
+        response = log_distance(rq)
+        data = json.loads(response.content)
+        self.assertEqual(data['status'], 'OK')
+
+        rq = factory.get(reverse('profile'), data={'token': auth.token_string})
+        response = profile(rq)
+        data = json.loads(response.content)
+        self.assertEqual(data['status'], 'OK')
+        self.assertEqual(data['we'], 'OK')

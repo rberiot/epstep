@@ -31,6 +31,28 @@ def validate_token(request):
         return HttpResponse(status=200)
 
 
+def update_profile(request):
+    token_param = request.POST.get('token')
+
+    if not AuthToken.is_token_valid(token_param) and settings.DEBUG is False:
+        return JsonResponse({'status': 'INVALID_TOKEN'})
+
+    name = request.POST.get('nickname')
+    if not name:
+        return HttpResponseBadRequest('nickname post parameter is required')
+
+    from django.utils.html import strip_tags, escape
+    name = escape(strip_tags(name))
+
+    token = AuthToken.objects.get(token_string=token_param)
+    user = token.user
+    user.public_name = name
+
+    user.save()
+
+    return JsonResponse({'status': 'OK'})
+
+
 def auth(request):
     token_param = request.GET.get('token')
     email_param = request.GET['email']
@@ -69,9 +91,16 @@ def distance(request):
     qr2_param_id = request.GET.get('qr_id_2')
 
     if not qr1_param_id and qr2_param_id:
-        HttpResponseBadRequest('qr_id_1 & qr_id_2 parameters are required')
+        return HttpResponseBadRequest('qr_id_1 & qr_id_2 parameters are required')
 
-    return JsonResponse({'status': 'OK', 'distance': '25.5'})
+    if qr1_param_id == qr2_param_id:
+        return HttpResponseBadRequest('qr_id_1 & qr_id_2 parameters must be different')
+
+    from models import Level
+    level_from = Level.objects.get(pk=qr1_param_id)
+    level_to = Level.objects.get(pk=qr2_param_id)
+
+    return JsonResponse({'status': 'OK', 'distance': Level.distance(level_from, level_to)})
 
 
 def qr_info(request):
@@ -80,23 +109,36 @@ def qr_info(request):
     if not qr1_param_id:
         HttpResponseBadRequest('qr_id parameter is required')
 
+    from models import Level
+
+    level = Level.objects.get(pk=qr1_param_id)
+
     return JsonResponse({'status': 'OK',
                          'id': qr1_param_id,
-                         'building': 'ASP',
-                         'level': '5',
-                         'stairwell': 'south-east1'})
+                         'building': level.stairwell.building,
+                         'shaft': level.stairwell.shaft,
+                         'level': level.floorNumber,
+                         })
 
 
 def log_distance(request):
-    token_param = request.GET.get('token')
+    from models import UserStats
+    token_param = request.POST.get('token')
     if not AuthToken.is_token_valid(token_param) and settings.DEBUG is False:
         return JsonResponse({'status': 'INVALID_TOKEN'})
 
-    distance = request.GET.get('distance')
-    if distance:
-        return JsonResponse({'status': 'ok'})
+    steps = request.POST.get('steps')
+    if not steps:
+        HttpResponseBadRequest('steps parameter is required')
 
-    return HttpResponseBadRequest('distance parameter is missing')
+    steps = int(steps)
+
+    token = AuthToken.objects.get(token_string=token_param)
+    user = token.user
+
+    UserStats.record_stats(user, steps)
+
+    return JsonResponse({'status': 'OK'})
 
 
 def profile(request):
@@ -104,11 +146,16 @@ def profile(request):
     if not AuthToken.is_token_valid(token_param) and settings.DEBUG is False:
         return JsonResponse({'status': 'INVALID_TOKEN'})
 
+    from models import UserStats
+    token = AuthToken.objects.get(token_string=token_param)
+    stats = UserStats.get_weekly_stats(token.user)
+
     return JsonResponse({'status': 'OK',
                          'nick_name': 'Johnny H',
                          'total_calories': '4852',
                          'total_steps': '74165',
                          'total_meters': '154',
+                         'weekly_stats': stats,
                          'current_challenge': {
                              'id': '1',
                              'name': 'Atomium',
