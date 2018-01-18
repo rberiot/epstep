@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^qr_info$', views.qr_info, name='qr_info'),
     url(r'^update_profile$', views.update_profile, name='update_profile'),
     url(r'^top_ten', views.top_ten, name='top_ten'),
+    url(r'^qr_list', views.qr_list, name='qr_list'),
 ]
 """urlpatterns = ['restaurant.views',
                url(r'^$', cache_page(60 * 15)(TemplateView.as_view(template_name="home.haml")), name='home'),

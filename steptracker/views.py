@@ -184,3 +184,34 @@ def top_ten(request):
     return JsonResponse({'status': 'OK',
                          'top_10': top10,
                          })
+
+
+def qr_list_json(request):
+    from models import Level
+    res = []
+    for qr in Level.objects.all():
+        res.append({'id': qr.pk,
+                    'building': qr.stairwell.building,
+                    'shaft': qr.stairwell.shaft,
+                    'level': qr.floorNumber,
+                    'url': settings.PUBLIC_URL + '/#/Scan?qr_id=' + str(qr.pk)})
+    return JsonResponse({'status': 'OK', 'qr': res})
+
+
+def qr_list(request):
+    import csv
+    from models import Level
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="qr.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['id', 'building', 'shaft', 'level', 'url'])
+    for qr in Level.objects.all():
+        writer.writerow([qr.pk,
+                         qr.stairwell.building,
+                         qr.stairwell.shaft,
+                         qr.floorNumber,
+                         settings.PUBLIC_URL + '/#/Scan?qr_id=' + str(qr.pk)
+                         ])
+    return response

@@ -253,12 +253,13 @@ class UserProfileViewTest(TestCase):
 
         factory = RequestFactory()
 
-        rq = factory.post(reverse('update_profile'), data={'token': auth.token_string, 'nickname': 'El Nicknamo'})
+        rq = factory.get(reverse('update_profile'), data={'token': auth.token_string, 'nickname': 'El Nicknamo'})
         response = update_profile(rq)
         data = json.loads(response.content)
         self.assertEqual(data['status'], 'OK')
         u = User.objects.get(pk=u.pk)
         self.assertEqual(u.public_name, 'El Nicknamo')
+
 
 class UserLogDistanceViewTest(TestCase):
     def test_log_distance(self):
@@ -294,7 +295,7 @@ class UserLogDistanceViewTest(TestCase):
         data = json.loads(response.content)
         self.assertEqual(data['distance'], 18)
 
-        rq = factory.post(reverse('log_distance'), data={'token': auth.token_string, 'steps': 18})
+        rq = factory.get(reverse('log_distance'), data={'token': auth.token_string, 'steps': 18})
         response = log_distance(rq)
         data = json.loads(response.content)
         self.assertEqual(data['status'], 'OK')
@@ -303,4 +304,24 @@ class UserLogDistanceViewTest(TestCase):
         response = profile(rq)
         data = json.loads(response.content)
         self.assertEqual(data['status'], 'OK')
-        self.assertEqual(data['we'], 'OK')
+
+
+class qr_list_test(TestCase):
+    def test_qr_list(self):
+        from models import Level, StairWell
+        from django.test import RequestFactory
+        from django.core.urlresolvers import reverse
+        from views import qr_list
+
+        sw = StairWell(building='ASP', shaft='south')
+        sw.save()
+        level1 = Level(stairwell=sw, floorNumber=1)
+        level1.save()
+        level2 = Level(stairwell=sw, floorNumber=2)
+        level2.save()
+
+        factory = RequestFactory()
+
+        rq = factory.get(reverse('qr_list'))
+
+        response = qr_list(rq)
