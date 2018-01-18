@@ -32,12 +32,12 @@ def validate_token(request):
 
 
 def update_profile(request):
-    token_param = request.POST.get('token')
+    token_param = request.GET.get('token')
 
     if not AuthToken.is_token_valid(token_param) and settings.DEBUG is False:
         return JsonResponse({'status': 'INVALID_TOKEN'})
 
-    name = request.POST.get('nickname')
+    name = request.GET.get('nickname')
     if not name:
         return HttpResponseBadRequest('nickname post parameter is required')
 
@@ -123,11 +123,11 @@ def qr_info(request):
 
 def log_distance(request):
     from models import UserStats
-    token_param = request.POST.get('token')
+    token_param = request.GET.get('token')
     if not AuthToken.is_token_valid(token_param) and settings.DEBUG is False:
         return JsonResponse({'status': 'INVALID_TOKEN'})
 
-    steps = request.POST.get('steps')
+    steps = request.GET.get('steps')
     if not steps:
         HttpResponseBadRequest('steps parameter is required')
 
