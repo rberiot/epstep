@@ -142,7 +142,7 @@ STATICFILES_DIRS = (
 
 PUBLIC_URL = ''
 EMAILS_ENABLED = False
-EMAIL_FROM_STRING = 'TestMan McTestface <test@test.com>'
+EMAIL_FROM_STRING = 'EPStep Team <noreply@test.com>'
 try:
     from settings_local import *
 except ImportError:

@@ -39,7 +39,7 @@ def update_profile(request):
 
     name = request.GET.get('nickname')
     if not name:
-        return HttpResponseBadRequest('nickname post parameter is required')
+        return HttpResponseBadRequest('nickname get parameter is required')
 
     from django.utils.html import strip_tags, escape
     name = escape(strip_tags(name))
@@ -172,9 +172,12 @@ def top_ten(request):
     top10_stats = UserStats.get_weekly_top_10(week)
     top10 = []
     for s in top10_stats:
+        all_time_stats = UserStats.get_all_time_stats(s.user)
+        prestige, challenge_progress = divmod(all_time_stats.get('all_time_steps'), 1000)
+
         top10.append({'name': s.user.public_name,
                       'id': s.user.pk,
-                      'prestige': 2,  # todo
+                      'prestige': prestige,
                       'total_steps': s.total_steps()
                       })
 

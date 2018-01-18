@@ -79,7 +79,7 @@ class UserStats(models.Model):
             week = week - datetime.timedelta(days=week.weekday())
 
         all_stats = UserStats.objects.filter(start_date=week)
-        sorted_stats = sorted(all_stats, key=lambda s: s.total_steps())
+        sorted_stats = sorted(all_stats, key=lambda s: s.total_steps(), reverse=True)
 
         return sorted_stats[:10]
 

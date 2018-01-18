@@ -52,7 +52,7 @@ class AuthToken(models.Model):
         if settings.EMAILS_ENABLED:
             send_mail(
                 'EpStep Account Validation',
-                'Here is the message. ' + public_url + 'validate_token/?validation_key=' +
+                'Here is the message. ' + public_url + '/validate_token?validation_key=' +
                 self.validation_key + '&email=' + self.user.email,
                 settings.EMAIL_FROM_STRING,
                 [self.user.email],
