@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import VisibilitySensor from 'react-visibility-sensor';
+
+import {
+  HashRouter as Router,
+  Route,
+  Redirect,
+  withRouter
+} from 'react-router-dom';
 
 import QrReader from 'react-qr-reader';
 
@@ -16,21 +22,17 @@ import CountUp from 'react-countup';
 
 import { ToastContainer, toast } from 'react-toastify';
 
-import { BarChart } from 'react-easy-chart';
-import ContainerDimensions from 'react-container-dimensions'
-
 import Confetti from 'react-dom-confetti';
 
 import './App.css';
 import './Loader.css';
 
-
-import {IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, Placeholder, IconUserEdit, IconStats, Star} from './SVGicon';
+import {UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo} from './SVGicon';
 
 import SVGInline from "react-svg-inline"
 import icon_rank from './icon_rank.svg'
 
-import logo from './logo.png';
+//import logo from './logo.png';
 import '../node_modules/material-components-web/dist/material-components-web.css';
 
 
@@ -38,7 +40,8 @@ import '../node_modules/material-components-web/dist/material-components-web.css
 const baseUrl = process.env.PUBLIC_URL;
 
 //const wsbaseurl = "http://localhost:8000";
-let wsbaseurl = "https://90dadbd1.ngrok.io";
+let wsbaseurl = "https://1893420d.ngrok.io";
+//let wsbaseurl = "";
 
 const styles = {
   loginErrorStyle: {
@@ -56,6 +59,11 @@ const styles = {
   },
   fullwidth: {
     width: '100%'
+  },
+  bgQR: {
+    height: 'calc(100vh - 80px)',
+    backgroundColor: 'rgba(161, 25, 125, 0.7)',
+    position: 'relative',
   },
   logo: {
     maxWidth: '80%',
@@ -136,8 +144,8 @@ function getAllUrlParams(url) {
 }
 
 
-const toastId = null;
-const ToastCloseButton = ({ YouCanPassAnyProps, closeToast }) => (
+
+const ToastCloseButton = ({ closeToast }) => (
   <span onClick={closeToast}>CLOSE</span>
 );
 
@@ -146,7 +154,8 @@ export class Header extends Component {
   render() {
     return (
       <div className="text-center">
-        <img src={logo} alt="Logo" style={styles.logo}  />
+        {/*<img src={logo} alt="Logo" style={styles.logo}  />*/}
+        <Logo />
       </div>
     );
   }
@@ -181,7 +190,7 @@ export class BottomNav extends Component {
     })
     setTimeout(() => {
       this.props.history.push(route);
-    }, 300)
+    }, 200)
   }
 
   render() {
@@ -193,12 +202,12 @@ export class BottomNav extends Component {
           <Tabs value={this.state.activeTabIndex} onChange={this.handleChange} inkBarStyle={{background: '#fff', display: 'none'}} style={styles.tabs} className="tabs">
             
             <Tab
-              icon={<IconUserTab />}
-              /* label="User" */
-              value='/Login'
-              data-route="/Login"
+              icon={<IconRankTab />}
+              /* label="Wall" */
+              value='/Wall'
+              data-route="/Wall"
               onActive={(event) => this.handleActive(event)}
-              className={this.state.activeTabIndex === '/Login' ? "tab active" : "tab"}
+              className={this.state.activeTabIndex === '/Wall' ? "tab active" : "tab"}
             />
 
             <Tab
@@ -210,9 +219,11 @@ export class BottomNav extends Component {
               className={this.state.activeTabIndex === '/Scan' ? "tab active" : "tab"}
             />
 
+            
+
             <Tab
-              icon={<IconRankTab />}
-              /* label="Stats" */
+              icon={<IconUserTab />}
+              /* label="User" */
               value='/Stats'
               data-route="/Stats"
               onActive={(event) => this.handleActive(event)}
@@ -225,7 +236,7 @@ export class BottomNav extends Component {
       :
       <footer id="bottomnav">
         <div className="text-center">
-          <p>You're not logged</p>
+          
         </div>
       </footer>
     );
@@ -233,183 +244,363 @@ export class BottomNav extends Component {
 }
 
 
-export class Scan extends Component {
+export class Scan extends React.Component {
 
   constructor(props){
     super(props)
+    let match = props.match;
+
     this.state = {
       message: 'SCAN A QR CODE',
       delay: 1000,
-      result: 'No result',
       qrcode_in: null,
-      qrcode_out: null,
-      loading: false
+      distance: null,
+      timeout: null,
+      loading: false,
+      result: false,
+      orientation: null
     }
+    // preserve the initial state in a new object
+    this.baseState = this.state;
     
-    localStorage.removeItem('qrcode_in')
+    localStorage.removeItem('qrcode_in');
     this.handleScan = this.handleScan.bind(this);
+    this.handleError = this.handleError.bind(this);
+    
   }
 
+  componentWillReceiveProps(nextProps){
+    this.setState({result: false})
+  }
+
+
   handleScan(data){
-   
-    if(data){
-      this.setState({
-        result: data,
-        message: 'NOW, PLEASE TAKE THE STAIRS...',
-        loading: true
-      })
 
-      if(localStorage.getItem('qrcode_in') !== null){
+    if(!data)
+      return
 
-        this.setState({
-            qrcode_in: localStorage.getItem('qrcode_in'),
-            qrcode_out: getAllUrlParams(this.state.result).qr_id_2,
-            loading: false
-        })
+    var scan_qr = getAllUrlParams(data).qr_id;
 
-        alert(this.state.qrcode_in +' / '+ this.state.qrcode_out)
+    if(scan_qr == localStorage.getItem('qrcode_in'))
+      return;
 
-        $.ajax({
-            url: wsbaseurl+'/distance',
-            type: "GET",
-            dataType: 'json',
-            data: { qr_id_1: this.state.qrcode_in, qr_id_2: this.state.qrcode_out },
-            success: function(data){
-              if (data && data.status === "OK") {
-                alert(data.distance);
-              }
-            }.bind(this),
-            complete: function(){
-              this.setState({
-                  message: 'THANK YOU, CHECK YOUR STATS !'
-              })
-              localStorage.removeItem('qrcode_in')
-            }.bind(this),
-            error: function(xhr, ajaxOptions, thrownError) {
-              alert(thrownError);      
-            }
-        });
-        
+    if(!scan_qr)
+      return;
 
-      } else{
- 
-        this.setState({
-            qrcode_in: getAllUrlParams(this.state.result).qr_id_1
-        })
-        localStorage.setItem('qrcode_in', this.state.qrcode_in)
-      }
+    navigator.vibrate(500);
+
+    if(localStorage.getItem('qrcode_in') == null || new Date().getTime() > localStorage.getItem('timeout')){
+
+      localStorage.setItem('qrcode_in', scan_qr)
+      localStorage.setItem('timeout', new Date().getTime() + 5*60*1000)
       
 
+      this.setState({
+          message: 'PLEASE TAKE THE STAIRS AND SCAN THE EXIT QR CODE...',
+          loading: true
+      })
+      
+
+    } else {
+      $.ajax({
+          url: wsbaseurl+'/distance',
+          type: "GET",
+          data: { qr_id_1: localStorage.getItem('qrcode_in'), qr_id_2: scan_qr },
+          success: function(data){
+            if (data && data.status === "OK") {
+
+              navigator.vibrate(500);
+              
+              this.setState({
+                message: 'DISTANCE CALCULATION',
+                distance: data.distance,
+                loading: false
+              })
+
+              localStorage.removeItem('qrcode_in');
+
+              if(localStorage.getItem('firstVisit') === 'true'){
+                localStorage.setItem('firstVisit', 'false');
+              }
+
+              $.ajax({
+                  url: wsbaseurl+'/log_distance',
+                  type: "GET",
+                  data: { steps: this.state.distance, token: localStorage.getItem('token') },
+                  success: function(data){
+
+                    console.log(data.status);
+
+                    if (data && data.status === "OK") {
+
+                      this.setState({
+                        message: 'THANK YOU, CHECK YOUR STATS !',
+                        //result: true
+                      })
+                      setTimeout(() => {
+                        this.props.history.push('/Stats');
+                      }, 1000)
+                    }
+
+                  }.bind(this),
+                  error: function(xhr, ajaxOptions, thrownError) {
+                    console.log(thrownError);
+                    this.setState({
+                        message: xhr.responseText,
+                        loading: false
+                    })
+                  }.bind(this)
+              });
+
+            }
+          }.bind(this),
+          error: function(xhr, ajaxOptions, thrownError) {
+            console.log(xhr.responseText);
+            this.setState({
+                message: xhr.responseText,
+                loading: false
+            })
+          }.bind(this)
+      });
     }
   }
 
   handleError(err){
     console.error(err)
+    this.setState({
+        message: err,
+        loading: false
+    })
   }
 
-  handleLogout(event){
+  handleCheckStats(event){
     const { history } = this.props;
-    alert(localStorage.getItem('token'));
-    history.push(baseUrl + "/Login");
+    history.push(baseUrl + "/Stats");
+  }
+
+  /*
+  handleScanAgain = () => {
+    this.setState(this.baseState)
+  }
+  */
+
+
+
+  componentWillMount(){
+    let _this = this;
+
+    if (window.orientation == 90 || window.orientation == -90) {
+      _this.setState({orientation: 'landscape'})
+    } else {
+      _this.setState({orientation: 'portrait'})
+    }
+    
+    window.addEventListener("orientationchange", function() {
+      if (window.orientation == 90 || window.orientation == -90) {
+        _this.setState({orientation: 'landscape'})
+      } else {
+        _this.setState({orientation: 'portrait'})
+      }
+    });
+  
+  }
+
+
+  componentDidMount(){
+
+    const { match } = this.props
+    
+
+    if(match.params.qr_id){
+      alert(match.params.qr_id)
+      localStorage.setItem('qrcode_in', match.params.qr_id)
+      //this.handleScan
+    }
+
   }
 
 
   render(){
 
-    return(
+    const previewStyle = {}
+    const { match } = this.props
 
-      <div className="container">
-        <div className="row">
-          <h3 className="overallTitle">{this.state.message}</h3>
-          
-          {this.state.loading &&
-          <div className="overallLoader">
-            <div className="loader">
-              <div className="loader__bar"></div>
-              <div className="loader__bar"></div>
-              <div className="loader__bar"></div>
-              <div className="loader__bar"></div>
-              <div className="loader__bar"></div>
-              <div className="loader__ball"></div>
+    //alert(match.params.qr_id)
+
+
+      if (this.state.orientation == 'landscape') {
+        return(
+          <div style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          left: 0,
+          bottom: 0,
+          backgroundColor: "rgba(161, 25, 125, 1)",
+          overflowX: "hidden",
+          overflowY: "auto",
+          outline: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+          }}>
+            <h3 style={{color: "#fff", fontSize: "14px", textTransform: "uppercase"}}>Please rotate your device to portrait mode</h3>
+          </div>
+        )
+      } else {
+    
+      if (!this.state.result) {
+        return(
+          <div className="container">
+            <div className="row" style={styles.bgQR}>
+
+            {this.state.loading &&
+              <div className="overallLoader">
+                <div className="loader_white">
+                  <div className="loader__bar"></div>
+                  <div className="loader__bar"></div>
+                  <div className="loader__bar"></div>
+                  <div className="loader__bar"></div>
+                  <div className="loader__bar"></div>
+                  <div className="loader__ball"></div>
+                </div>
+              </div>
+              }
+
+              <QrReader
+                delay={this.state.delay}
+                onError={this.handleError}
+                onScan={this.handleScan}
+                style={previewStyle}
+              />
+              <h3 className="overallTitle">{this.state.message}</h3>
+
+              
+              <BottomNav history={this.props.history} logged={true} />
             </div>
           </div>
-          }
+        )
+      } else {
+        return(
+          <div className="container">
+            <div className="row ">
+              <div className="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4" >
+                <div className="scan_success">
+                  <h4 className="value uppercase">Great !</h4>
+                  <Medal />
+                  <h5 className="value uppercase">You just walked</h5>
+                  <CountUp
+                    className="account-balance CircularProgressbar-text"
+                    start={0}
+                    end={this.state.distance*0.18}
+                    duration={2}
+                    useEasing={true}
+                    useGrouping={true}
+                    separator=" "
+                    decimals={1}
+                    decimal="."
+                    suffix="m"
+                  />
+                </div>
+              </div>
 
-          <QrReader
-            delay={this.state.delay}
-            onError={this.handleError}
-            onScan={this.handleScan}
-            style={{ width: '100%' }}
-          />
-          <div className="col-xs-12">
-            <p>{this.state.result}</p>
-          
-            <MuiThemeProvider>
-              <RaisedButton label="Logout" style={styles.fullwidth} backgroundColor="#a1197d" labelColor="#fff" rippleStyle={styles.button} onClick={(event) => this.handleLogout(event)} />
-            </MuiThemeProvider>
+              <div className="col-xs-12 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+                <div className="marginVertical20">
+                  <MuiThemeProvider >
+                    <RaisedButton label="Check your stats" style={styles.fullwidth} backgroundColor="#a1197d" labelColor="#fff" rippleStyle={styles.button} onClick={(event) => this.handleCheckStats(event)} />
+                  </MuiThemeProvider>
+                </div>
+              </div>
+              <BottomNav history={this.props.history} logged={true} />
+            </div>
           </div>
+        )
+      }
+    }
 
-          <BottomNav history={this.props.history} logged={true} />
-        </div>
-
-      </div>
-    )
   }
 }
 
 
-
 /* https://github.com/iqnivek/react-circular-progressbar/tree/c3796f26d82cc5da81714cfec5b2bf9b9ffb4b96 */
 class ChangingProgressbar extends Component {
+
+ toastId = null;
+ 
   constructor(props) {
     super(props);
     this.state = {
-      next_level_access: false,
+      showConfetti: false,
+      percentage: this.props.percentages,
+      prestige: this.props.prestige,
     };
   }
 
   componentDidMount(){
+    //this.handleConfetti();
+    //this.handleToast();
+  }
+
+  handleConfetti() {
     setTimeout(() => {
-      this.setState({next_level_access: true});
-    }, 5000);
+      this.setState({showConfetti: true});
+    }, 200);
+  }
+
+  handleToast = () => {
+    setTimeout(() => {
+      if (! toast.isActive(this.toastId)) {
+        this.toastId = toast("Happy to see you again "+localStorage.getItem('nickname')+"!");
+      }
+    }, 3000);
   }
 
   render() {
 
+    const { history } = this.props;
+
     const confetti_config = {
       angle: 90,
-      spread: 40,
-      startVelocity: 25,
-      elementCount: 60,
-      decay: 0.93
+      spread: 37,
+      startVelocity: 30,
+      elementCount: 70,
+      decay: 0.92
     };
 
     let challenge_icon = null;
     let challenge_icon_location = null;
+    let challenge_name = null;
     let challenge_star = null;
 
     if (this.props.challenge_name === "Atomium") {
       challenge_icon = <Atomium />
       challenge_icon_location = <small>Brussels, Belgium</small>
-    } else if (this.props.challenge_name === "MONT EUROPA") {
-      challenge_icon = <MontEuropa />
+    } else if (this.props.challenge_name === "mount_europa") {
+      challenge_name = "MOUNT EUROPA"
+      challenge_icon = <Montain />
       challenge_icon_location = <small>Brussels, Belgium</small>
-    } else {
-      challenge_icon = <Montain />;
-      challenge_icon_location = <small>Alpes, France</small>
     }
 
-    if (this.props.total_meters <= 1000) {
-      challenge_star = <Star />
-    } else if (this.props.total_meters <= 2000){
-      challenge_star = <div><Star /><Star /></div>
-    } else if (this.props.total_meters <= 3000){
-      challenge_star = <div><Star /><Star /><Star /></div>
-    } else if (this.props.total_meters <= 4000){
-      challenge_star = <div><Star /><Star /><Star /><Star /></div>
-    } else if (this.props.total_meters <= 5000){
-      challenge_star = <div><Star /><Star /><Star /><Star /><Star /></div>
+  
+
+    const prestigeConfig = () => {
+
+      let prestige = this.state.prestige;
+
+      var stars = [];
+      for (var i = 0; i < prestige; i++) {
+          stars.push(<Star key={i}/>);
+      } 
+      return (<div>{stars}</div>);
     }
+
+    challenge_star = prestigeConfig()
+
+    const onCountUpComplete = () => {
+      console.log('Completed! 👏'+this.state.percentage);
+      if(this.state.prestige > 0)
+        this.handleConfetti();
+    };
     
     return (
       <div className="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4" >
@@ -428,27 +619,40 @@ class ChangingProgressbar extends Component {
               decimals={0}
               decimal=","
               suffix="%"
+              onComplete={onCountUpComplete}
             />
           </div>
 
           <div style={{ width: '100%', padding: '17%', marginBottom: '30%' }} className="text-center progress_ctn" >
 
             <div className="challenge_title">
-              <h4 className="value uppercase">{this.props.challenge_name}</h4>
+              <h4 className="value uppercase">{challenge_name}</h4>
               {challenge_icon_location}
             </div>
 
-            <div className="challenge_icon">
-              {challenge_icon}
-            </div>
+            {challenge_icon !== null ? (
+              <div className={"challenge_icon "+ (this.state.showConfetti ? '' : '')}>
+                {challenge_icon}
+                <div className={"challenge_star "+ (this.state.showConfetti ? 'bounce' : '')}>{challenge_star}</div>
+              </div>
 
-            {challenge_star}
+            ):(
+              <div className="challenge_first">
+                <h4 className="value" onClick={() => history.push('/Scan')}>SCAN YOUR FIRST QR CODE</h4>
+              </div>
+            )}
 
-            <div className="challenge_meters">
-              <h4 className="value">{this.props.total_meters}m</h4>
-            </div>
+         
 
-            <Confetti active={ this.state.next_level_access } config={ confetti_config } />
+            {this.props.total_meters &&
+              <div className="challenge_meters">
+                <h4 className="value">{this.props.total_meters}m</h4>
+              </div>
+            }
+
+            <Confetti active={ this.state.showConfetti } config={ confetti_config } />
+            <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'helloToast'} autoClose={false} closeButton={<ToastCloseButton />} />
+
 
           </div>
 
@@ -472,9 +676,7 @@ export class Stats extends Component {
       challenge_name: null,
       total_meters: null,
       current_percent: null,
-      random: null,
       scoreResults: [],
-      profileResults: [],
       avatar: null,
       profileLoaded: false
     };
@@ -485,67 +687,53 @@ export class Stats extends Component {
   max = 100;
 
   componentDidMount(){
-    this.setState({random: this.min + Math.floor((Math.random() * (this.max - this.min))), profileResults: false});
-    this.handleToast();
-    var query    = "Hallyday";
-    var category = "song";
-    //var URL1      = 'https://itunes.apple.com/search?term=' + query +'&country=us&limit=50&entity=' + category;
-    var URL1 = 'https://randomuser.me/api/?inc=name&results=50';
-    this.scoreSearch(URL1)
-    //var URL2 = "https://randomuser.me/api/";
-    //this.profileSearch(URL2)
-    this.getStatsData()
-  }
- 
-  showScoreResults(response){
-    function shuffle(a) {
-      for (let i = a.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a.slice(0, 10);
+    this.setState({profileResults: false});
+    if(localStorage.getItem('firstVisit') === null || localStorage.getItem('firstVisit') === 'true'){
+      this.setState({
+          challenge_name: null,
+          current_percent: '0',
+          //nick_name: data.nick_name,
+          total_calories: '0',
+          total_steps: '0',
+          total_meters: null,
+          prestige: null,
+          weekly_stats: null,
+          avatar:<UserPicturePlaceholder />,
+          profileLoaded: true
+      })
+    } else {
+      this.getStatsData();
     }
-    this.setState({
-        scoreResults: shuffle(response.results)
-    })
-  }
-
-  // showProfileResults(response){
-  //   alert(response)
-  //   this.setState({
-  //       profileResults: response.results
-  //   })
-  // }
-
-  showStatsResults(response){
-    this.setState({
-        profileResults: response
-    })
+    
   }
 
   getStatsData() {
     $.ajax({
       url: wsbaseurl+'/profile',
       dataType : 'json',
-      data: { email: null, token: null },
+      data: { email: localStorage.getItem('email'), token: localStorage.getItem('token') },
       type: "GET",
       cache: false, 
       success: function (data) {
         if (data && data.status === "OK") {
 
+          //console.log(data.current_challenge.current_steps)
+
           this.setState({
               challenge_name: data.current_challenge.name,
-              current_percent: data.current_challenge.current_percent,
+              current_percent: data.current_challenge.current_steps/data.current_challenge.total_steps,
               nick_name: data.nick_name,
-              total_calories: data.total_calories,
-              total_steps: data.total_steps,
-              total_meters: data.total_meters
+              total_calories: data.all_time_stats.all_time_cal,
+              total_steps: data.all_time_stats.all_time_steps,
+              total_meters: Math.floor(data.all_time_stats.all_time_meters),
+              prestige: data.current_challenge.prestige,
+              weekly_stats: data.weekly_stats
           })
 
-          //this.showStatsResults(basicObj);
         }
         this.setState({
-          avatar: "https://randomuser.me/api/portraits/men/"+Math.floor((Math.random() * (this.max - this.min)))+".jpg",
+          //avatar: "https://randomuser.me/api/portraits/men/"+Math.floor((Math.random() * (this.max - this.min)))+".jpg",
+          avatar:<UserPicturePlaceholder />
         });
       }.bind(this),
       complete: function () {
@@ -559,34 +747,7 @@ export class Stats extends Component {
     });
   }
 
-  scoreSearch(URL){
-    $.ajax({
-        type: "GET",
-        dataType: 'jsonp',
-        url: URL,
-        success: function(response){
-            this.showScoreResults(response);
-        }.bind(this)
-    });
-  }
-  // profileSearch(URL){
-  //   $.ajax({
-  //       type: "GET",
-  //       dataType: 'jsonp',
-  //       url: URL,
-  //       success: function(response){
-  //           this.showProfileResults(response);
-  //       }.bind(this)
-  //   });
-  // }
-
-  handleToast(tab) {
-    setTimeout(() => {
-      if (! toast.isActive(this.toastId)) {
-        this.toastId = toast("Happy to see you again "+localStorage.getItem('nickname')+"!");
-      }
-    }, 3500);
-  }
+  
 
   render(){
     //alert(this.state.imageStatus)
@@ -595,10 +756,81 @@ export class Stats extends Component {
         <div className="container">
           <div className="row">
             <ProfileResult nick_name={this.state.nick_name} total_calories={this.state.total_calories} total_steps={this.state.total_steps} total_meters={this.state.total_meters} avatar={this.state.avatar} />
-            <ChangingProgressbar percentages={this.state.current_percent*100} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} />
-            <Graph />
+            <ChangingProgressbar history={this.props.history} percentages={this.state.current_percent*100} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} prestige={this.state.prestige} />
+            {this.state.challenge_name &&
+              <Graph data={this.state.weekly_stats} />
+            }
             <ScoreResults scoreResults={this.state.scoreResults} />
-            <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'helloToast'} autoClose={false} closeButton={<ToastCloseButton YouCanPassAnyProps="foo" />} />
+            <BottomNav history={this.props.history} logged={true} />
+          </div>
+        </div>  
+      :
+        <div className="container">
+          <div className="row text-center">
+            <div className="marginVerticalTop40">
+              <div className="loader">
+                <div className="loader__bar"></div>
+                <div className="loader__bar"></div>
+                <div className="loader__bar"></div>
+                <div className="loader__bar"></div>
+                <div className="loader__bar"></div>
+                <div className="loader__ball"></div>
+              </div>
+            </div>
+          </div>
+          <BottomNav history={this.props.history} logged={true} />
+        </div>
+    )
+  }
+}
+
+
+export class Wall extends Component {
+
+  constructor(props){
+    super(props);
+    this.state = {
+      scoreResults: [],
+    };
+
+    this.getTop10();
+
+  }
+
+  getTop10() {
+    $.ajax({
+      url: wsbaseurl+'/top_ten',
+      dataType : 'json',
+      type: "GET",
+      cache: false, 
+      success: function (data) {
+        if (data && data.status === "OK") {
+
+          console.log(JSON.stringify(data.top_10));
+
+          this.setState({
+              scoreResults: data.top_10,
+          })
+
+        }
+
+      }.bind(this),
+      complete: function () {
+
+      }.bind(this),
+      error: function(xhr, ajaxOptions, thrownError) {
+        console.log(thrownError);      
+      }
+    });
+  }
+
+
+  render() {
+    return (
+      this.state.scoreResults ?
+        <div className="container">
+          <div className="row">
+            <ScoreResults scoreResults={this.state.scoreResults} wallOfFameOnly={true} />
             <BottomNav history={this.props.history} logged={true} />
           </div>
         </div>  
@@ -616,7 +848,7 @@ export class Stats extends Component {
           </div>
           <BottomNav history={this.props.history} logged={true} />
         </div>
-    )
+    );
   }
 }
 
@@ -649,13 +881,18 @@ export class ProfileResult extends Component {
     return (
       <div className="col-xs-12 col-sm-6 col-sm-offset-3">
 
-       
-
         <div className="row profile text-center">
 
-          <img src={this.state.avatar} alt=""  className="img-circle" />
+          <div>
+            {localStorage.getItem("avatarImg64") ?(
+              <img src={localStorage.getItem("avatarImg64")} alt="" className="img-circle mirror" />
+            ):(
+              this.state.avatar
+            )}
+          </div>
 
-          <h3>{this.state.nick_name}</h3>
+          {/*<h3>{this.state.nick_name}</h3>*/}
+          <h3>{localStorage.getItem('nickname')}</h3>
          
             <div className="col-xs-6 calories">
               <div className="row">
@@ -713,21 +950,103 @@ export class ProfileResult extends Component {
 };
 
 export class ScoreResults extends Component {
+
+  constructor(props){
+    super(props);
+    this.state = {
+      scoreResults: [],
+    };
+
+    this.getTop10()
+
+  }
+
+  componentDidMount(){
+    //var URL1 = 'https://randomuser.me/api/?nat=fr&results=20';
+    //this.scoreSearch(URL1)
+  }
+
+  getTop10() {
+    $.ajax({
+      url: wsbaseurl+'/top_ten',
+      dataType : 'json',
+      type: "GET",
+      cache: false, 
+      success: function (data) {
+        if (data && data.status === "OK") {
+          console.log(JSON.stringify(data.top_10));
+          this.setState({
+              scoreResults: data.top_10,
+          })
+        }
+
+      }.bind(this),
+      complete: function () {
+
+      }.bind(this),
+      error: function(xhr, ajaxOptions, thrownError) {
+        console.log(thrownError);      
+      }
+    });
+  }
+
+  showScoreResults(response){
+
+    function shuffleData(a) {
+      for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a.slice(0, 10);
+    }
+
+    function sortPostcode(data, key, way) {
+      return data.sort(function(a, b) {
+          var x = a[key].postcode; var y = b[key].postcode;
+          if (way === 'asc' ) { return ((x < y) ? -1 : ((x > y) ? 1 : 0)); }
+          if (way === 'desc') { return ((x > y) ? -1 : ((x < y) ? 1 : 0)); }
+      }).slice(0, 10);
+    }
+
+
+    this.setState({
+        scoreResults: sortPostcode(response.results, 'location', 'desc')
+    })
+  }
+
+
+
+  scoreSearch(URL){
+    $.ajax({
+        type: "GET",
+        dataType: 'jsonp',
+        url: URL,
+        success: function(response){
+            this.showScoreResults(response);
+        }.bind(this)
+    });
+  }
+
+
   render(){
-      var resultItems = this.props.scoreResults.map(function(result, index) {
-          return <ScoreResultItem key={index.toString()} nickname={result.name.first} index={index+1} />
+
+      var resultItems = this.state.scoreResults.map(function(result, index) {
+          return <ScoreResultItem key={index.toString()} nickname={result.name} steps={result.total_steps} prestige={result.prestige} index={index+1} />
       });
+
       return(
           <div className="wallOfFame">
+            
+            <div className={(this.props.wallOfFameOnly ? 'hidden' : '')}>
+              <div className="col-xs-6 sepa"></div>
+              <div className="col-xs-6"></div>
+            </div>
 
-            <div className="col-xs-6 sepa"></div>
-            <div className="col-xs-6"></div>
-
-            <div className="col-xs-12 text-center">
+            <div className="col-xs-12 text-center marginVertical20">
               <SVGInline svg={ icon_rank } style={{marginLeft: '-3px'}} />
             </div>
 
-            <div className="col-xs-12">
+            <div className="col-xs-12 hidden">
               <h4>Wall of fame</h4>
             </div>
             <div className="col-xs-12 fullwidth">
@@ -750,17 +1069,8 @@ export class ScoreResultItem extends Component {
   constructor(props){
     super(props);
     this.state = {
-      wof_meters: null,
-      wof_stars: null
+      wof_stars: this.props.prestige
     };
-  }
-
-  componentDidMount(){
-    let wof_value = Math.floor(Math.random() * 5000)
-    this.setState({
-      wof_meters: wof_value,
-      wof_stars: Math.floor(wof_value/1000)
-    });
   }
 
   getStars(){
@@ -777,74 +1087,12 @@ export class ScoreResultItem extends Component {
           <span className="badge"><span>{this.props.index}</span></span>
           <span className="nick_name">{this.props.nickname}</span>
           <span className="stars">{this.getStars()}</span>
-          <span className="total_meters">{this.state.wof_meters}</span>
+          <span className="total_meters">{this.props.steps}</span>
         </li>
       );
   }
 };
 
-
-
-export class History extends React.Component {
-
-  constructor(props){
-    super(props);
-    this.state = {
-
-    };
-  }
-
-  render(){
-
-      return(
-
-          <div className="col-xs-12 history">
-
-            <div className="col-xs-6 sepa"></div>
-            <div className="col-xs-6"></div>
-
-            <div className="col-xs-12 text-center">
-              <SVGInline svg={ icon_rank } style={{marginLeft: '-3px'}} />
-            </div>
-
-
-            <h4>History</h4>
-
-            <ContainerDimensions> 
-            { ({ width, height }) => 
-
-            <BarChart
-              
-              axes={(this.state.componentWidth) > 400 ? true : true}
-              yAxisOrientRight
-              yTickNumber={5}
-              colorBars
-              grid
-              width={width - 20}
-              height={width / 1.7 }
-              barWidth={30}
-
-              xType={'time'}
-              xDomainRange={['18-Dec-17', '26-Dec-17']}
-              yDomainRange={[50, 500]}
-              data={[
-                { x: '18-Dec-17', y: 200, color: '#a1197d' },
-                { x: '19-Dec-17', y: 160, color: '#f5e8f2' },
-                { x: '20-Dec-17', y: 350, color: '#a1197d' }
-              ]}
-            />
-            }
-            </ContainerDimensions> 
-
-          </div>        
-      );
-  }
-};
-
-
-function getRandomInt(min, max) {  
-  return Math.floor(Math.random() * (max - min)) + min;
-}
 
 function compareNumbers(a, b) {  
   return a - b;
@@ -852,7 +1100,6 @@ function compareNumbers(a, b) {
 
 /* https://codepen.io/maydie/pen/WvpzPG */
 export class Graph extends React.Component {
-
 
   constructor(props){
     super(props);
@@ -862,71 +1109,58 @@ export class Graph extends React.Component {
       labels: [],
       colors: []
     };
-
-
     this.onChange = this.onChange.bind(this);
-
   }
 
-
-
   componentDidMount(){
-
-    
     //setInterval(this.populateArray, 2000);
-
     this.setState({
-      //data: [],
+      weekly_stats: this.props.data,
       series: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
-      labels: ['Day steps', 'Maximum weekly steps'],
+      labels: ['Daily steps', 'Maximum weekly steps'],
       colors: ['#A1197D', '#F5E8F1']
     });
   }
 
   populateArray(){
-    var data = [[72], [215], [142], [49], [0]],
-        series = 5
-
-    // for (var i = series; i--; ) {
-    //   var tmp = [];
-    //   tmp.push(getRandomInt(0, 300));
-    //   data.push(tmp);     
-    // }
+    var data = [[this.state.weekly_stats.monday], 
+                [this.state.weekly_stats.tuesday], 
+                [this.state.weekly_stats.wednesday], 
+                [this.state.weekly_stats.thursday], 
+                [this.state.weekly_stats.friday]]
     this.setState({ data: data });
-    
   }
 
   onChange(isVisible) {
-    console.log('Element is now %s', isVisible ? 'visible' : 'hidden');
-
+    //console.log('Element is now %s', isVisible ? 'visible' : 'hidden');
     if(isVisible){
       this.populateArray();
     }
-   
   };
 
   render() {
     return (
-
-      
 
       <div className="col-xs-12 history">
 
         <div className="col-xs-6 sepa"></div>
         <div className="col-xs-6"></div>
 
-        <div className="col-xs-12 text-center">
+        <div className="col-xs-12 text-center marginVertical20">
           <IconStats />
         </div>
 
-        <div className="col-xs-12">
+        <div className="col-xs-12 hidden">
           <h4>History</h4>
+        </div>
+
+        <div className="col-xs-12">
           <section>
     
             <VisibilitySensor
               delayedCall={true}
               partialVisibility='bottom'
-              offset={{bottom:150}}
+              offset={{bottom:70}}
               onChange={this.onChange}
             >
 
@@ -939,9 +1173,9 @@ export class Graph extends React.Component {
               />
             
             </VisibilitySensor>
-            
           
             <Legend labels={ this.state.labels } colors={ this.state.colors } />
+
           </section>
         </div>
       </div>
@@ -976,11 +1210,10 @@ class Charts extends React.Component {
 
   render() {
 
-    //alert(this.props.data)
 
     var self = this,
       data = this.props.data,
-      layered = this.props.grouping === 'layered' ? true : false,
+      //layered = this.props.grouping === 'layered' ? true : false,
       stacked = this.props.grouping === 'stacked' ? true : false,
       opaque = this.props.opaque,
       max = 0;

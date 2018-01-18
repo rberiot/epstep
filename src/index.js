@@ -9,7 +9,7 @@ import {
 } from 'react-router-dom';
 
 import './index.css';
-import {Scan,Stats,Header,ProfileResult,BottomNav} from './App';
+import {Scan,Stats,Wall,Header,BottomNav} from './App';
 import registerServiceWorker from './registerServiceWorker';
 
 import $ from 'jquery'; 
@@ -19,9 +19,11 @@ import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
 import { ToastContainer, toast } from 'react-toastify';
 
-import {IconUserEdit, Bin} from './SVGicon';
+import {IconUser, IconUserEdit, Bin, UserPicturePlaceholder, EditPlaceholder, EditPen} from './SVGicon';
 
 import './App.css';
+
+import Webcam from 'react-webcam';
 
 const styles = {
   loginErrorStyle: {
@@ -68,8 +70,12 @@ const styles = {
     width: '100%',
     height: '48px',
     lineHeight: '48px',
-    marginTop: '15px',
+    marginTop: '50px',
     marginBottom: '15px',
+  },
+  bgAuth: {
+    height: 'calc(100vh - 48px)',
+    backgroundColor: 'rgba(161, 25, 125, 1)',
   },
   
 };
@@ -88,15 +94,17 @@ const appAuth = {
   }
 }
 
-
 var email;
 var token;
 var tokenValidationIntervalId;
 
 //let wsbaseurl = "http://localhost:8000";
-let wsbaseurl = "https://90dadbd1.ngrok.io";
+let wsbaseurl = "https://1893420d.ngrok.io";
+//let wsbaseurl = "";
+
 
 function tokenValidation(self) {
+
   $.ajax({
     url: wsbaseurl+'/auth',
     dataType : 'json',
@@ -107,7 +115,9 @@ function tokenValidation(self) {
 
       if (data && data.status === "OK") {
         clearInterval(tokenValidationIntervalId)
-        localStorage.setItem("loggedIn", true);
+        
+        localStorage.setItem("loggedIn", 'true');
+        localStorage.setItem("firstVisit", 'true');
 
         appAuth.authenticate(() => {
           self.setState(() => ({
@@ -115,6 +125,23 @@ function tokenValidation(self) {
           }))
           self.props.history.push('/Scan')
         })
+
+        $.ajax({
+          url: wsbaseurl+'/update_profile',
+          type: "GET",
+          data: { nickname: localStorage.getItem('nickname'), token: localStorage.getItem('token') },
+          success: function(data){
+            console.log(data.status);
+            if (data && data.status === "OK") {
+               console.log("nickname correctly updated on DB");
+            }
+          }.bind(this),
+          error: function(xhr, ajaxOptions, thrownError) {
+            console.log(thrownError);
+          }.bind(this)
+        });
+
+
       } else if (data && data.status === "TOKEN_NOT_ACTIVATED") {
         self.props.history.push('/Authlogin')
       }
@@ -127,27 +154,35 @@ function tokenValidation(self) {
 }
 
 
-if (localStorage.getItem("loggedIn")) {
-  appAuth.signout();
-} else {
+if (localStorage.getItem("loggedIn") === 'true') {
   appAuth.authenticate();
+} else {
+  appAuth.signout();
 }
 
 
 /* !!! TO REMOVE !!! */
 //appAuth.signout();
-appAuth.authenticate();
+//appAuth.authenticate();
 /* !!! TO REMOVE !!! */
 
 
-const CookieMsg = ({ closeToast }) => (
-  <div>
-  <h2>Cookie</h2>
-    <p>The cookie settings on this website are set to 'allow all cookies' to give you the very best experience. If you continue without changing these settings, you consent to this - but if you want, you can change your settings at any time at the bottom of this page.</p>
-    <button onClick={closeToast}>Accept</button>
-    <button>Cancel</button>
-  </div>
-)
+
+
+const CookieMsg = ({ id, undo, closeToast }) => {
+  function handleClick(){
+    localStorage.setItem("acceptCookie", 'true');
+    closeToast();
+  }
+
+  return (
+    <div>
+      <h2>Cookie</h2>
+      <p>The cookie settings on this website are set to 'allow all cookies' to give you the very best experience. If you continue without changing these settings, you consent to this - but if you want, you can change your settings at any time at the bottom of this page.</p>
+      <button onClick={handleClick}>Ok</button>
+    </div>
+  );
+}
 
 
 /* https://medium.com/technoetics/create-basic-login-forms-using-create-react-app-module-in-reactjs-511b9790dede */
@@ -169,7 +204,9 @@ class Login extends React.Component {
   }
 
   componentDidMount(){
-    this.handleToast4cookie();
+    if(localStorage.getItem('acceptCookie') === null || localStorage.getItem('acceptCookie') === 'false'){
+      this.handleToast4cookie();
+    }
   }
 
   handleToast4cookie(tab) {
@@ -177,7 +214,7 @@ class Login extends React.Component {
       if (! toast.isActive(this.toastId)) {
         toast(<CookieMsg />);
       }
-    }, 2500);
+    }, 2000);
   }
 
   handleChange(event) {
@@ -203,16 +240,14 @@ class Login extends React.Component {
         //console.log("status:"+data.status+" / "+"token:"+data.token);
 
         if (data && data.status === "OK") {
-
           localStorage.setItem("email", this.state.email);
           localStorage.setItem("nickname", this.state.nickname);
-
+          localStorage.setItem("token", data.token);
           email = this.state.email;
           token = data.token;
-
           tokenValidation(self, email, token)
-        
         }
+        
         
       }.bind(this),
       error: function(xhr, ajaxOptions, thrownError) {
@@ -257,8 +292,8 @@ class Login extends React.Component {
                   onChange={this.handleChange}
                   name="email"
                   value={email}
-                  validators={['required', 'isEmail', 'matchRegexp:^[a-z0-9](.?[a-z0-9]){3,}@europarl.europa.eu|^[a-z0-9](.?[a-z0-9]){3,}@ext.europarl.europa.eu$']}
-                  errorMessages={['This field is required', 'Please provide a valid email address', 'Please provide a valid @europarl.europa.eu or @ext.europarl.europa.eu email address']}
+                  validators={['required', 'isEmail', 'matchRegexp:^[a-z0-9](.?[a-z0-9]){3,}@europarl.europa.eu|^[a-z0-9](.?[a-z0-9]){3,}@ext.europarl.europa.eu|^[a-z0-9](.?[a-z0-9]){3,}@ep.europa.eu$']}
+                  errorMessages={['This field is required', 'Please provide a valid email address', 'Please provide a valid @ep.europa.eu, @europarl.europa.eu or @ext.europarl.europa.eu email address']}
                 />
                 <TextValidator
                   style={styles.fullwidth}
@@ -276,8 +311,13 @@ class Login extends React.Component {
                 <RaisedButton type="Submit" style={styles.button} label="Login" backgroundColor="#a1197d" labelColor="#fff" />
               </ValidatorForm>
             </MuiThemeProvider>
+
           </div>
         </div>
+
+        {appAuth.isAuthenticated &&
+          <BottomNav history={this.props.history} logged={true} />
+        }
 
         <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'cookieToast'} autoClose={false} closeOnClick={false} closeButton={false}  />
       </div>
@@ -291,10 +331,16 @@ class Edit extends React.Component {
       super(props);
       this.state={
         email: localStorage.getItem("email"),
-        nickname: localStorage.getItem("nickname")
+        nickname: localStorage.getItem("nickname"),
+        showCameraPreview: null,
+        avatarImg64: null
       }
       this.handleChange2 = this.handleChange2.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
+
+      this.setRef = this.setRef.bind(this);
+      this.capture = this.capture.bind(this);
+      this.editPlaceholder = this.editPlaceholder.bind(this);
   }
 
 
@@ -304,9 +350,44 @@ class Edit extends React.Component {
   }
 
   handleSubmit() {
+
     let self = this;
     localStorage.setItem("nickname", this.state.nickname);
-    self.props.history.push('/Stats')
+
+
+    $.ajax({
+      url: wsbaseurl+'/update_profile',
+      type: "GET",
+      data: { nickname: this.state.nickname, token: localStorage.getItem('token') },
+      success: function(data){
+        console.log(data.status);
+        if (data && data.status === "OK") {
+           console.log("nickname correctly updated on DB");
+           self.props.history.push('/Stats')
+        }
+
+      }.bind(this),
+      error: function(xhr, ajaxOptions, thrownError) {
+        console.log(thrownError);
+      }.bind(this)
+    });
+
+    
+    
+  }
+
+  setRef(webcam) {
+    this.webcam = webcam;
+  }
+
+  capture() {
+    const imageSrc = this.webcam.getScreenshot();
+    localStorage.setItem("avatarImg64", imageSrc);
+    this.setState({ avatarImg64: localStorage.getItem("avatarImg64") });
+  }
+
+  editPlaceholder() {
+    this.setState({ showCameraPreview: 'true'} );
   }
 
   render(){
@@ -315,7 +396,48 @@ class Edit extends React.Component {
       <div className="container">
         <div className="row">
           <div className="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">
-            <Header />
+       
+            <div className="editprofile">
+
+              {this.state.showCameraPreview == 'true' ? (
+                <div>
+                  <div className="preview">
+                    <Webcam
+                      audio={false}
+                      height={94}
+                      ref={this.setRef}
+                      screenshotFormat="image/jpeg"
+                      width={94}
+                      className=""
+                    />
+                  </div>
+                  <button onClick={this.capture}>Capture photo</button>
+                </div>
+              ):(
+                <div className="editPlaceholder" onClick={this.editPlaceholder}>
+
+                {localStorage.getItem("avatarImg64") ?(
+                  <div>
+                    <img src={localStorage.getItem("avatarImg64")} alt="" className="img-circle mirror" />
+                    <div className="editPen"><EditPen /></div>
+                  </div>
+                ):(
+                  <EditPlaceholder />
+                )}
+                
+
+                </div>
+              )} 
+              
+              {this.state.avatarImg64 &&
+                <div>
+                <img src={this.state.avatarImg64} alt="" className="img-circle resized" />
+                
+                </div>
+              }
+
+            </div>
+            
           </div>
         </div>
 
@@ -363,7 +485,6 @@ class Edit extends React.Component {
         </div>
          
         <BottomNav history={this.props.history} logged={true} />
-          
 
       </div>
     );
@@ -378,16 +499,24 @@ class Authlogin extends React.Component {
   render(){
     return (
       <div className="container">
-        <div className="row">
+        <div className="row" style={styles.bgAuth}>
+
           <div className="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">
             <Header />
           </div>
-          <div className="col-xs-12 col-md-4 col-md-offset-4">
 
-            <p>Please check your mailbox to activate your account...</p>
+          <div className="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">
+            <div className="marginVertical20 text-center">
+              <h4 className="contrast_text">Please check your mailbox <br/> to activate your account...</h4>
+            </div>
           </div>
+
         </div>
+
+        <BottomNav history={this.props.history} logged={false} />
+
       </div>
+
     );
   }
 }
@@ -405,17 +534,6 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
   )} />
 )
 
-const AuthButton = withRouter(({ history }) => (
-  appAuth.isAuthenticated ? (
-    <p>
-      Hello <strong>{localStorage.getItem('nickname')}</strong> <button onClick={() => {
-        appAuth.signout(() => history.push('/'))
-      }}>Sign out</button>
-    </p>
-  ) : (
-    <p>Not logged in.</p>
-  )
-))
 
 class Topbar extends React.Component {
 
@@ -425,40 +543,56 @@ class Topbar extends React.Component {
       history: PropTypes.object.isRequired
     }
 
+    constructor(props){
+        super(props);
+        this.handleDeleteAccount = this.handleDeleteAccount.bind(this);
+    }
+
+    handleDeleteAccount() {
+      let self = this;
+      
+      localStorage.removeItem("email")
+      localStorage.removeItem("firstVisit")
+      localStorage.removeItem("loggedIn")
+      localStorage.removeItem("nickname")
+      localStorage.removeItem("token")
+      localStorage.removeItem("acceptCookie")
+      localStorage.removeItem("avatarImg64")
+      localStorage.removeItem("timeout")
+
+      self.props.history.push('/')
+    }
+
+
     render() {
-      const { match, location, history } = this.props
+      const { location, history } = this.props
         return (
-          appAuth.isAuthenticated ? (
+          appAuth.isAuthenticated &&
             <div className="container account">
 
                 <div className="row">
                   <div className="col-xs-6 sepa">
                     <div>
-                      <span>Hello <strong>{localStorage.getItem('nickname')}</strong> @ {location.pathname}</span>
-         
+                      <span>Hello <strong>{localStorage.getItem('nickname')}</strong> <span className="hidden">@ {location.pathname}</span></span>
                     </div>
                   </div>
                   <div className="col-xs-6 text-right">
                     {location.pathname === '/Edit' ? (
                       <div>
-                        <span onClick={() => history.push('/')}>Delete my account </span>
+                        <span onClick={this.handleDeleteAccount}>Delete my account </span>
                         <Bin />
-                        
                       </div>
                     ) : (
                       <div>
                         <span onClick={() => history.push('/Edit')}>Edit my account </span>
                         <IconUserEdit />
-                        
                       </div>
                     )}
                     
                   </div>
               </div>
             </div>
-          ) : (
-            <p>Not logged in.</p>
-          )
+
         )
     }
 }
@@ -466,19 +600,21 @@ class Topbar extends React.Component {
 const TopBar = withRouter(Topbar);
 
 
-
 export default function Main () {
   return (
     <Router>
       <div>
-          {/* <AuthButton/> */}
           <TopBar />
           <Route exact path='/' component={Login} />
           <Route path='/Login' component={Login} />
           <Route path='/Authlogin' component={Authlogin} />
-          <PrivateRoute path='/Scan' component={Scan} />
+          <PrivateRoute exact path='/Scan' component={Scan} />
           <PrivateRoute path='/Stats' component={Stats} />
+          <PrivateRoute path='/Wall' component={Wall} />
           <PrivateRoute path='/Edit' component={Edit} />
+
+          <PrivateRoute path='/scan/:qr_id' component={Scan} />
+
       </div>
     </Router>
   )

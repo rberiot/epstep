@@ -3,7 +3,7 @@ html {
     min-height: 100%;
 }
 body {
-    margin: 0 0 68px; /* bottom has to be the same as footer height */
+    margin: 0 0 48px; /* bottom has to be the same as footer height */
   	padding: 0;
   	font-family: 'Roboto', sans-serif;
   	font-size: 16px;
@@ -11,20 +11,15 @@ body {
 footer {  
     position: fixed;
     z-index: 9999;
-    margin: 20px 0 0 0;
+    margin: 0px 0 0 0;
     padding: 0;
     left: 0;
     bottom: 0;
     height: 48px;
     width: 100%;
+
+    background: #a1197d;
 }
 
 
-.cookieToast{
-  font-family: 'Roboto', sans-serif;
-  color: #fff;
-  background-color: #bed000;
-  padding: 0 20px;
-  margin: 0 auto;
-}
  

@@ -17,6 +17,12 @@ select:-webkit-autofill:focus {
     outline: none;
 }
 
+
+.logoSVG {
+  max-width: 80%;
+  margin-top: 15px;
+}
+
 button {
   border-radius: 0 !important;
   box-shadow: none !important;
@@ -25,9 +31,25 @@ button {
 button[type=Submit] {
 
 }
-
+.default_text,
+.contrast_text{
+  font-weight: bold;
+  font-size: 0.875em; /* 14px/16px = 0.875*/
+  color: #a1197d;
+}
+.contrast_text{
+  color: #fff;
+  font-weight: 500;
+  text-transform: uppercase;
+}
 .uppercase{
   text-transform: uppercase;
+}
+.marginVertical20{
+  margin: 20px auto;
+}
+.marginVerticalTop40{
+  margin: 40px auto 0 auto;
 }
 .account{
   margin: 5px auto;
@@ -45,6 +67,7 @@ button[type=Submit] {
 .account svg{
   vertical-align: middle;
   margin-top: -6px;
+  max-width: 24px;
 }
 .account .sepa{
   border-right:3px solid #a1197d;
@@ -52,7 +75,7 @@ button[type=Submit] {
 }
 
 .profile{
-  margin: 15px 0;
+  margin: 5px 0 10px 0;
   overflow: hidden;
 }
 .profile .img-circle{
@@ -61,8 +84,81 @@ button[type=Submit] {
   max-width: 94px;
   min-height: 94px;
 }
+.editprofile{
+  margin: 5px auto;
+  text-align: center;
+}
+.editprofile .preview,
+.editprofile .img-circle{
+  background:#eee;
+  width: 94px;
+  height: 94px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 10px auto;
 
 
+}
+.editprofile video{
+  border-radius: 50%;
+  box-shadow: 0 0 0px 5px #eee inset;
+  transform: scaleX(-1);
+    -webkit-transform:scaleX(-1); /* Safari and Chrome */
+    -moz-transform:scaleX(-1); /* Firefox */
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+}
+.editprofile button{
+  color: #fff;
+  background: #a1197d;
+  height: 36px;
+  line-height: 36px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  padding: 0 16px;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 14px;
+  border:0;
+}
+
+.editprofile .img-circle{
+  padding: 5px;
+  overflow: hidden;
+  transform: scaleX(-1);
+    -webkit-transform:scaleX(-1); /* Safari and Chrome */
+    -moz-transform:scaleX(-1); /* Firefox */
+  margin: 0;
+}
+.editprofile .img-circle.resized{
+  object-fit: cover;
+}
+.editprofile .editPlaceholder{
+  margin: 5px auto;
+  text-align: center;
+}
+.editprofile .editPen{
+  position: absolute;
+  top: 35px;
+  left: 50%;
+  margin-left: -18px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.img-circle.mirror{
+  transform: scaleX(-1);
+    -webkit-transform:scaleX(-1); /* Safari and Chrome */
+    -moz-transform:scaleX(-1); /* Firefox */
+  object-fit: cover;
+  height: 94px;
+  width: 94px;
+}
 .profile h3,
 .profile h4{
   color: #a1197d;
@@ -137,11 +233,11 @@ button[type=Submit] {
   width: 33px;
 }
 .scoreResultsTitle .nick_name{
-  width: calc(70% - 57px);
+  width: calc(60% - 57px);
   margin-left: 57px;
 }
 .scoreResultsTitle .stars{
-  width: 15%;
+  width: 25%;
 }
 .scoreResultsTitle .total_meters{
   width: calc(15% - 12px);
@@ -161,12 +257,12 @@ button[type=Submit] {
 }
 
 .scoreResults li .nick_name{
-  width: calc(70% - 57px);
+  width: calc(60% - 57px);
   text-transform: capitalize;
 }
 
 .scoreResults li .stars{
-  width: 15%;
+  width: 25%;
 }
 .scoreResults li .total_meters{
   width: calc(15% - 12px);
@@ -252,23 +348,45 @@ div[data-css-npp5qg]{
 
 .overallTitle{
   position: absolute;
-  z-index: 9999999;
+  z-index: 9998;
   width: calc(100% - 0px);
+  padding: 0 15px;
   text-align: center;
   color: #fff;
   font-size: 14px;
 }
 .overallLoader{
   position: absolute;
-  top: calc(50% - 100px);
-  z-index: 9999999;
+  padding-top: 45%;
+  z-index: 9998;
   width: calc(100% - 0px);
-
 }
 
 .tabs .tab{
   background-color: #a1197d !important;
 }
+
+
+.scan_success{
+  color: #a1197d;
+  font-size: 20px;
+  font-weight: 500;
+  display: block;
+  text-align:center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.scan_success svg{
+  max-width: 60%;
+  margin-top: 20px;
+}
+
+.scan_succes .account-balance{
+  font-size: 36px;
+  display: block;
+}
+
 /*
  * react-circular-progressbar styles
  *
@@ -366,26 +484,124 @@ div[data-css-npp5qg]{
 
 .progress_ctn {
   display: flex;
-
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-
 }
 
 .progress_ctn > div.challenge_title{
   flex: 0;
   justify-content: flex-start;
 }
+.progress_ctn > div.challenge_title h4{
+  letter-spacing: -0.6px;
+}
 .progress_ctn > div.challenge_icon{
-  width: 50%; 
+  padding-bottom: 56%; 
+  height: 1px; 
+  overflow: visible;
+}
+.progress_ctn > div.challenge_icon > svg{
+  width: 49%; 
+}
+.progress_ctn > div.challenge_icon.spin > svg{
+  animation-name: spinner;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-duration: 1s;
+    animation-delay: 0;
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+.progress_ctn > div.challenge_first{
+  width: 90%; 
+  padding-top: 30%;
   padding-bottom: 55%; 
   height: 1px; 
   overflow: visible 
 }
+.progress_ctn > div.challenge_first h4{
+  position: relative;
+  z-index: 99;
+}
+
+.progress_ctn > div.challenge_icon > div.challenge_star{
+  position: relative;
+}
+.progress_ctn > div.challenge_icon div.challenge_star div svg {
+  animation-timing-function: ease-in-out;
+
+  transform: scale(0) rotate(0deg);
+
+transform-origin: center;
+
+margin-right: 8px;
+-webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+
+    
+}
+.progress_ctn > div.challenge_icon div.challenge_star div svg:last-child {
+  margin-right: 0px; 
+}
+.progress_ctn > div.challenge_icon div.challenge_star.bounce div svg {
+  animation: bounce 1s 0s both;
+}
+.progress_ctn > div.challenge_icon div.challenge_star.bounce div svg+svg {
+  animation: bounce 1s 0.2s both;
+}
+.progress_ctn > div.challenge_icon div.challenge_star.bounce div svg+svg+svg {
+  animation: bounce 1s 0.4s both;
+}
+.progress_ctn > div.challenge_icon div.challenge_star.bounce div svg+svg+svg+svg {
+  animation: bounce 1s 0.6s both;
+}
+.progress_ctn > div.challenge_icon div.challenge_star.bounce div svg+svg+svg+svg+svg {
+  animation: bounce 1s 0.8s both;
+}
+.progress_ctn > div.challenge_icon div.challenge_star.bounce div svg+svg+svg+svg+svg+svg {
+  animation: bounce 1s 1s both;
+}
+.progress_ctn > div.challenge_icon div.challenge_star.bounce div svg+svg+svg+svg+svg+svg+svg {
+  animation: bounce 1s 1.2s both;
+}
+
+/* WebKit and Opera browsers */
+@-webkit-keyframes spinner {
+  from { -webkit-transform: rotateY(0deg);    }
+  to   { -webkit-transform: rotateY(-360deg); }
+}
+
+/* all other browsers */
+@keyframes spinner {
+  from {
+    -moz-transform: rotateY(0deg);
+    -ms-transform: rotateY(0deg);
+    transform: rotateY(0deg);
+  }
+  to {
+    -moz-transform: rotateY(-360deg);
+    -ms-transform: rotateY(-360deg);
+    transform: rotateY(-360deg);
+  }
+}
+
+@keyframes bounce {
+  0% { transform: scale(0) rotate(10deg); }
+  30% { transform: scale(2.8) rotate(-240deg); }
+  60% { transform: scale(3.5) rotate(-150deg); }
+  70% { transform: scale(2.3) rotate(-50deg); }
+  90% { transform: scale(0.7) rotate(20deg); }
+  100% { transform: scale(1.2) rotate(0deg); }
+}
+
 .progress_ctn > div.challenge_meters{
-  flex: 0;
-  justify-content: flex-end;
+  position: absolute;
+  bottom: 25%;
 }
 
 @media all and (min-width: 480px) {
@@ -400,10 +616,8 @@ div[data-css-npp5qg]{
 }
 
 
-
-
 .Charts {
-  margin: 0 auto;
+  margin: 15px auto 0 auto;
   background-color: #fff;
   display: -webkit-box;
   display: -ms-flexbox;
