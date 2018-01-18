@@ -142,6 +142,7 @@ STATICFILES_DIRS = (
 
 PUBLIC_URL = ''
 EMAILS_ENABLED = False
+EMAIL_FROM_STRING = 'TestMan McTestface <test@test.com>'
 try:
     from settings_local import *
 except ImportError:

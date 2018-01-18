@@ -148,19 +148,36 @@ def profile(request):
 
     from models import UserStats
     token = AuthToken.objects.get(token_string=token_param)
-    stats = UserStats.get_weekly_stats(token.user)
-
+    weekly_stats = UserStats.get_weekly_stats(token.user)
+    all_time_stats = UserStats.get_all_time_stats(token.user)
+    prestige, challenge_progress = divmod(all_time_stats.get('all_time_steps'), 1000)
     return JsonResponse({'status': 'OK',
-                         'nick_name': 'Johnny H',
-                         'total_calories': '4852',
-                         'total_steps': '74165',
-                         'total_meters': '154',
-                         'weekly_stats': stats,
+                         'nick_name': token.user.public_name,
+                         'all_time_stats': all_time_stats,
+                         'weekly_stats': weekly_stats,
                          'current_challenge': {
                              'id': '1',
-                             'name': 'Atomium',
+                             'prestige': prestige,
+                             'name': 'mount_europa',
                              'total_steps': '1000',
-                             'current_steps': '500',
-                             'current_percent': '0.5',
+                             'current_steps': challenge_progress,
                          },
+                         })
+
+
+def top_ten(request):
+    week = request.GET.get('week')
+    from models import UserStats
+
+    top10_stats = UserStats.get_weekly_top_10(week)
+    top10 = []
+    for s in top10_stats:
+        top10.append({'name': s.user.public_name,
+                      'id': s.user.pk,
+                      'prestige': 2,  # todo
+                      'total_steps': s.total_steps()
+                      })
+
+    return JsonResponse({'status': 'OK',
+                         'top_10': top10,
                          })

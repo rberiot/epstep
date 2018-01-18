@@ -48,13 +48,13 @@ class AuthToken(models.Model):
     def send_validation_mail(self, public_url):
         from django.core.mail import send_mail
 
-        #todo prevent spamming with a timmer
+        #todo prevent spamming with a timer
         if settings.EMAILS_ENABLED:
             send_mail(
                 'EpStep Account Validation',
                 'Here is the message. ' + public_url + 'validate_token/?validation_key=' +
                 self.validation_key + '&email=' + self.user.email,
-                settings.EMAIL_HOST_USER,
+                settings.EMAIL_FROM_STRING,
                 [self.user.email],
                 fail_silently=False,
             )

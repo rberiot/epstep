@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import models
 import datetime
 from steptracker.models import User
+from steptracker.utils.converter import to_calories, to_meters
 
 
 class UserStats(models.Model):
@@ -42,7 +43,7 @@ class UserStats(models.Model):
 
     @classmethod
     def get_weekly_stats(cls, user, week=None):
-        #first lets get the range of date which starts on monday.
+        # first lets get the range of date which starts on monday.
         if not week:
             week = datetime.date.today()
 
@@ -57,13 +58,38 @@ class UserStats(models.Model):
         stats = res[0] if len(res) != 0 else UserStats(user=user, start_date=week)
 
         return {'total_steps': stats.total_steps(),
+                'total_meters': to_meters(stats.total_steps()),
+                'total_cal': to_calories(stats.total_steps()),
                 'monday': stats.monday_steps,
                 'tuesday': stats.tuesday_steps,
                 'wednesday': stats.wednesday_steps,
-                'thrusday': stats.thursday_steps,
+                'thursday': stats.thursday_steps,
                 'friday': stats.friday_steps,
                 'saturday': stats.saturday_steps,
                 'sunday': stats.sunday_steps,
+                }
+
+    @classmethod
+    def get_weekly_top_10(cls, week=None):
+        # first lets get the range of date which starts on monday.
+        if not week:
+            week = datetime.date.today()
+
+        if week.weekday() != 0:
+            week = week - datetime.timedelta(days=week.weekday())
+
+        all_stats = UserStats.objects.filter(start_date=week)
+        sorted_stats = sorted(all_stats, key=lambda s: s.total_steps())
+
+        return sorted_stats[:10]
+
+    @classmethod
+    def get_all_time_stats(cls, user):
+        all_stats = cls.objects.filter(user=user)
+        total_steps = sum(map((lambda x: x.total_steps()), all_stats))
+        return {'all_time_cal': to_calories(total_steps),
+                'all_time_steps': total_steps,
+                'all_time_meters': to_meters(total_steps)
                 }
 
     def add(self, steps, day=datetime.date.today()):
