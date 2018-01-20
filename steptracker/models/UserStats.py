@@ -32,11 +32,7 @@ class UserStats(models.Model):
 
         stats = cls.objects.filter(user=user, start_date=monday)
 
-        week_stats = None
-        if len(stats) < 1:
-            week_stats = UserStats(user=user, start_date=monday)
-        else:
-            week_stats = stats[0]
+        week_stats = stats[0] if len(stats) else UserStats(user=user, start_date=monday)
 
         week_stats.add(steps, day)
         week_stats.save()
@@ -120,3 +116,6 @@ class UserStats(models.Model):
         total += self.sunday_steps
 
         return total
+
+    def __str__(self):
+        return str(self.user.email) + '(' + str(self.start_date) + ')'

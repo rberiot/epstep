@@ -14,7 +14,6 @@ class AuthToken(models.Model):
     valid = models.BooleanField(default=False)
     validation_key = models.TextField()
 
-
     @classmethod
     def gen_token_string(cls, email):
         import hashlib
@@ -48,7 +47,7 @@ class AuthToken(models.Model):
     def send_validation_mail(self, public_url):
         from django.core.mail import send_mail
 
-        #todo prevent spamming with a timer
+        # todo prevent spamming with a timer
         if settings.EMAILS_ENABLED:
             send_mail(
                 'EpStep Account Validation',
@@ -71,4 +70,4 @@ class AuthToken(models.Model):
             return False
 
     def __str__(self):
-        return str(self.user.email) + 'valid: ' + str(self.valid) + ' token: ' + str(self.token_string)
+        return str(self.user.email) + ' valid( ' + str(self.valid) + ') token: ' + str(self.token_string)

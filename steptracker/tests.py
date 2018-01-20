@@ -30,7 +30,7 @@ class AuthTokenTest(TestCase):
     def test_token_generation(self):
         from models import AuthToken
 
-#we want each token to be different as the same user can have more than one if they have multiple devices
+# we want each token to be different as the same user can have more than one if they have multiple devices
         token = AuthToken.gen_token_string('remy@.com')
         same_token = AuthToken.gen_token_string('remy@.com')
         different_token = AuthToken.gen_token_string('autre@.com')
@@ -98,8 +98,7 @@ class AuthViewTest(TestCase):
         internal_token = AuthToken.objects.get(token_string=token_string)
         self.assertIsNotNone(internal_token)
 
-
-        #phase 2. check that login is denied before token is activated
+        # phase 2. check that login is denied before token is activated
         rq = factory.get(reverse('auth'), data={'email': 'ee@ext.europarl.europa.eu', 'token': token_string})
         response = auth(rq)
         data = json.loads(response.content)
@@ -108,7 +107,7 @@ class AuthViewTest(TestCase):
         internal_token.valid = True
         internal_token.save()
 
-        #phase 3. login allowed
+        # phase 3. login allowed
         rq = factory.get(reverse('auth'), data={'email': 'ee@ext.europarl.europa.eu', 'token': token_string})
         response = auth(rq)
         data = json.loads(response.content)
@@ -126,18 +125,18 @@ class GetDistanceViewTest(TestCase):
         well = StairWell(building='ASP', shaft='South-East')
         well.save()
 
-        L0 = Level(stairwell=well, floorNumber=0, steps=0) #steps for this one should never matter.
-        L0.save()
-        L1 = Level(stairwell=well, floorNumber=1)
-        L1.save()
-        L2 = Level(stairwell=well, floorNumber=2)
-        L2.save()
-        L3 = Level(stairwell=well, floorNumber=3)
-        L3.save()
-        L8 = Level(stairwell=well, floorNumber=8)
-        L8.save()
+        l0 = Level(stairwell=well, floorNumber=0, steps=0)  # steps for this one should never matter.
+        l0.save()
+        l1 = Level(stairwell=well, floorNumber=1)
+        l1.save()
+        l2 = Level(stairwell=well, floorNumber=2)
+        l2.save()
+        l3 = Level(stairwell=well, floorNumber=3)
+        l3.save()
+        l8 = Level(stairwell=well, floorNumber=8)
+        l8.save()
 
-        rq = factory.get(reverse('distance'), data={'qr_id_1': L0.pk, 'qr_id_2': L3.pk})
+        rq = factory.get(reverse('distance'), data={'qr_id_1': l0.pk, 'qr_id_2': l3.pk})
 
         response = distance(rq)
         self.assertIsNotNone(response)
@@ -158,7 +157,8 @@ class LogDistanceViewTest(TestCase):
         response = log_distance(rq)
         self.assertIsNotNone(response)
         data = json.loads(response.content)
-        #self.assertEqual(data['email'], 'ee@ext.europarl.europa.eu')
+        self.assertIsNotNone(data)
+        # self.assertEqual(data['email'], 'ee@ext.europarl.europa.eu')
 
 
 class ProfileViewTest(TestCase):
@@ -174,7 +174,8 @@ class ProfileViewTest(TestCase):
         response = profile(rq)
         self.assertIsNotNone(response)
         data = json.loads(response.content)
-        #self.assertEqual(data['email'], 'ee@ext.europarl.europa.eu')
+        self.assertIsNotNone(data)
+        # self.assertEqual(data['email'], 'ee@ext.europarl.europa.eu')
 
 
 class UserStatsTest(TestCase):
@@ -263,7 +264,7 @@ class UserProfileViewTest(TestCase):
 
 class UserLogDistanceViewTest(TestCase):
     def test_log_distance(self):
-        from models import User, AuthToken, Level, StairWell, UserStats
+        from models import User, AuthToken, Level, StairWell
         from django.test import RequestFactory
         from django.core.urlresolvers import reverse
         from views import log_distance, distance, profile
@@ -306,7 +307,7 @@ class UserLogDistanceViewTest(TestCase):
         self.assertEqual(data['status'], 'OK')
 
 
-class qr_list_test(TestCase):
+class QRListTest(TestCase):
     def test_qr_list(self):
         from models import Level, StairWell
         from django.test import RequestFactory
@@ -325,3 +326,4 @@ class qr_list_test(TestCase):
         rq = factory.get(reverse('qr_list'))
 
         response = qr_list(rq)
+        self.assertIsNotNone(response)

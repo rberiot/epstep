@@ -9,4 +9,4 @@ class User(models.Model):
     public_name = models.TextField()
 
     def __str__(self):
-        return str(self.email) + 'valid: ' + str(self.public_name)
+        return str(self.email) + ' - ' + str(self.public_name)
