@@ -48,6 +48,9 @@ button[type=Submit] {
 .marginVertical20{
   margin: 20px auto;
 }
+.marginVerticalTop20{
+  margin: 20px auto 0 auto;
+}
 .marginVerticalTop40{
   margin: 40px auto 0 auto;
 }
@@ -224,7 +227,7 @@ button[type=Submit] {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  font-size: 10px;
+  font-size: 0.625em; /* 10px/16px = 0.625*/
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -431,6 +434,31 @@ div[data-css-npp5qg]{
   border-right:3px solid #a1197d;
   min-height: 40px;
   margin-bottom: 10px;
+}
+
+.wallOfFame .title,
+.wallOfFame .subtitle{
+  color: #a1197d;
+  font-size: 1.125em; /* 18px/16px = 1.125*/
+  font-weight: 500;
+  text-transform: uppercase;
+  text-align: center;
+}
+.wallOfFame .title{
+  margin-top: 5px;
+  margin-bottom: 2px;
+}
+.wallOfFame .subtitle{
+  font-size: 0.625em; /* 10px/16px = 0.625*/
+  font-weight: 700;
+  color: rgba(161, 25, 125, 0.5);
+  margin-top: 0px;
+}
+.wallOfFame .content{
+  font-size: 1em;
+  font-weight: 500;
+  color: rgba(161, 25, 125, 1);
+  margin: 20px auto;
 }
 
 .CircularProgressdata h4.value{
@@ -662,7 +690,7 @@ margin-right: 8px;
   left: 0;
   right: 0;
   bottom: -25px;
-  font-size: 10px;
+  font-size: 0.625em; /* 10px/16px = 0.625*/
   font-weight: bold;
   text-align: center;
   color: #A1197D;
@@ -683,9 +711,12 @@ margin-right: 8px;
 .Charts--item b {
   position: relative;
   font-family: Helvetica, sans-serif;
-  font-size: 10px;
+  font-size: 0.625em; /* 10px/16px = 0.625*/
   top: -20px;
   color: #43A19E;
+}
+.Legend {
+  margin-bottom: 20px;
 }
 .Legend--color {
   display: inline-block;

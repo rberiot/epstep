@@ -1,10 +1,10 @@
-.loader,
-.loader_white {
+.loader {
   position: relative;
-  width: 40px;
+  width: 50px;
   height: 40px;
-  margin: 0 auto;
+  margin: 45% auto 0 auto;
 }
+.overallLoader.loader_white .loader{margin: 0 auto;}
 .loader__bar {
   position: absolute;
   bottom: 0;

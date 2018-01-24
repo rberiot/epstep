@@ -99,8 +99,8 @@ var token;
 var tokenValidationIntervalId;
 
 //let wsbaseurl = "http://localhost:8000";
-let wsbaseurl = "https://1893420d.ngrok.io";
-//let wsbaseurl = "";
+//let wsbaseurl = "https://a2780b8b.ngrok.io";
+let wsbaseurl = "";
 
 
 function tokenValidation(self) {
@@ -264,7 +264,7 @@ class Login extends React.Component {
     const { nickname } = this.state;
 
     if (redirectToReferrer) {
-      <Redirect to={from}/>
+      <Redirect to={from} />
     }
 
     return (
@@ -292,7 +292,7 @@ class Login extends React.Component {
                   onChange={this.handleChange}
                   name="email"
                   value={email}
-                  validators={['required', 'isEmail', 'matchRegexp:^[a-z0-9](.?[a-z0-9]){3,}@europarl.europa.eu|^[a-z0-9](.?[a-z0-9]){3,}@ext.europarl.europa.eu|^[a-z0-9](.?[a-z0-9]){3,}@ep.europa.eu$']}
+                  validators={['required', 'isEmail', 'matchRegexp:^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@europarl.europa.eu|^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@ext.europarl.europa.eu|^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@ep.europa.eu$']}
                   errorMessages={['This field is required', 'Please provide a valid email address', 'Please provide a valid @ep.europa.eu, @europarl.europa.eu or @ext.europarl.europa.eu email address']}
                 />
                 <TextValidator
@@ -612,9 +612,7 @@ export default function Main () {
           <PrivateRoute path='/Stats' component={Stats} />
           <PrivateRoute path='/Wall' component={Wall} />
           <PrivateRoute path='/Edit' component={Edit} />
-
-          <PrivateRoute path='/scan/:qr_id' component={Scan} />
-
+          <PrivateRoute path='/scan:qr_id' component={Scan} />
       </div>
     </Router>
   )

@@ -40,8 +40,8 @@ import '../node_modules/material-components-web/dist/material-components-web.css
 const baseUrl = process.env.PUBLIC_URL;
 
 //const wsbaseurl = "http://localhost:8000";
-let wsbaseurl = "https://1893420d.ngrok.io";
-//let wsbaseurl = "";
+//let wsbaseurl = "https://a2780b8b.ngrok.io";
+let wsbaseurl = "";
 
 const styles = {
   loginErrorStyle: {
@@ -144,6 +144,16 @@ function getAllUrlParams(url) {
 }
 
 
+const Loader = () => (
+  <div className="loader">
+    <div className="loader__bar"></div>
+    <div className="loader__bar"></div>
+    <div className="loader__bar"></div>
+    <div className="loader__bar"></div>
+    <div className="loader__bar"></div>
+    <div className="loader__ball"></div>
+  </div>
+);
 
 const ToastCloseButton = ({ closeToast }) => (
   <span onClick={closeToast}>CLOSE</span>
@@ -258,6 +268,7 @@ export class Scan extends React.Component {
       timeout: null,
       loading: false,
       result: false,
+      scansComplete: false,
       orientation: null
     }
     // preserve the initial state in a new object
@@ -274,12 +285,16 @@ export class Scan extends React.Component {
   }
 
 
-  handleScan(data){
+  handleScan(data, directAccess){
 
     if(!data)
       return
 
-    var scan_qr = getAllUrlParams(data).qr_id;
+    if(!directAccess){
+      var scan_qr = getAllUrlParams(data).qr_id;
+    } else {
+      var scan_qr = data;
+    }
 
     if(scan_qr == localStorage.getItem('qrcode_in'))
       return;
@@ -287,7 +302,12 @@ export class Scan extends React.Component {
     if(!scan_qr)
       return;
 
-    navigator.vibrate(500);
+    if(this.state.scansComplete)
+      return;
+
+    if ("vibrate" in navigator) {
+      window.navigator.vibrate([100,30]);
+    }
 
     if(localStorage.getItem('qrcode_in') == null || new Date().getTime() > localStorage.getItem('timeout')){
 
@@ -309,7 +329,9 @@ export class Scan extends React.Component {
           success: function(data){
             if (data && data.status === "OK") {
 
-              navigator.vibrate(500);
+              if ("vibrate" in navigator) {
+                window.navigator.vibrate([100,50]);
+              }
               
               this.setState({
                 message: 'DISTANCE CALCULATION',
@@ -334,12 +356,13 @@ export class Scan extends React.Component {
                     if (data && data.status === "OK") {
 
                       this.setState({
-                        message: 'THANK YOU, CHECK YOUR STATS !',
+                        message: 'THANK YOU, LOOK AT YOUR STATS !',
+                        scansComplete: true
                         //result: true
                       })
                       setTimeout(() => {
                         this.props.history.push('/Stats');
-                      }, 1000)
+                      }, 700)
                     }
 
                   }.bind(this),
@@ -384,8 +407,6 @@ export class Scan extends React.Component {
   }
   */
 
-
-
   componentWillMount(){
     let _this = this;
 
@@ -408,14 +429,28 @@ export class Scan extends React.Component {
 
   componentDidMount(){
 
-    const { match } = this.props
-    
 
-    if(match.params.qr_id){
-      alert(match.params.qr_id)
-      localStorage.setItem('qrcode_in', match.params.qr_id)
-      //this.handleScan
+    const search = this.props.location.search; // could be '?foo=bar'
+    const params = new URLSearchParams(search);
+    const qr_id = params.get('qr_id'); // bar
+    //alert(qr_id)
+    this.handleScan(qr_id, true)
+
+
+    //const { match } = this.props;
+
+    //let qrID = match.params.qr_id
+    //alert(qrID)
+
+    /*
+    if(qrID && qrID.indexOf("qr_id") >= 0){
+      
+      if(qrID.indexOf("qr_id") >= 0){
+        qrID = qrID.split('=')
+      }
+      this.handleScan(qrID[1], true)
     }
+    */
 
   }
 
@@ -453,20 +488,11 @@ export class Scan extends React.Component {
         return(
           <div className="container">
             <div className="row" style={styles.bgQR}>
-
-            {this.state.loading &&
-              <div className="overallLoader">
-                <div className="loader_white">
-                  <div className="loader__bar"></div>
-                  <div className="loader__bar"></div>
-                  <div className="loader__bar"></div>
-                  <div className="loader__bar"></div>
-                  <div className="loader__bar"></div>
-                  <div className="loader__ball"></div>
-                </div>
+              {this.state.loading &&
+              <div className="overallLoader loader_white">
+                <Loader />
               </div>
               }
-
               <QrReader
                 delay={this.state.delay}
                 onError={this.handleError}
@@ -474,8 +500,6 @@ export class Scan extends React.Component {
                 style={previewStyle}
               />
               <h3 className="overallTitle">{this.state.message}</h3>
-
-              
               <BottomNav history={this.props.history} logged={true} />
             </div>
           </div>
@@ -525,25 +549,38 @@ export class Scan extends React.Component {
 /* https://github.com/iqnivek/react-circular-progressbar/tree/c3796f26d82cc5da81714cfec5b2bf9b9ffb4b96 */
 class ChangingProgressbar extends Component {
 
- toastId = null;
+  toastId = null;
  
   constructor(props) {
     super(props);
     this.state = {
       showConfetti: false,
-      percentage: this.props.percentages,
+      showStars: false,
+      currentPercentageIndex: 0,
+      //percentage: this.props.percentages,
       prestige: this.props.prestige,
     };
   }
 
   componentDidMount(){
+
+    setTimeout(() => {
+      this.setState({
+        currentPercentageIndex: (this.state.currentPercentageIndex + 1) % this.props.percentages.length
+      });
+    }, 100);
+
+    localStorage.setItem('previous_percentage', this.props.percentages[1]);
+
     //this.handleConfetti();
     //this.handleToast();
+    
   }
 
   handleConfetti() {
     setTimeout(() => {
       this.setState({showConfetti: true});
+      this.setState({showStars: true});
     }, 200);
   }
 
@@ -581,12 +618,8 @@ class ChangingProgressbar extends Component {
       challenge_icon_location = <small>Brussels, Belgium</small>
     }
 
-  
-
     const prestigeConfig = () => {
-
       let prestige = this.state.prestige;
-
       var stars = [];
       for (var i = 0; i < prestige; i++) {
           stars.push(<Star key={i}/>);
@@ -597,9 +630,12 @@ class ChangingProgressbar extends Component {
     challenge_star = prestigeConfig()
 
     const onCountUpComplete = () => {
-      console.log('Completed! 👏'+this.state.percentage);
-      if(this.state.prestige > 0)
+      console.log('Completed! 👏'+this.props.percentages[1]);
+      if(this.state.prestige > 0 && (this.props.percentages[1] < this.props.percentages[0])){
         this.handleConfetti();
+      } else {
+        this.setState({showStars: true});
+      }
     };
     
     return (
@@ -607,12 +643,12 @@ class ChangingProgressbar extends Component {
 
         <div style={{ position: 'relative', width: '100%', height: '100%'}} className="CircularProgressdata">
           <div style={{ position: 'absolute', width: '100%' }}>
-            <CircularProgressbar className="" {...this.props} percentage={this.props.percentages} initialAnimation={true} strokeWidth={5} />
+            <CircularProgressbar className="" {...this.props} percentage={this.props.percentages[this.state.currentPercentageIndex]} initialAnimation={this.props.startFrom0} strokeWidth={5} />
             <CountUp
               className="account-balance CircularProgressbar-text"
               start={0}
-              end={this.props.percentages}
-              duration={1.5}
+              end={this.props.percentages[1]}
+              duration={1}
               useEasing={true}
               useGrouping={true}
               separator=" "
@@ -633,15 +669,13 @@ class ChangingProgressbar extends Component {
             {challenge_icon !== null ? (
               <div className={"challenge_icon "+ (this.state.showConfetti ? '' : '')}>
                 {challenge_icon}
-                <div className={"challenge_star "+ (this.state.showConfetti ? 'bounce' : '')}>{challenge_star}</div>
+                <div className={"challenge_star "+ (this.state.showStars ? 'bounce' : '')}>{challenge_star}</div>
               </div>
-
             ):(
               <div className="challenge_first">
                 <h4 className="value" onClick={() => history.push('/Scan')}>SCAN YOUR FIRST QR CODE</h4>
               </div>
             )}
-
          
 
             {this.props.total_meters &&
@@ -675,6 +709,7 @@ export class Stats extends Component {
     this.state = {
       challenge_name: null,
       total_meters: null,
+      previous_percent: localStorage.getItem('previous_percentage'),
       current_percent: null,
       scoreResults: [],
       avatar: null,
@@ -721,7 +756,7 @@ export class Stats extends Component {
 
           this.setState({
               challenge_name: data.current_challenge.name,
-              current_percent: data.current_challenge.current_steps/data.current_challenge.total_steps,
+              current_percent: (data.current_challenge.current_steps/data.current_challenge.total_steps)*100,
               nick_name: data.nick_name,
               total_calories: data.all_time_stats.all_time_cal,
               total_steps: data.all_time_stats.all_time_steps,
@@ -756,11 +791,17 @@ export class Stats extends Component {
         <div className="container">
           <div className="row">
             <ProfileResult nick_name={this.state.nick_name} total_calories={this.state.total_calories} total_steps={this.state.total_steps} total_meters={this.state.total_meters} avatar={this.state.avatar} />
-            <ChangingProgressbar history={this.props.history} percentages={this.state.current_percent*100} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} prestige={this.state.prestige} />
+           
+            {this.state.current_percent < this.state.previous_percent ?
+              <ChangingProgressbar history={this.props.history} percentages={[0, this.state.current_percent]} startFrom0={true} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} prestige={this.state.prestige} />
+            :
+              <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} prestige={this.state.prestige} />
+            }
+
             {this.state.challenge_name &&
               <Graph data={this.state.weekly_stats} />
             }
-            <ScoreResults scoreResults={this.state.scoreResults} />
+            <ScoreResults {...this.props} scoreResults={this.state.scoreResults} />
             <BottomNav history={this.props.history} logged={true} />
           </div>
         </div>  
@@ -768,14 +809,7 @@ export class Stats extends Component {
         <div className="container">
           <div className="row text-center">
             <div className="marginVerticalTop40">
-              <div className="loader">
-                <div className="loader__bar"></div>
-                <div className="loader__bar"></div>
-                <div className="loader__bar"></div>
-                <div className="loader__bar"></div>
-                <div className="loader__bar"></div>
-                <div className="loader__ball"></div>
-              </div>
+              <Loader />
             </div>
           </div>
           <BottomNav history={this.props.history} logged={true} />
@@ -790,7 +824,7 @@ export class Wall extends Component {
   constructor(props){
     super(props);
     this.state = {
-      scoreResults: [],
+      scoreResults: null,
     };
 
     this.getTop10();
@@ -824,27 +858,19 @@ export class Wall extends Component {
     });
   }
 
-
   render() {
     return (
       this.state.scoreResults ?
         <div className="container">
           <div className="row">
-            <ScoreResults scoreResults={this.state.scoreResults} wallOfFameOnly={true} />
+            <ScoreResults {...this.props} scoreResults={this.state.scoreResults} wallOfFameOnly={true} />
             <BottomNav history={this.props.history} logged={true} />
           </div>
         </div>  
       :
         <div className="container">
           <div className="row text-center">
-            <div className="loader">
-              <div className="loader__bar"></div>
-              <div className="loader__bar"></div>
-              <div className="loader__bar"></div>
-              <div className="loader__bar"></div>
-              <div className="loader__bar"></div>
-              <div className="loader__ball"></div>
-            </div>
+            <Loader />
           </div>
           <BottomNav history={this.props.history} logged={true} />
         </div>
@@ -1030,6 +1056,8 @@ export class ScoreResults extends Component {
 
   render(){
 
+      const { history } = this.props;
+
       var resultItems = this.state.scoreResults.map(function(result, index) {
           return <ScoreResultItem key={index.toString()} nickname={result.name} steps={result.total_steps} prestige={result.prestige} index={index+1} />
       });
@@ -1042,23 +1070,35 @@ export class ScoreResults extends Component {
               <div className="col-xs-6"></div>
             </div>
 
-            <div className="col-xs-12 text-center marginVertical20">
+            <div className="col-xs-12 text-center marginVerticalTop20">
               <SVGInline svg={ icon_rank } style={{marginLeft: '-3px'}} />
             </div>
 
-            <div className="col-xs-12 hidden">
-              <h4>Wall of fame</h4>
+            <div className="col-xs-12">
+              <h3 className="title">Walk of fame</h3>
+              <h4 className="subtitle">The one week challenge</h4>
             </div>
-            <div className="col-xs-12 fullwidth">
-              <div className="scoreResultsTitle">
-                  <span className="nick_name">Nickname</span>
-                  <span className="stars">Prestige</span>
-                  <span className="total_meters">Steps</span>
+
+            {this.state.scoreResults.length == 1 ?(
+              <div className="col-xs-12 col-sm-6 col-sm-offset-3">
+                <p className="content">Be the first to figure on this weekly top ten</p>
+                <MuiThemeProvider>
+                  <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
+                </MuiThemeProvider>
               </div>
-              <ul className="scoreResults">
-                  {resultItems}
-              </ul>
-            </div>   
+            ):(
+              <div className="col-xs-12 fullwidth">
+                <div className="scoreResultsTitle">
+                    <span className="nick_name">Nickname</span>
+                    <span className="stars">Prestige</span>
+                    <span className="total_meters">Steps</span>
+                </div>
+                <ul className="scoreResults">
+                    {resultItems}
+                </ul>
+              </div>
+            )}
+
           </div>     
       );
   }
