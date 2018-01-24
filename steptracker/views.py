@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render
-
-# Create your views here.
-import json
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.conf import settings
-from django.views.decorators.cache import cache_page
-from steptracker.utils.email import is_email_valid
 from models import AuthToken, User
 
 
@@ -59,7 +53,7 @@ def auth(request):
 
     if token_param is None:  # register new token
         user_list = User.objects.filter(email=email_param)
-        u = None
+
         if not user_list:
             u = User(email=email_param)
             u.save()
@@ -73,7 +67,7 @@ def auth(request):
         token.send_validation_mail(public_url='http://' + request.META.get('HTTP_HOST', settings.PUBLIC_URL))
 
         return JsonResponse({'token': token.token_string, 'status': 'OK'})
-    else:  #actual auth
+    else:  # actual auth
         token_list = AuthToken.objects.filter(token_string=token_param)
         if len(token_list) == 0:
             return JsonResponse({'status': 'TOKEN_NOT_FOUND'})
