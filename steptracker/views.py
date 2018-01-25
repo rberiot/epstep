@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.conf import settings
 from models import AuthToken, User
+from datetime import datetime
 
 
 def validate_token(request):
@@ -159,8 +160,36 @@ def profile(request):
                          })
 
 
+def weekly_stat(request):
+    week = request.GET.get('week')
+    token_param = request.GET.get('token')
+    if not AuthToken.is_token_valid(token_param) and settings.DEBUG is False:
+        return JsonResponse({'status': 'INVALID_TOKEN'})
+
+    if week:
+        try:
+            week = datetime.strptime(week, '%m-%d-%Y')
+        except:
+            return JsonResponse({'status': 'ILLEGAL_DATE_FORMAT'})
+
+    from models import UserStats
+    token = AuthToken.objects.get(token_string=token_param)
+    weekly_stats = UserStats.get_weekly_stats(token.user, week)
+
+    return JsonResponse({'status': 'OK',
+                         'week_of': week - datetime.timedelta(days=week.weekday()),
+                         'weekly_stats': weekly_stats,
+                         })
+
+
 def top_ten(request):
     week = request.GET.get('week')
+    if week:
+        try:
+            week = datetime.strptime(week, '%m-%d-%Y')
+        except:
+            return JsonResponse({'status': 'ILLEGAL_DATE_FORMAT'})
+
     from models import UserStats
 
     top10_stats = UserStats.get_weekly_top_10(week)

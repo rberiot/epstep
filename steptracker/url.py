@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^distance$', views.distance, name='distance'),
     url(r'^log_distance$', views.log_distance, name='log_distance'),
     url(r'^profile$', views.profile, name='profile'),
+    url(r'^weekly_stat$', views.profile, name='weekly_stat'),
     url(r'^qr_info$', views.qr_info, name='qr_info'),
     url(r'^update_profile$', views.update_profile, name='update_profile'),
     url(r'^top_ten', views.top_ten, name='top_ten'),
