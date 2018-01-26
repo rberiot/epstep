@@ -553,6 +553,26 @@ export class Lock extends React.Component {
     }
 }
 
+export class Filter extends React.Component {
+    render() {
+        return (
+          <svg width="16px" height="20px" viewBox="0 0 16 20" xmlns="http://www.w3.org/2000/svg">
+              <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                  <g id="User-Dashboard-Copy-4" transform="translate(-330.000000, -14.000000)">
+                      <g id="content-filter" transform="translate(326.000000, 12.000000)">
+                          <g id="Frame_-_24px">
+                              <rect id="Rectangle-path" x="0" y="0.002" width="24" height="24"></rect>
+                          </g>
+                          <g id="Line_Icons" transform="translate(4.000000, 2.000000)" fill="#A1197D" fillRule="nonzero">
+                              <path d="M14,0 L2,0 C0.896,0 0,0.898 0,2 L0,6 C0,6.256 0.098,6.512 0.293,6.707 L5,11.415 L5,19 C5,19.404 5.244,19.769 5.617,19.924 C5.741,19.976 5.871,20 6,20 C6.26,20 6.516,19.898 6.707,19.707 L10.707,15.707 C10.895,15.52 11,15.266 11,15 L11,11.414 L15.707,6.707 C15.902,6.512 16,6.257 16,6 L16,2 C16,0.898 15.104,0 14,0 Z M9.293,10.293 C9.105,10.481 9,10.735 9,11 L9,14.586 L7,16.586 L7,11 C7,10.735 6.895,10.48 6.707,10.293 L2,5.586 L2,2 L14,2 L14,5.586 L9.293,10.293 Z" id="Shape"></path>
+                          </g>
+                      </g>
+                  </g>
+              </g>
+          </svg>
+        );
+    }
+}
 
 export class UserPicturePlaceholder extends React.Component {
     render() {
@@ -575,6 +595,62 @@ export class UserPicturePlaceholder extends React.Component {
                                   <g id="Clip-4"></g>
                                   <path d="M4.3174,10 L27.6834,10 C26.4854,6.384 22.0154,4 15.9994,4 C9.9834,4 5.5134,6.384 4.3174,10 Z M31.9994,14 L-0.0006,14 L-0.0006,12 C-0.0006,4.934 6.5794,0 15.9994,0 C25.4214,0 31.9994,4.934 31.9994,12 L31.9994,14 Z" id="Fill-3" fillOpacity="0.5" fill="#FFFFFF" mask="url(#mask-2z)"></path>
                               </g>
+                          </g>
+                      </g>
+                  </g>
+              </g>
+          </svg>
+        );
+    }
+}
+
+export class QrcodeTour extends React.Component {
+    render() {
+        return (
+          <svg width="20px" height="20px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                <g id="Home/login" transform="translate(-172.000000, -604.000000)">
+                    <g id="toolbar" transform="translate(0.000000, 592.000000)">
+                        <g id="navbar" transform="translate(36.000000, 9.000000)">
+                            <g id="qr-code" transform="translate(134.000000, 0.000000)">
+                                <g>
+                                    <g id="Frame_-_24px">
+                                        <rect id="Rectangle-path" x="0" y="0.999" width="24" height="24"></rect>
+                                    </g>
+                                    <g id="Line_Icons" transform="translate(2.000000, 2.000000)" fillRule="nonzero" fill="#A1197D" fillOpacity="1">
+                                        <g id="Group">
+                                            <polygon id="Shape" points="10 8.999 8 8.999 8 4.999 12 4.999 12 6.999 10 6.999"></polygon>
+                                            <polygon id="Shape" points="9 13.999 4 13.999 4 8.999 6 8.999 6 11.999 9 11.999"></polygon>
+                                            <rect id="Rectangle-path" x="10" y="9.999" width="2" height="4"></rect>
+                                            <polygon id="Shape" points="16 12.999 14 12.999 14 10.999 13 10.999 13 8.999 16 8.999"></polygon>
+                                            <path d="M18,20.999 L2,20.999 C0.897,20.999 0,20.103 0,18.999 L0,2.999 C0,1.895 0.897,0.999 2,0.999 L18,0.999 C19.103,0.999 20,1.895 20,2.999 L20,18.999 C20,20.103 19.103,20.999 18,20.999 Z M2,2.999 L2,18.999 L18.001,18.999 L18,2.999 L2,2.999 Z" id="Shape"></path>
+                                            <rect id="Rectangle-path" x="4" y="4.999" width="3" height="3"></rect>
+                                            <rect id="Rectangle-path" x="13" y="13.999" width="3" height="3"></rect>
+                                            <rect id="Rectangle-path" x="13" y="4.999" width="3" height="3"></rect>
+                                            <rect id="Rectangle-path" x="7" y="14.999" width="5" height="2"></rect>
+                                            <rect id="Rectangle-path" x="4" y="14.999" width="2" height="2"></rect>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+          </svg>
+        );
+    }
+}
+
+export class Share extends React.Component {
+    render() {
+        return (
+          <svg width="20px" height="20px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <g id="Symbols" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                  <g id="share" transform="translate(-2.000000, -2.000000)" fill="#A1197D" fillRule="nonzero">
+                      <g id="Line_Icons">
+                          <g transform="translate(2.000000, 2.000000)">
+                              <path d="M16,12 C14.8,12 13.734,12.541 13,13.381 L7.908,10.836 C7.967,10.567 8,10.288 8,10 C8,9.712 7.967,9.434 7.908,9.163 L13,6.618 C13.734,7.458 14.8,8 16,8 C18.205,8 20,6.205 20,4 C20,1.794 18.205,0 16,0 C13.795,0 12,1.794 12,4 C12,4.287 12.033,4.566 12.092,4.836 L7,7.381 C6.266,6.542 5.2,6 4,6 C1.795,6 0,7.794 0,10 C0,12.205 1.795,14 4,14 C5.2,14 6.266,13.457 7,12.617 L12.092,15.163 C12.033,15.434 12,15.713 12,16 C12,18.205 13.795,20 16,20 C18.205,20 20,18.205 20,16 C20,13.794 18.205,12 16,12 Z M16,2 C17.104,2 18,2.895 18,4 C18,5.104 17.104,6 16,6 C14.896,6 14,5.104 14,4 C14,2.895 14.896,2 16,2 Z M4,12 C2.896,12 2,11.104 2,10 C2,8.895 2.896,8 4,8 C5.104,8 6,8.895 6,10 C6,11.104 5.104,12 4,12 Z M16,18 C14.896,18 14,17.104 14,16 C14,14.895 14.896,14 16,14 C17.104,14 18,14.895 18,16 C18,17.104 17.104,18 16,18 Z" id="Shape"></path>
                           </g>
                       </g>
                   </g>

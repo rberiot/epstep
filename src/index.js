@@ -9,7 +9,7 @@ import {
 } from 'react-router-dom';
 
 import './index.css';
-import {Scan,Stats,Wall,Header,BottomNav} from './App';
+import {Scan,Stats,Wall,Header,TopBar,BottomNav,Edit} from './App';
 import registerServiceWorker from './registerServiceWorker';
 
 import $ from 'jquery'; 
@@ -19,11 +19,11 @@ import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
 import { ToastContainer, toast } from 'react-toastify';
 
-import {IconUser, IconUserEdit, Bin, UserPicturePlaceholder, EditPlaceholder, EditPen} from './SVGicon';
+import {IconUser, IconUserEdit, Bin, UserPicturePlaceholder, Filter} from './SVGicon';
 
 import './App.css';
 
-import Webcam from 'react-webcam';
+
 
 const styles = {
   loginErrorStyle: {
@@ -35,7 +35,6 @@ const styles = {
   loginDisabledUnderlineStyle: {
     borderColor: '#ccc',
     borderWidth: '1px',
-
   },
   loginFloatingLabelStyle: {
     color: '#a1197d',
@@ -99,8 +98,8 @@ var token;
 var tokenValidationIntervalId;
 
 //let wsbaseurl = "http://localhost:8000";
-//let wsbaseurl = "https://a2780b8b.ngrok.io";
-let wsbaseurl = "";
+let wsbaseurl = "https://a2780b8b.ngrok.io";
+//let wsbaseurl = "";
 
 
 function tokenValidation(self) {
@@ -325,171 +324,7 @@ class Login extends React.Component {
   }
 }
 
-class Edit extends React.Component {
 
-  constructor(props){
-      super(props);
-      this.state={
-        email: localStorage.getItem("email"),
-        nickname: localStorage.getItem("nickname"),
-        showCameraPreview: null,
-        avatarImg64: null
-      }
-      this.handleChange2 = this.handleChange2.bind(this);
-      this.handleSubmit = this.handleSubmit.bind(this);
-
-      this.setRef = this.setRef.bind(this);
-      this.capture = this.capture.bind(this);
-      this.editPlaceholder = this.editPlaceholder.bind(this);
-  }
-
-
-  handleChange2(event) {
-      const nickname = event.target.value;
-      this.setState({ nickname });
-  }
-
-  handleSubmit() {
-
-    let self = this;
-    localStorage.setItem("nickname", this.state.nickname);
-
-
-    $.ajax({
-      url: wsbaseurl+'/update_profile',
-      type: "GET",
-      data: { nickname: this.state.nickname, token: localStorage.getItem('token') },
-      success: function(data){
-        console.log(data.status);
-        if (data && data.status === "OK") {
-           console.log("nickname correctly updated on DB");
-           self.props.history.push('/Stats')
-        }
-
-      }.bind(this),
-      error: function(xhr, ajaxOptions, thrownError) {
-        console.log(thrownError);
-      }.bind(this)
-    });
-
-    
-    
-  }
-
-  setRef(webcam) {
-    this.webcam = webcam;
-  }
-
-  capture() {
-    const imageSrc = this.webcam.getScreenshot();
-    localStorage.setItem("avatarImg64", imageSrc);
-    this.setState({ avatarImg64: localStorage.getItem("avatarImg64") });
-  }
-
-  editPlaceholder() {
-    this.setState({ showCameraPreview: 'true'} );
-  }
-
-  render(){
-
-    return (
-      <div className="container">
-        <div className="row">
-          <div className="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">
-       
-            <div className="editprofile">
-
-              {this.state.showCameraPreview == 'true' ? (
-                <div>
-                  <div className="preview">
-                    <Webcam
-                      audio={false}
-                      height={94}
-                      ref={this.setRef}
-                      screenshotFormat="image/jpeg"
-                      width={94}
-                      className=""
-                    />
-                  </div>
-                  <button onClick={this.capture}>Capture photo</button>
-                </div>
-              ):(
-                <div className="editPlaceholder" onClick={this.editPlaceholder}>
-
-                {localStorage.getItem("avatarImg64") ?(
-                  <div>
-                    <img src={localStorage.getItem("avatarImg64")} alt="" className="img-circle mirror" />
-                    <div className="editPen"><EditPen /></div>
-                  </div>
-                ):(
-                  <EditPlaceholder />
-                )}
-                
-
-                </div>
-              )} 
-              
-              {this.state.avatarImg64 &&
-                <div>
-                <img src={this.state.avatarImg64} alt="" className="img-circle resized" />
-                
-                </div>
-              }
-
-            </div>
-            
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-xs-12 col-md-4 col-md-offset-4">
-            <MuiThemeProvider>
-              <ValidatorForm
-                ref="form"
-                onSubmit={this.handleSubmit}
-                instantValidate={true}
-                onError={errors => console.log(errors)}
-              >
-                <TextValidator
-                  disabled={true}
-                  style={styles.fullwidth}
-                  floatingLabelStyle={styles.loginFloatingLabelStyle}
-                  floatingLabelFocusStyle={styles.loginFloatingLabelFocusStyle}
-                  underlineFocusStyle={styles.loginUnderlineStyle}
-                  underlineDisabledStyle={styles.loginDisabledUnderlineStyle}
-                  floatingLabelText="You can't change your email"
-                  hintText="xyz.xyz@europarl.europa.eu"
-                  onChange={this.handleChange}
-                  name="email"
-                  value={this.state.email}
-                  validators={['required', 'isEmail', 'matchRegexp:^[a-z0-9](.?[a-z0-9]){3,}@europarl.europa.eu|^[a-z0-9](.?[a-z0-9]){3,}@ext.europarl.europa.eu$']}
-                  errorMessages={['This field is required', 'Please provide a valid email address', 'Please provide a valid @europarl.europa.eu or @ext.europarl.europa.eu email address']}
-                />
-                <TextValidator
-                  style={styles.fullwidth}
-                  floatingLabelStyle={styles.loginFloatingLabelStyle}
-                  floatingLabelFocusStyle={styles.loginFloatingLabelFocusStyle}
-                  underlineFocusStyle={styles.loginUnderlineStyle}
-                  floatingLabelText="Change your nickname"
-                  hintText={this.state.nickname}
-                  onChange={this.handleChange2}
-                  name="nickname"
-                  value={this.state.nickname}
-                  validators={['required', 'maxStringLength:12']}
-                  errorMessages={['This field is required', 'Maximum 12 characters']}
-                />
-                <RaisedButton type="Submit" style={styles.button} label="Save" backgroundColor="#a1197d" labelColor="#fff" />
-              </ValidatorForm>
-            </MuiThemeProvider>
-          </div>
-        </div>
-         
-        <BottomNav history={this.props.history} logged={true} />
-
-      </div>
-    );
-  }
-}
 
 class Authlogin extends React.Component {
   componentDidMount() {
@@ -535,87 +370,28 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 )
 
 
-class Topbar extends React.Component {
+export class Main extends React.Component {
 
-    static propTypes = {
-      match: PropTypes.object.isRequired,
-      location: PropTypes.object.isRequired,
-      history: PropTypes.object.isRequired
-    }
+  constructor(props){
+    super(props);
+  }
 
-    constructor(props){
-        super(props);
-        this.handleDeleteAccount = this.handleDeleteAccount.bind(this);
-    }
-
-    handleDeleteAccount() {
-      let self = this;
-      
-      localStorage.removeItem("email")
-      localStorage.removeItem("firstVisit")
-      localStorage.removeItem("loggedIn")
-      localStorage.removeItem("nickname")
-      localStorage.removeItem("token")
-      localStorage.removeItem("acceptCookie")
-      localStorage.removeItem("avatarImg64")
-      localStorage.removeItem("timeout")
-
-      self.props.history.push('/')
-    }
-
-
-    render() {
-      const { location, history } = this.props
-        return (
-          appAuth.isAuthenticated &&
-            <div className="container account">
-
-                <div className="row">
-                  <div className="col-xs-6 sepa">
-                    <div>
-                      <span>Hello <strong>{localStorage.getItem('nickname')}</strong> <span className="hidden">@ {location.pathname}</span></span>
-                    </div>
-                  </div>
-                  <div className="col-xs-6 text-right">
-                    {location.pathname === '/Edit' ? (
-                      <div>
-                        <span onClick={this.handleDeleteAccount}>Delete my account </span>
-                        <Bin />
-                      </div>
-                    ) : (
-                      <div>
-                        <span onClick={() => history.push('/Edit')}>Edit my account </span>
-                        <IconUserEdit />
-                      </div>
-                    )}
-                    
-                  </div>
-              </div>
-            </div>
-
-        )
-    }
-}
-
-const TopBar = withRouter(Topbar);
-
-
-export default function Main () {
-  return (
-    <Router>
-      <div>
-          <TopBar />
-          <Route exact path='/' component={Login} />
-          <Route path='/Login' component={Login} />
-          <Route path='/Authlogin' component={Authlogin} />
-          <PrivateRoute exact path='/Scan' component={Scan} />
-          <PrivateRoute path='/Stats' component={Stats} />
-          <PrivateRoute path='/Wall' component={Wall} />
-          <PrivateRoute path='/Edit' component={Edit} />
-          <PrivateRoute path='/scan:qr_id' component={Scan} />
-      </div>
-    </Router>
-  )
+  render(){
+    return (
+      <Router>
+        <div>
+            <Route exact path='/' component={Login} />
+            <Route path='/Login' component={Login} />
+            <Route path='/Authlogin' component={Authlogin} />
+            <PrivateRoute exact path='/Scan' component={Scan} />
+            <PrivateRoute path='/Stats' component={Stats} />
+            <PrivateRoute path='/Wall' component={Wall} />
+            <PrivateRoute path='/Edit' component={Edit} />
+            <PrivateRoute path='/scan:qr_id' component={Scan} />
+        </div>
+      </Router>
+    )
+  }
 }
 
 

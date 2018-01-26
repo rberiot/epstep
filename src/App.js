@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import VisibilitySensor from 'react-visibility-sensor';
+import PropTypes from 'prop-types';
 
 import {
   HashRouter as Router,
@@ -9,25 +10,26 @@ import {
 } from 'react-router-dom';
 
 import QrReader from 'react-qr-reader';
-
 import $ from 'jquery'; 
+import Swiper from 'swiper';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
-
 import {Tabs, Tab} from 'material-ui/Tabs';
-
 import CircularProgressbar from 'react-circular-progressbar';
 import CountUp from 'react-countup';
-
 import { ToastContainer, toast } from 'react-toastify';
-
 import Confetti from 'react-dom-confetti';
+import Webcam from 'react-webcam';
+import { ValidatorForm } from 'react-form-validator-core';
+import { TextValidator} from 'react-material-ui-form-validator';
 
 import './App.css';
 import './Loader.css';
+import 'swiper/dist/css/swiper.min.css';
 
-import {UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo} from './SVGicon';
+
+import {Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, Filter, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo} from './SVGicon';
 
 import SVGInline from "react-svg-inline"
 import icon_rank from './icon_rank.svg'
@@ -40,10 +42,23 @@ import '../node_modules/material-components-web/dist/material-components-web.css
 const baseUrl = process.env.PUBLIC_URL;
 
 //const wsbaseurl = "http://localhost:8000";
-//let wsbaseurl = "https://a2780b8b.ngrok.io";
-let wsbaseurl = "";
+let wsbaseurl = "https://a2780b8b.ngrok.io";
+//let wsbaseurl = "";
 
 const styles = {
+
+
+  loginDisabledUnderlineStyle: {
+    borderColor: '#ccc',
+    borderWidth: '1px',
+  },
+  loginFloatingLabelStyle: {
+    color: '#a1197d',
+    opacity: '0.7',
+    fontSize: '12px',
+    fontWeight: 'normal',
+    textTransform: 'uppercase'
+  },
   loginErrorStyle: {
     color: '#ccc',
   },
@@ -61,7 +76,7 @@ const styles = {
     width: '100%'
   },
   bgQR: {
-    height: 'calc(100vh - 80px)',
+    height: 'calc(100vh - 48px)',
     backgroundColor: 'rgba(161, 25, 125, 0.7)',
     position: 'relative',
   },
@@ -157,7 +172,68 @@ const Loader = () => (
 
 const ToastCloseButton = ({ closeToast }) => (
   <span onClick={closeToast}>CLOSE</span>
-);
+)
+
+ 
+export class TourMsg extends Component {
+  
+  componentDidMount() {
+    let mySwiper = new Swiper('.swiper-container', {init:false, loop:false, spaceBetween:40, autoHeight:false, pagination: {el: '.swiper-pagination'} });
+    mySwiper.init()
+  }
+
+  dismiss = () =>  toast.dismiss(this.toastId);
+
+  render() {
+
+    return (
+      <div>
+        
+        <div className="content">
+          <div className="swiper-container">
+
+              <div className="swiper-wrapper">
+
+                  <div className="swiper-slide">  
+                    <div className="head"> 
+                      <QrcodeTour /> 
+                      <h3 className="title">FIRST STEP</h3>
+                      <h4 className="subtitle">SCAN A QR CODE</h4>
+                    </div>     
+                    <p>The cookie settings on this website are set to 'allow all cookies' to give you the very best experience. If you continue without changing these settings, you consent to this - but if you want, you can change your settings at any time at the bottom of this page.</p>
+                  </div>
+
+                  <div className="swiper-slide">  
+                    <div className="head"> 
+                      <QrcodeTour /> 
+                      <h3 className="title">SECOND STEP</h3>
+                      <h4 className="subtitle">SCAN A QR CODE</h4>
+                    </div>     
+                    <p>The cookie settings on this website are set to 'allow all cookies' to give you the very best experience. If you continue without changing these settings, you consent to this - but if you want, you can change your settings at any time at the bottom of this page.</p>
+                  </div>
+
+                  <div className="swiper-slide">  
+                    <div className="head"> 
+                      <QrcodeTour /> 
+                      <h3 className="title">THIRD STEP</h3>
+                      <h4 className="subtitle">SCAN A QR CODE</h4>
+                    </div>     
+                    <p>The cookie settings on this website are set to 'allow all cookies' to give you the very best experience. If you continue without changing these settings, you consent to this - but if you want, you can change your settings at any time at the bottom of this page.</p>
+                  </div>
+                  
+              </div>
+
+              <div className="swiper-pagination"></div>
+           
+          </div>
+
+        </div>
+
+        <button onClick={this.dismiss}>Got it</button>
+      </div>
+    )
+  }
+}
 
 
 export class Header extends Component {
@@ -170,6 +246,99 @@ export class Header extends Component {
     );
   }
 }
+
+
+class Topbar extends React.Component {
+
+    static propTypes = {
+      match: PropTypes.object.isRequired,
+      location: PropTypes.object.isRequired,
+      history: PropTypes.object.isRequired
+    }
+
+    constructor(props){
+        super(props);
+        this.handleDeleteAccount = this.handleDeleteAccount.bind(this);
+    }
+
+    handleDeleteAccount() {
+      let self = this;
+      
+      localStorage.removeItem("email")
+      localStorage.removeItem("firstVisit")
+      localStorage.removeItem("loggedIn")
+      localStorage.removeItem("nickname")
+      localStorage.removeItem("token")
+      localStorage.removeItem("acceptCookie")
+      localStorage.removeItem("avatarImg64")
+      localStorage.removeItem("timeout")
+
+      self.props.history.push('/')
+    }
+
+    handleShareResults() {
+      var email = "xyz@abc.com";
+      var body = "Salut";
+      window.location.href = "mailto:"+email;
+    }
+
+
+    render() {
+      const { location, history } = this.props
+        return (
+          localStorage.getItem('loggedIn') == 'true' ?
+            <div className="container account">
+
+              {location.pathname == "/OtherTopBar" ?(
+                <div className="row">
+                  <div className="col-xs-6 sepa">
+                    <div>
+                      <span>Hello <strong>{localStorage.getItem('nickname')}</strong> <span className="hidden">@ {location.pathname}</span></span>
+                    </div>
+                  </div>
+                  <div className="col-xs-6 text-right">
+                    <div>
+                      <span onClick={this.props.action}>All time ranking </span>
+                      <Filter />
+                    </div>
+                  </div>
+                </div>
+
+                ):(
+
+                <div className="row">
+                  <div className="col-xs-6 sepa">
+                    <div>
+                      <Share />
+                      <span onClick={this.handleShareResults}>Share my results</span>
+                    </div>
+                  </div>
+                  <div className="col-xs-6 text-right">
+                    {location.pathname === '/Edit' ? (
+                      <div>
+                        <span onClick={this.handleDeleteAccount}>Delete my account </span>
+                        <Bin />
+                      </div>
+                    ) : (
+                      <div>
+                        <span onClick={() => history.push('/Edit')}>Edit my account </span>
+                        <IconUserEdit />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                )}
+            </div>
+          :
+            <p>You're not logged</p>
+          
+
+        )
+    }
+}
+
+const TopBar = withRouter(Topbar);
 
 
 export class BottomNav extends Component {
@@ -433,24 +602,8 @@ export class Scan extends React.Component {
     const search = this.props.location.search; // could be '?foo=bar'
     const params = new URLSearchParams(search);
     const qr_id = params.get('qr_id'); // bar
-    //alert(qr_id)
+
     this.handleScan(qr_id, true)
-
-
-    //const { match } = this.props;
-
-    //let qrID = match.params.qr_id
-    //alert(qrID)
-
-    /*
-    if(qrID && qrID.indexOf("qr_id") >= 0){
-      
-      if(qrID.indexOf("qr_id") >= 0){
-        qrID = qrID.split('=')
-      }
-      this.handleScan(qrID[1], true)
-    }
-    */
 
   }
 
@@ -459,8 +612,6 @@ export class Scan extends React.Component {
 
     const previewStyle = {}
     const { match } = this.props
-
-    //alert(match.params.qr_id)
 
 
       if (this.state.orientation == 'landscape') {
@@ -568,7 +719,7 @@ class ChangingProgressbar extends Component {
       this.setState({
         currentPercentageIndex: (this.state.currentPercentageIndex + 1) % this.props.percentages.length
       });
-    }, 100);
+    }, 300);
 
     localStorage.setItem('previous_percentage', this.props.percentages[1]);
 
@@ -630,8 +781,8 @@ class ChangingProgressbar extends Component {
     challenge_star = prestigeConfig()
 
     const onCountUpComplete = () => {
-      console.log('Completed! 👏'+this.props.percentages[1]);
-      if(this.state.prestige > 0 && (this.props.percentages[1] < this.props.percentages[0])){
+      console.log('Completed! 👏'+'--previous percentage:'+Math.floor(this.props.percentages[0])+'--current percentage:'+Math.floor(this.props.percentages[1]));
+      if(this.state.prestige > 0 && (Math.floor(this.props.percentages[1]) < Math.floor(this.props.percentages[0]))){
         this.handleConfetti();
       } else {
         this.setState({showStars: true});
@@ -685,8 +836,7 @@ class ChangingProgressbar extends Component {
             }
 
             <Confetti active={ this.state.showConfetti } config={ confetti_config } />
-            <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'helloToast'} autoClose={false} closeButton={<ToastCloseButton />} />
-
+            {/*<ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'helloToast'} autoClose={false} closeButton={<ToastCloseButton />} />*/}
 
           </div>
 
@@ -721,6 +871,15 @@ export class Stats extends Component {
   min = 1;
   max = 100;
 
+  handleToast4tour(tab) {
+    setTimeout(() => {
+      if (!toast.isActive(this.toastId)) {
+        toast(<TourMsg />);
+      }
+    }, 1000);
+  }
+
+
   componentDidMount(){
     this.setState({profileResults: false});
     if(localStorage.getItem('firstVisit') === null || localStorage.getItem('firstVisit') === 'true'){
@@ -736,11 +895,16 @@ export class Stats extends Component {
           avatar:<UserPicturePlaceholder />,
           profileLoaded: true
       })
+
+      this.handleToast4tour();
+
     } else {
       this.getStatsData();
+      //this.handleToast4tour();
     }
     
   }
+
 
   getStatsData() {
     $.ajax({
@@ -767,7 +931,6 @@ export class Stats extends Component {
 
         }
         this.setState({
-          //avatar: "https://randomuser.me/api/portraits/men/"+Math.floor((Math.random() * (this.max - this.min)))+".jpg",
           avatar:<UserPicturePlaceholder />
         });
       }.bind(this),
@@ -785,34 +948,42 @@ export class Stats extends Component {
   
 
   render(){
-    //alert(this.state.imageStatus)
+
     return(
       this.state.profileLoaded ?
-        <div className="container">
-          <div className="row">
-            <ProfileResult nick_name={this.state.nick_name} total_calories={this.state.total_calories} total_steps={this.state.total_steps} total_meters={this.state.total_meters} avatar={this.state.avatar} />
-           
-            {this.state.current_percent < this.state.previous_percent ?
-              <ChangingProgressbar history={this.props.history} percentages={[0, this.state.current_percent]} startFrom0={true} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} prestige={this.state.prestige} />
-            :
-              <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} prestige={this.state.prestige} />
-            }
+        <div>
+          <TopBar />
+          <div className="container">
+            <div className="row">
+              <ProfileResult nick_name={this.state.nick_name} total_calories={this.state.total_calories} total_steps={this.state.total_steps} total_meters={this.state.total_meters} avatar={this.state.avatar} />
+             
+              {this.state.current_percent <= this.state.previous_percent ?
+                <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={true} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} prestige={this.state.prestige} />
+              :
+                <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} prestige={this.state.prestige} />
+              }
 
-            {this.state.challenge_name &&
-              <Graph data={this.state.weekly_stats} />
-            }
-            <ScoreResults {...this.props} scoreResults={this.state.scoreResults} />
-            <BottomNav history={this.props.history} logged={true} />
-          </div>
-        </div>  
-      :
-        <div className="container">
-          <div className="row text-center">
-            <div className="marginVerticalTop40">
-              <Loader />
+              {this.state.challenge_name &&
+                <Graph data={this.state.weekly_stats} />
+              }
+              <ScoreResults {...this.props} scoreResults={this.state.scoreResults} />
+              <BottomNav history={this.props.history} logged={true} />
+              <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'tourToast'} autoClose={false} closeOnClick={false} closeButton={false}  />
+
             </div>
           </div>
-          <BottomNav history={this.props.history} logged={true} />
+        </div>
+      :
+        <div>
+          <TopBar />
+          <div className="container">
+            <div className="row text-center">
+              <div className="marginVerticalTop40">
+                <Loader />
+              </div>
+            </div>
+            <BottomNav history={this.props.history} logged={true} />
+          </div>
         </div>
     )
   }
@@ -824,14 +995,18 @@ export class Wall extends Component {
   constructor(props){
     super(props);
     this.state = {
-      scoreResults: null,
+      scoreResults: [],
+      scoreResultsAllTime: [],
     };
 
-    this.getTop10();
+    this.getTop10Weekly();
+    this.getTop10AllTime();
+
+    //this.handler = this.handler.bind(this);
 
   }
 
-  getTop10() {
+  getTop10Weekly() {
     $.ajax({
       url: wsbaseurl+'/top_ten',
       dataType : 'json',
@@ -858,22 +1033,63 @@ export class Wall extends Component {
     });
   }
 
+  getTop10AllTime() {
+    $.ajax({
+      url: wsbaseurl+'/top_ten',
+      dataType : 'json',
+      type: "GET",
+      cache: false, 
+      success: function (data) {
+        if (data && data.status === "OK") {
+          console.log(JSON.stringify(data.top_10));
+          this.setState({
+              scoreResultsAllTime: data.top_10,
+          })
+        }
+
+      }.bind(this),
+      complete: function () {
+
+      }.bind(this),
+      error: function(xhr, ajaxOptions, thrownError) {
+        console.log(thrownError);      
+      }
+    });
+  }
+
+  // This method will be sent to the child component
+  /*
+  handler() {
+    this.getTop10();
+  }
+  */
+
   render() {
+
     return (
-      this.state.scoreResults ?
-        <div className="container">
-          <div className="row">
-            <ScoreResults {...this.props} scoreResults={this.state.scoreResults} wallOfFameOnly={true} />
+
+      
+      this.state.scoreResults.length > 0 ?
+        <div>
+          <TopBar /*action={this.handler}*/ />
+          <div className="container">
+            <div className="row">
+              <ScoreResults {...this.props} scoreResults={this.state.scoreResults} scoreResultsAllTime={this.state.scoreResultsAllTime} wallOfFameOnly={true} />
+              <BottomNav history={this.props.history} logged={true} />
+            </div>
+          </div> 
+        </div> 
+      :
+        <div>
+          <TopBar />
+          <div className="container">
+            <div className="row text-center">
+              <Loader />
+            </div>
             <BottomNav history={this.props.history} logged={true} />
           </div>
-        </div>  
-      :
-        <div className="container">
-          <div className="row text-center">
-            <Loader />
-          </div>
-          <BottomNav history={this.props.history} logged={true} />
         </div>
+
     );
   }
 }
@@ -980,19 +1196,32 @@ export class ScoreResults extends Component {
   constructor(props){
     super(props);
     this.state = {
-      scoreResults: [],
+      scoreResults: this.props.scoreResults,
+      scoreResultsAllTime: this.props.scoreResults,
+      wallOfFameSubtitle : 'The one week challenge'
     };
 
-    this.getTop10()
+    if(!this.props.wallOfFameOnly){
+      this.getTop10Weekly()
+      this.getTop10AllTime()
+    }
+    this.handleTab = this.handleTab.bind(this);
 
   }
 
-  componentDidMount(){
-    //var URL1 = 'https://randomuser.me/api/?nat=fr&results=20';
-    //this.scoreSearch(URL1)
+  handleTab = (key) => {
+    if(key=="0"){
+      this.setState({
+        wallOfFameSubtitle : 'The one week challenge'
+      });
+    } else {
+      this.setState({
+        wallOfFameSubtitle : 'The all time challenge'
+      });
+    }
   }
 
-  getTop10() {
+  getTop10Weekly() {
     $.ajax({
       url: wsbaseurl+'/top_ten',
       dataType : 'json',
@@ -1016,42 +1245,31 @@ export class ScoreResults extends Component {
     });
   }
 
-  showScoreResults(response){
-
-    function shuffleData(a) {
-      for (let i = a.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a.slice(0, 10);
-    }
-
-    function sortPostcode(data, key, way) {
-      return data.sort(function(a, b) {
-          var x = a[key].postcode; var y = b[key].postcode;
-          if (way === 'asc' ) { return ((x < y) ? -1 : ((x > y) ? 1 : 0)); }
-          if (way === 'desc') { return ((x > y) ? -1 : ((x < y) ? 1 : 0)); }
-      }).slice(0, 10);
-    }
-
-
-    this.setState({
-        scoreResults: sortPostcode(response.results, 'location', 'desc')
-    })
-  }
-
-
-
-  scoreSearch(URL){
+  getTop10AllTime() {
     $.ajax({
-        type: "GET",
-        dataType: 'jsonp',
-        url: URL,
-        success: function(response){
-            this.showScoreResults(response);
-        }.bind(this)
+      url: wsbaseurl+'/top_ten',
+      dataType : 'json',
+      type: "GET",
+      cache: false, 
+      success: function (data) {
+        if (data && data.status === "OK") {
+          console.log(JSON.stringify(data.top_10));
+          this.setState({
+              scoreResultsAllTime: data.top_10,
+          })
+        }
+
+      }.bind(this),
+      complete: function () {
+
+      }.bind(this),
+      error: function(xhr, ajaxOptions, thrownError) {
+        console.log(thrownError);      
+      }
     });
   }
+
+
 
 
   render(){
@@ -1059,6 +1277,10 @@ export class ScoreResults extends Component {
       const { history } = this.props;
 
       var resultItems = this.state.scoreResults.map(function(result, index) {
+          return <ScoreResultItem key={index.toString()} nickname={result.name} steps={result.total_steps} prestige={result.prestige} index={index+1} />
+      });
+
+      var resultItemsAllTime = this.state.scoreResultsAllTime.map(function(result, index) {
           return <ScoreResultItem key={index.toString()} nickname={result.name} steps={result.total_steps} prestige={result.prestige} index={index+1} />
       });
 
@@ -1076,26 +1298,47 @@ export class ScoreResults extends Component {
 
             <div className="col-xs-12">
               <h3 className="title">Walk of fame</h3>
-              <h4 className="subtitle">The one week challenge</h4>
+              <h4 className="subtitle">{this.state.wallOfFameSubtitle}</h4>
             </div>
 
-            {this.state.scoreResults.length == 1 ?(
+            {this.state.scoreResults.length > 0 ?(
+              <div>
+
+                <div className="col-xs-12 fullwidth">
+                  
+
+                  <SwitchTabs className="tabs-wrapper" onChangeTab={this.handleTab}>
+                    <SwitchTab active="true" title="Week" >
+                      <div className="scoreResultsTitle">
+                        <span className="nick_name">Nickname</span>
+                        <span className="stars">Prestige</span>
+                        <span className="total_meters">Steps</span>
+                      </div>
+                      <ul className="scoreResults">
+                        {resultItems}
+                      </ul>
+                    </SwitchTab>
+                    <SwitchTab title="All time">
+                      <div className="scoreResultsTitle">
+                        <span className="nick_name">Nickname</span>
+                        <span className="stars">Prestige</span>
+                        <span className="total_meters">Steps</span>
+                      </div>
+                      <ul className="scoreResults">
+                          {resultItemsAllTime}
+                      </ul>
+                    </SwitchTab>
+                  </SwitchTabs>
+
+                  
+                </div>
+              </div>
+            ):(
               <div className="col-xs-12 col-sm-6 col-sm-offset-3">
                 <p className="content">Be the first to figure on this weekly top ten</p>
                 <MuiThemeProvider>
                   <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
                 </MuiThemeProvider>
-              </div>
-            ):(
-              <div className="col-xs-12 fullwidth">
-                <div className="scoreResultsTitle">
-                    <span className="nick_name">Nickname</span>
-                    <span className="stars">Prestige</span>
-                    <span className="total_meters">Steps</span>
-                </div>
-                <ul className="scoreResults">
-                    {resultItems}
-                </ul>
               </div>
             )}
 
@@ -1326,5 +1569,232 @@ class Charts extends React.Component {
 };
 
 
+export class Edit extends React.Component {
+
+  constructor(props){
+      super(props);
+      this.state={
+        email: localStorage.getItem("email"),
+        nickname: localStorage.getItem("nickname"),
+        showCameraPreview: null,
+        avatarImg64: null
+      }
+      this.handleChange2 = this.handleChange2.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);
+
+      this.setRef = this.setRef.bind(this);
+      this.capture = this.capture.bind(this);
+      this.editPlaceholder = this.editPlaceholder.bind(this);
+  }
+
+
+  handleChange2(event) {
+      const nickname = event.target.value;
+      this.setState({ nickname });
+  }
+
+  handleSubmit() {
+
+    let self = this;
+    localStorage.setItem("nickname", this.state.nickname);
+
+
+    $.ajax({
+      url: wsbaseurl+'/update_profile',
+      type: "GET",
+      data: { nickname: this.state.nickname, token: localStorage.getItem('token') },
+      success: function(data){
+        console.log(data.status);
+        if (data && data.status === "OK") {
+           console.log("nickname correctly updated on DB");
+           self.props.history.push('/Stats')
+        }
+
+      }.bind(this),
+      error: function(xhr, ajaxOptions, thrownError) {
+        console.log(thrownError);
+      }.bind(this)
+    });
+    
+  }
+
+  setRef(webcam) {
+    this.webcam = webcam;
+  }
+
+  capture() {
+    const imageSrc = this.webcam.getScreenshot();
+    localStorage.setItem("avatarImg64", imageSrc);
+    this.setState({ avatarImg64: localStorage.getItem("avatarImg64") });
+  }
+
+  editPlaceholder() {
+    this.setState({ showCameraPreview: 'true'} );
+  }
+
+  render(){
+
+    return (
+      <div>
+        <TopBar />
+        <div className="container">
+          <div className="row">
+            <div className="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">
+         
+              <div className="editprofile">
+
+                {this.state.showCameraPreview == 'true' ? (
+                  <div>
+                    <div className="preview">
+                      <Webcam
+                        audio={false}
+                        height={94}
+                        ref={this.setRef}
+                        screenshotFormat="image/jpeg"
+                        width={94}
+                        className=""
+                      />
+                    </div>
+                    <button onClick={this.capture}>Capture photo</button>
+                  </div>
+                ):(
+                  <div className="editPlaceholder" onClick={this.editPlaceholder}>
+
+                  {localStorage.getItem("avatarImg64") ?(
+                    <div>
+                      <img src={localStorage.getItem("avatarImg64")} alt="" className="img-circle mirror" />
+                      <div className="editPen"><EditPen /></div>
+                    </div>
+                  ):(
+                    <EditPlaceholder />
+                  )}
+                  
+
+                  </div>
+                )} 
+                
+                {this.state.avatarImg64 &&
+                  <div>
+                  <img src={this.state.avatarImg64} alt="" className="img-circle resized" />
+                  
+                  </div>
+                }
+
+              </div>
+              
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col-xs-12 col-md-4 col-md-offset-4">
+              <MuiThemeProvider>
+                <ValidatorForm
+                  ref="form"
+                  onSubmit={this.handleSubmit}
+                  instantValidate={true}
+                  onError={errors => console.log(errors)}
+                >
+                  <TextValidator
+                    disabled={true}
+                    style={styles.fullwidth}
+                    floatingLabelStyle={styles.loginFloatingLabelStyle}
+                    floatingLabelFocusStyle={styles.loginFloatingLabelFocusStyle}
+                    underlineFocusStyle={styles.loginUnderlineStyle}
+                    underlineDisabledStyle={styles.loginDisabledUnderlineStyle}
+                    floatingLabelText="You can't change your email"
+                    hintText="xyz.xyz@europarl.europa.eu"
+                    onChange={this.handleChange}
+                    name="email"
+                    value={this.state.email}
+                    validators={['required', 'isEmail', 'matchRegexp:^[a-z0-9](.?[a-z0-9]){3,}@europarl.europa.eu|^[a-z0-9](.?[a-z0-9]){3,}@ext.europarl.europa.eu$']}
+                    errorMessages={['This field is required', 'Please provide a valid email address', 'Please provide a valid @europarl.europa.eu or @ext.europarl.europa.eu email address']}
+                  />
+                  <TextValidator
+                    style={styles.fullwidth}
+                    floatingLabelStyle={styles.loginFloatingLabelStyle}
+                    floatingLabelFocusStyle={styles.loginFloatingLabelFocusStyle}
+                    underlineFocusStyle={styles.loginUnderlineStyle}
+                    floatingLabelText="Change your nickname"
+                    hintText={this.state.nickname}
+                    onChange={this.handleChange2}
+                    name="nickname"
+                    value={this.state.nickname}
+                    validators={['required', 'maxStringLength:12']}
+                    errorMessages={['This field is required', 'Maximum 12 characters']}
+                  />
+                  <RaisedButton type="Submit" style={styles.button} label="Save" backgroundColor="#a1197d" labelColor="#fff" />
+                </ValidatorForm>
+              </MuiThemeProvider>
+            </div>
+          </div>
+           
+          <BottomNav history={this.props.history} logged={true} />
+
+        </div>
+      </div>
+    );
+  }
+}
+
+
+class SwitchTabs extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+        activeIndex : 0
+    };
+  }
+
+  handleOnClick(key, event) {
+    event.preventDefault();
+    this.setState({
+        activeIndex : key
+    });
+    this.props.onChangeTab(key); 
+  }
+
+  renderNavItem(key) {
+    let tab = this.props.children[key];
+    return (
+        <li key={ key } className={ this.state.activeIndex == key ? 'active' : ''}>
+            <a href="#" onClick={ this.handleOnClick.bind(this, key) }>{ tab.props.title }</a>
+        </li>
+    );
+  }
+
+  render() {
+    let index = 0;
+    let active = this.state.activeIndex;
+    let tabs = React.Children.map(this.props.children, function (child) {
+        return React.cloneElement(child, {
+            active : child.props.active === true ? true : (active == index++)
+        });
+    });
+    return (
+      <div className={ this.props.className }>
+          <ul className="switchtabs-nav">
+              { Object.keys(this.props.children).map(this.renderNavItem.bind(this)) }
+          </ul>
+          <div className="switchtabs-content">
+              { tabs }
+          </div>
+      </div>
+    )
+  }
+}
+
+class SwitchTab extends React.Component {
+  render() {
+    return (
+      <div className={ "switchtab-panel" + (this.props.active ? ' active' : '') }>
+        { this.props.children }
+      </div>
+    )
+  }
+}
+
+SwitchTab.defaultProps = { 
+  active : false 
+};
 
 
