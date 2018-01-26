@@ -356,30 +356,3 @@ class AllTimeTop10Test(TestCase):
 
         response = all_time_top_ten(rq)
         self.assertIsNotNone(response)
-
-
-    def test_total_steps(self):
-        from models import UserStats
-        import datetime
-        today = datetime.datetime(2017, 10, 20)
-
-        monday = today - datetime.timedelta(days=today.weekday())
-        tuesday = monday + datetime.timedelta(days=1)
-        wednesday = monday + datetime.timedelta(days=2)
-        thursday = monday + datetime.timedelta(days=3)
-        friday = monday + datetime.timedelta(days=4)
-        saturday = monday + datetime.timedelta(days=5)
-        sunday = monday + datetime.timedelta(days=6)
-
-        s = UserStats()
-        s.add(25, monday)
-        s.add(25, monday)
-
-        s.add(7, tuesday)
-        s.add(89, wednesday)
-        s.add(2, thursday)
-        s.add(3, friday)
-        s.add(5, saturday)
-        s.add(9, sunday)
-
-        self.assertEqual(s.total_steps(), 25+25+7+89+2+3+5+9)

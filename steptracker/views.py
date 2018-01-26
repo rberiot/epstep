@@ -217,6 +217,9 @@ def all_time_top_ten(request):
     top10_stats = UserStats.get_all_time_top_10()
     top10 = []
     for user, steps in top10_stats:
+        if steps == 0:
+            continue
+
         prestige, challenge_progress = divmod(steps, 1000)
 
         top10.append({'name': user.public_name,
