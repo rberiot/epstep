@@ -321,7 +321,7 @@ export class Atomium extends React.Component {
 export class IconUser extends React.Component {
     render() {
         return (
-          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+          <svg width="20px" height="20px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <polygon id="path-1" points="7.99985 7 0 7 0 0 15.9997 0 15.9997 7"></polygon>
             </defs>

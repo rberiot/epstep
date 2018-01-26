@@ -29,7 +29,7 @@ import './Loader.css';
 import 'swiper/dist/css/swiper.min.css';
 
 
-import {Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, Filter, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo} from './SVGicon';
+import {IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, Filter, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo} from './SVGicon';
 
 import SVGInline from "react-svg-inline"
 import icon_rank from './icon_rank.svg'
@@ -200,25 +200,25 @@ export class TourMsg extends Component {
                       <h3 className="title">FIRST STEP</h3>
                       <h4 className="subtitle">SCAN A QR CODE</h4>
                     </div>     
-                    <p>The cookie settings on this website are set to 'allow all cookies' to give you the very best experience. If you continue without changing these settings, you consent to this - but if you want, you can change your settings at any time at the bottom of this page.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
                   </div>
 
                   <div className="swiper-slide">  
                     <div className="head"> 
-                      <QrcodeTour /> 
+                      <IconUser /> 
                       <h3 className="title">SECOND STEP</h3>
-                      <h4 className="subtitle">SCAN A QR CODE</h4>
+                      <h4 className="subtitle">CREATE YOUR PROFILE</h4>
                     </div>     
-                    <p>The cookie settings on this website are set to 'allow all cookies' to give you the very best experience. If you continue without changing these settings, you consent to this - but if you want, you can change your settings at any time at the bottom of this page.</p>
+                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
                   </div>
 
                   <div className="swiper-slide">  
                     <div className="head"> 
-                      <QrcodeTour /> 
+                      <SVGInline svg={ icon_rank } style={{marginLeft: '-3px'}} />
                       <h3 className="title">THIRD STEP</h3>
-                      <h4 className="subtitle">SCAN A QR CODE</h4>
+                      <h4 className="subtitle">CHECK YOUR STATS</h4>
                     </div>     
-                    <p>The cookie settings on this website are set to 'allow all cookies' to give you the very best experience. If you continue without changing these settings, you consent to this - but if you want, you can change your settings at any time at the bottom of this page.</p>
+                    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                   </div>
                   
               </div>
@@ -277,11 +277,12 @@ class Topbar extends React.Component {
     }
 
     handleShareResults() {
-      var email = "xyz@abc.com";
-      var body = "Salut";
-      window.location.href = "mailto:"+email;
+      var page = window.location.protocol+"//"+window.location.hostname;
+      var email = "";
+      var subject = "Invitation to join a stair challenge on EPStairs";
+      var body = "Hey!"+ "\r\n\r\n" +"I've just setup a mini stair climbing challenge with EPStairs."+ "\r\n" +"Join me and let's compare our results."+ "\r\n\r\n" +page;
+      window.location.href = "mailto:"+email+"?Subject=" + subject + "&body=" + encodeURIComponent(body);
     }
-
 
     render() {
       const { location, history } = this.props
@@ -519,11 +520,8 @@ export class Scan extends React.Component {
                   type: "GET",
                   data: { steps: this.state.distance, token: localStorage.getItem('token') },
                   success: function(data){
-
-                    console.log(data.status);
-
+                    //console.log(data.status);
                     if (data && data.status === "OK") {
-
                       this.setState({
                         message: 'THANK YOU, LOOK AT YOUR STATS !',
                         scansComplete: true
@@ -708,6 +706,7 @@ class ChangingProgressbar extends Component {
       showConfetti: false,
       showStars: false,
       currentPercentageIndex: 0,
+      current_steps: this.props.current_steps,
       //percentage: this.props.percentages,
       prestige: this.props.prestige,
     };
@@ -831,7 +830,8 @@ class ChangingProgressbar extends Component {
 
             {this.props.total_meters &&
               <div className="challenge_meters">
-                <h4 className="value">{this.props.total_meters}m</h4>
+                <h4 className="value">{this.props.current_steps}/{this.props.current_challenge}</h4>
+                <h5 className="value">Steps</h5>
               </div>
             }
 
@@ -862,8 +862,10 @@ export class Stats extends Component {
       previous_percent: localStorage.getItem('previous_percentage'),
       current_percent: null,
       scoreResults: [],
+      scoreResultsAllTime: [],
       avatar: null,
-      profileLoaded: false
+      profileLoaded: false,
+      current_steps: null
     };
 
   }
@@ -893,7 +895,10 @@ export class Stats extends Component {
           prestige: null,
           weekly_stats: null,
           avatar:<UserPicturePlaceholder />,
-          profileLoaded: true
+          profileLoaded: true,
+          current_steps: '0',
+          current_challenge: '0'
+
       })
 
       this.handleToast4tour();
@@ -915,9 +920,6 @@ export class Stats extends Component {
       cache: false, 
       success: function (data) {
         if (data && data.status === "OK") {
-
-          //console.log(data.current_challenge.current_steps)
-
           this.setState({
               challenge_name: data.current_challenge.name,
               current_percent: (data.current_challenge.current_steps/data.current_challenge.total_steps)*100,
@@ -926,9 +928,10 @@ export class Stats extends Component {
               total_steps: data.all_time_stats.all_time_steps,
               total_meters: Math.floor(data.all_time_stats.all_time_meters),
               prestige: data.current_challenge.prestige,
-              weekly_stats: data.weekly_stats
+              weekly_stats: data.weekly_stats,
+              current_steps: data.current_challenge.current_steps,
+              current_challenge: data.current_challenge.total_steps
           })
-
         }
         this.setState({
           avatar:<UserPicturePlaceholder />
@@ -958,15 +961,17 @@ export class Stats extends Component {
               <ProfileResult nick_name={this.state.nick_name} total_calories={this.state.total_calories} total_steps={this.state.total_steps} total_meters={this.state.total_meters} avatar={this.state.avatar} />
              
               {this.state.current_percent <= this.state.previous_percent ?
-                <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={true} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} prestige={this.state.prestige} />
+                <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={true} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
               :
-                <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} prestige={this.state.prestige} />
+                <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
               }
+              
+              <ScoreResults {...this.props} wallOfFameOnly={false} />
 
               {this.state.challenge_name &&
                 <Graph data={this.state.weekly_stats} />
               }
-              <ScoreResults {...this.props} scoreResults={this.state.scoreResults} />
+
               <BottomNav history={this.props.history} logged={true} />
               <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'tourToast'} autoClose={false} closeOnClick={false} closeButton={false}  />
 
@@ -999,11 +1004,16 @@ export class Wall extends Component {
       scoreResultsAllTime: [],
     };
 
-    this.getTop10Weekly();
-    this.getTop10AllTime();
+    
 
     //this.handler = this.handler.bind(this);
 
+  }
+
+  componentDidMount(){
+    this.getTop10Weekly();
+    this.getTop10AllTime();
+    
   }
 
   getTop10Weekly() {
@@ -1014,15 +1024,11 @@ export class Wall extends Component {
       cache: false, 
       success: function (data) {
         if (data && data.status === "OK") {
-
-          console.log(JSON.stringify(data.top_10));
-
+          //console.log(JSON.stringify(data.top_10));
           this.setState({
               scoreResults: data.top_10,
           })
-
         }
-
       }.bind(this),
       complete: function () {
 
@@ -1035,13 +1041,13 @@ export class Wall extends Component {
 
   getTop10AllTime() {
     $.ajax({
-      url: wsbaseurl+'/top_ten',
+      url: wsbaseurl+'/all_time_top_ten',
       dataType : 'json',
       type: "GET",
       cache: false, 
       success: function (data) {
         if (data && data.status === "OK") {
-          console.log(JSON.stringify(data.top_10));
+          //console.log(JSON.stringify(data.top_10));
           this.setState({
               scoreResultsAllTime: data.top_10,
           })
@@ -1196,29 +1202,25 @@ export class ScoreResults extends Component {
   constructor(props){
     super(props);
     this.state = {
-      scoreResults: this.props.scoreResults,
-      scoreResultsAllTime: this.props.scoreResults,
+      scoreResults: [],
+      scoreResultsAllTime: [],
       wallOfFameSubtitle : 'The one week challenge'
     };
-
-    if(!this.props.wallOfFameOnly){
-      this.getTop10Weekly()
-      this.getTop10AllTime()
-    }
     this.handleTab = this.handleTab.bind(this);
+
 
   }
 
-  handleTab = (key) => {
-    if(key=="0"){
+  componentWillMount(){
+    this.props.scoreResults ? 
       this.setState({
-        wallOfFameSubtitle : 'The one week challenge'
-      });
-    } else {
-      this.setState({
-        wallOfFameSubtitle : 'The all time challenge'
-      });
-    }
+        scoreResults: this.props.scoreResults,
+        scoreResultsAllTime: this.props.scoreResultsAllTime
+      })
+    : 
+      this.getTop10Weekly();
+      this.getTop10AllTime();
+    
   }
 
   getTop10Weekly() {
@@ -1229,12 +1231,11 @@ export class ScoreResults extends Component {
       cache: false, 
       success: function (data) {
         if (data && data.status === "OK") {
-          console.log(JSON.stringify(data.top_10));
+          //console.log(JSON.stringify(data.top_10));
           this.setState({
               scoreResults: data.top_10,
           })
         }
-
       }.bind(this),
       complete: function () {
 
@@ -1247,13 +1248,13 @@ export class ScoreResults extends Component {
 
   getTop10AllTime() {
     $.ajax({
-      url: wsbaseurl+'/top_ten',
+      url: wsbaseurl+'/all_time_top_ten',
       dataType : 'json',
       type: "GET",
       cache: false, 
       success: function (data) {
         if (data && data.status === "OK") {
-          console.log(JSON.stringify(data.top_10));
+          //console.log(JSON.stringify(data.top_10));
           this.setState({
               scoreResultsAllTime: data.top_10,
           })
@@ -1268,9 +1269,21 @@ export class ScoreResults extends Component {
       }
     });
   }
+  
 
+  handleTab = (key) => {
+    if(key=="0"){
+      this.setState({
+        wallOfFameSubtitle : 'The one week challenge'
+      });
+    } else {
+      this.setState({
+        wallOfFameSubtitle : 'The all time challenge'
+      });
+    }
+  }
 
-
+ 
 
   render(){
 
@@ -1306,7 +1319,6 @@ export class ScoreResults extends Component {
 
                 <div className="col-xs-12 fullwidth">
                   
-
                   <SwitchTabs className="tabs-wrapper" onChangeTab={this.handleTab}>
                     <SwitchTab active="true" title="Week" >
                       <div className="scoreResultsTitle">
@@ -1330,7 +1342,6 @@ export class ScoreResults extends Component {
                     </SwitchTab>
                   </SwitchTabs>
 
-                  
                 </div>
               </div>
             ):(
@@ -1429,8 +1440,13 @@ export class Graph extends React.Component {
         <div className="col-xs-6 sepa"></div>
         <div className="col-xs-6"></div>
 
-        <div className="col-xs-12 text-center marginVertical20">
+        <div className="col-xs-12 text-center marginVerticalTop20">
           <IconStats />
+        </div>
+
+        <div className="col-xs-12">
+          <h3 className="title">Historical graph</h3>
+          <h4 className="subtitle">Your weekly performance</h4>
         </div>
 
         <div className="col-xs-12 hidden">
@@ -1598,18 +1614,15 @@ export class Edit extends React.Component {
     let self = this;
     localStorage.setItem("nickname", this.state.nickname);
 
-
     $.ajax({
       url: wsbaseurl+'/update_profile',
       type: "GET",
       data: { nickname: this.state.nickname, token: localStorage.getItem('token') },
       success: function(data){
-        console.log(data.status);
         if (data && data.status === "OK") {
-           console.log("nickname correctly updated on DB");
+           //console.log("nickname correctly updated on DB");
            self.props.history.push('/Stats')
         }
-
       }.bind(this),
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);
