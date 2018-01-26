@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.conf import settings
 from models import AuthToken, User
 from datetime import datetime
-
+from django.views.decorators.cache import cache_page
 
 def validate_token(request):
     email_param = request.GET.get('email')
@@ -182,6 +182,7 @@ def weekly_stat(request):
                          })
 
 
+# todo: cache this
 def top_ten(request):
     week = request.GET.get('week')
     if week:
@@ -202,6 +203,26 @@ def top_ten(request):
                       'id': s.user.pk,
                       'prestige': prestige,
                       'total_steps': s.total_steps()
+                      })
+
+    return JsonResponse({'status': 'OK',
+                         'top_10': top10,
+                         })
+
+
+# todo: cache this
+def all_time_top_ten(request):
+    from models import UserStats
+
+    top10_stats = UserStats.get_all_time_top_10()
+    top10 = []
+    for user, steps in top10_stats:
+        prestige, challenge_progress = divmod(steps, 1000)
+
+        top10.append({'name': user.public_name,
+                      'id': user.pk,
+                      'prestige': prestige,
+                      'total_steps': steps
                       })
 
     return JsonResponse({'status': 'OK',

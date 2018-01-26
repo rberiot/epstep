@@ -163,7 +163,7 @@ class LogDistanceViewTest(TestCase):
 
 class ProfileViewTest(TestCase):
 
-    def test_log_distance_view(self):
+    def test_profile_view(self):
         from django.test import RequestFactory
         from django.core.urlresolvers import reverse
         from views import profile
@@ -327,3 +327,59 @@ class QRListTest(TestCase):
 
         response = qr_list(rq)
         self.assertIsNotNone(response)
+
+
+class AllTimeTop10Test(TestCase):
+    def test_all_time(self):
+        from models import UserStats, User
+        import datetime
+
+        from django.test import RequestFactory
+        from django.core.urlresolvers import reverse
+        from views import all_time_top_ten
+
+        day = datetime.datetime(2017, 10, 20)
+
+        for i in range(11):
+            u = User(public_name='Roulio', email=str(i))
+            u.save()
+            s = UserStats(user=u, start_date=day)
+            s.monday_steps = 10 + i
+            s.save()
+            s = UserStats(user=u, start_date=day - datetime.timedelta(days=7))
+            s.monday_steps = 10 + i
+            s.save()
+
+        factory = RequestFactory()
+
+        rq = factory.get(reverse('all_time_top_ten'))
+
+        response = all_time_top_ten(rq)
+        self.assertIsNotNone(response)
+
+
+    def test_total_steps(self):
+        from models import UserStats
+        import datetime
+        today = datetime.datetime(2017, 10, 20)
+
+        monday = today - datetime.timedelta(days=today.weekday())
+        tuesday = monday + datetime.timedelta(days=1)
+        wednesday = monday + datetime.timedelta(days=2)
+        thursday = monday + datetime.timedelta(days=3)
+        friday = monday + datetime.timedelta(days=4)
+        saturday = monday + datetime.timedelta(days=5)
+        sunday = monday + datetime.timedelta(days=6)
+
+        s = UserStats()
+        s.add(25, monday)
+        s.add(25, monday)
+
+        s.add(7, tuesday)
+        s.add(89, wednesday)
+        s.add(2, thursday)
+        s.add(3, friday)
+        s.add(5, saturday)
+        s.add(9, sunday)
+
+        self.assertEqual(s.total_steps(), 25+25+7+89+2+3+5+9)

@@ -80,6 +80,22 @@ class UserStats(models.Model):
         return sorted_stats[:10]
 
     @classmethod
+    def get_all_time_top_10(cls):
+        """
+        :return: an array with each elements being a tuple (user, total_steps)
+        """
+        from steptracker.models import User
+
+        global_top = []
+        for u in User.objects.all():
+            user_stats = UserStats.objects.filter(user=u)
+            global_top.append((u, sum(map((lambda x: x.total_steps()), user_stats))))
+
+        sorted_stats = sorted(global_top, key=lambda (user, total_steps): total_steps, reverse=True)
+
+        return sorted_stats[:10]
+
+    @classmethod
     def get_all_time_stats(cls, user):
         all_stats = cls.objects.filter(user=user)
         total_steps = sum(map((lambda x: x.total_steps()), all_stats))

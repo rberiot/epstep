@@ -13,5 +13,6 @@ urlpatterns = [
     url(r'^qr_info$', views.qr_info, name='qr_info'),
     url(r'^update_profile$', views.update_profile, name='update_profile'),
     url(r'^top_ten', views.top_ten, name='top_ten'),
+    url(r'^all_time_top_ten', views.all_time_top_ten, name='all_time_top_ten'),
     url(r'^qr_list', views.qr_list, name='qr_list'),
 ]
