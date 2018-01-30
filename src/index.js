@@ -1,15 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types'
 import {
   HashRouter as Router,
   Route,
-  Redirect,
-  withRouter
+  Redirect
 } from 'react-router-dom';
 
 import './index.css';
-import {Scan,Stats,Wall,Header,TopBar,BottomNav,Edit} from './App';
+import {Scan,Stats,Wall,Header,BottomNav,Edit} from './App';
 import registerServiceWorker from './registerServiceWorker';
 
 import $ from 'jquery'; 
@@ -19,7 +17,7 @@ import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
 import { ToastContainer, toast } from 'react-toastify';
 
-import {IconUser, IconUserEdit, Bin, UserPicturePlaceholder, Filter} from './SVGicon';
+import {} from './SVGicon';
 
 import './App.css';
 
@@ -98,8 +96,8 @@ var token;
 var tokenValidationIntervalId;
 
 //let wsbaseurl = "http://localhost:8000";
-let wsbaseurl = "https://a2780b8b.ngrok.io";
-//let wsbaseurl = "";
+//let wsbaseurl = "https://a2780b8b.ngrok.io";
+let wsbaseurl = "";
 
 
 function tokenValidation(self) {
@@ -122,7 +120,7 @@ function tokenValidation(self) {
           self.setState(() => ({
             redirectToReferrer: true
           }))
-          self.props.history.push('/Scan')
+          self.props.history.push('/Stats')
         })
 
         $.ajax({
@@ -134,10 +132,10 @@ function tokenValidation(self) {
             if (data && data.status === "OK") {
                console.log("nickname correctly updated on DB");
             }
-          }.bind(this),
+          },
           error: function(xhr, ajaxOptions, thrownError) {
             console.log(thrownError);
-          }.bind(this)
+          }
         });
 
 
@@ -307,7 +305,7 @@ class Login extends React.Component {
                   validators={['required', 'maxStringLength:12']}
                   errorMessages={['This field is required', 'Maximum 12 characters']}
                 />
-                <RaisedButton type="Submit" style={styles.button} label="Login" backgroundColor="#a1197d" labelColor="#fff" />
+                <RaisedButton type="Submit" style={styles.button} label="Authenticate" backgroundColor="#a1197d" labelColor="#fff" />
               </ValidatorForm>
             </MuiThemeProvider>
 
@@ -371,16 +369,11 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 
 
 export class Main extends React.Component {
-
-  constructor(props){
-    super(props);
-  }
-
   render(){
     return (
       <Router>
         <div>
-            <Route exact path='/' component={Login} />
+            <Route exact path='/' component={Scan} />
             <Route path='/Login' component={Login} />
             <Route path='/Authlogin' component={Authlogin} />
             <PrivateRoute exact path='/Scan' component={Scan} />

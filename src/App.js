@@ -3,9 +3,6 @@ import VisibilitySensor from 'react-visibility-sensor';
 import PropTypes from 'prop-types';
 
 import {
-  HashRouter as Router,
-  Route,
-  Redirect,
   withRouter
 } from 'react-router-dom';
 
@@ -29,7 +26,7 @@ import './Loader.css';
 import 'swiper/dist/css/swiper.min.css';
 
 
-import {IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, Filter, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo} from './SVGicon';
+import {IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, Filter, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo, Climber} from './SVGicon';
 
 import SVGInline from "react-svg-inline"
 import icon_rank from './icon_rank.svg'
@@ -42,8 +39,8 @@ import '../node_modules/material-components-web/dist/material-components-web.css
 const baseUrl = process.env.PUBLIC_URL;
 
 //const wsbaseurl = "http://localhost:8000";
-let wsbaseurl = "https://a2780b8b.ngrok.io";
-//let wsbaseurl = "";
+//let wsbaseurl = "https://a2780b8b.ngrok.io";
+let wsbaseurl = "";
 
 const styles = {
 
@@ -64,10 +61,6 @@ const styles = {
   },
   loginUnderlineStyle: {
     borderColor: '#a1197d',
-  },
-  loginFloatingLabelStyle: {
-    color: '#ccc',
-    fontWeight: 'normal',
   },
   loginFloatingLabelFocusStyle: {
     color: '#a1197d',
@@ -170,10 +163,11 @@ const Loader = () => (
   </div>
 );
 
+/*
 const ToastCloseButton = ({ closeToast }) => (
   <span onClick={closeToast}>CLOSE</span>
 )
-
+*/
  
 export class TourMsg extends Component {
   
@@ -256,6 +250,7 @@ class Topbar extends React.Component {
       history: PropTypes.object.isRequired
     }
 
+
     constructor(props){
         super(props);
         this.handleDeleteAccount = this.handleDeleteAccount.bind(this);
@@ -264,33 +259,34 @@ class Topbar extends React.Component {
     handleDeleteAccount() {
       let self = this;
       
-      localStorage.removeItem("email")
-      localStorage.removeItem("firstVisit")
-      localStorage.removeItem("loggedIn")
-      localStorage.removeItem("nickname")
-      localStorage.removeItem("token")
-      localStorage.removeItem("acceptCookie")
-      localStorage.removeItem("avatarImg64")
-      localStorage.removeItem("timeout")
+      localStorage.removeItem("email");
+      localStorage.removeItem("firstVisit");
+      localStorage.removeItem("loggedIn");
+      localStorage.removeItem("nickname");
+      localStorage.removeItem("token");
+      localStorage.removeItem("acceptCookie");
+      localStorage.removeItem("avatarImg64");
+      localStorage.removeItem("timeout");
 
-      self.props.history.push('/')
+      //self.props.history.push('/');
+      window.location.reload();
     }
 
     handleShareResults() {
       var page = window.location.protocol+"//"+window.location.hostname;
       var email = "";
       var subject = "Invitation to join a stair challenge on EPStairs";
-      var body = "Hey!"+ "\r\n\r\n" +"I've just setup a mini stair climbing challenge with EPStairs."+ "\r\n" +"Join me and let's compare our results."+ "\r\n\r\n" +page;
+      var body = "Hey!"+"\r\n\r\n"+"I've just setup a mini stair climbing challenge with EPStairs."+"\r\n"+"Join me and let's compare our results."+"\r\n\r\n"+page;
       window.location.href = "mailto:"+email+"?Subject=" + subject + "&body=" + encodeURIComponent(body);
     }
 
     render() {
       const { location, history } = this.props
         return (
-          localStorage.getItem('loggedIn') == 'true' ?
+          localStorage.getItem('loggedIn') === 'true' ?
             <div className="container account">
 
-              {location.pathname == "/OtherTopBar" ?(
+              {location.pathname === "/OtherTopBar" ?(
                 <div className="row">
                   <div className="col-xs-6 sepa">
                     <div>
@@ -428,7 +424,7 @@ export class Scan extends React.Component {
 
   constructor(props){
     super(props)
-    let match = props.match;
+    //let match = props.match;
 
     this.state = {
       message: 'SCAN A QR CODE',
@@ -442,7 +438,7 @@ export class Scan extends React.Component {
       orientation: null
     }
     // preserve the initial state in a new object
-    this.baseState = this.state;
+    //this.baseState = this.state;
     
     localStorage.removeItem('qrcode_in');
     this.handleScan = this.handleScan.bind(this);
@@ -457,16 +453,22 @@ export class Scan extends React.Component {
 
   handleScan(data, directAccess){
 
+    this.setState({
+        camera: 'active'
+    })
+
+    var scan_qr;
+
     if(!data)
       return
 
     if(!directAccess){
-      var scan_qr = getAllUrlParams(data).qr_id;
+      scan_qr = getAllUrlParams(data).qr_id;
     } else {
-      var scan_qr = data;
+      scan_qr = data;
     }
 
-    if(scan_qr == localStorage.getItem('qrcode_in'))
+    if(scan_qr === localStorage.getItem('qrcode_in'))
       return;
 
     if(!scan_qr)
@@ -480,17 +482,12 @@ export class Scan extends React.Component {
     }
 
     if(localStorage.getItem('qrcode_in') == null || new Date().getTime() > localStorage.getItem('timeout')){
-
       localStorage.setItem('qrcode_in', scan_qr)
       localStorage.setItem('timeout', new Date().getTime() + 5*60*1000)
-      
-
       this.setState({
           message: 'PLEASE TAKE THE STAIRS AND SCAN THE EXIT QR CODE...',
           loading: true
       })
-      
-
     } else {
       $.ajax({
           url: wsbaseurl+'/distance',
@@ -556,10 +553,12 @@ export class Scan extends React.Component {
   }
 
   handleError(err){
-    console.error(err)
+    console.log(err);
+    //this.props.history.push('/Stats');
     this.setState({
         message: err,
-        loading: false
+        loading: false,
+        camera: 'inactive'
     })
   }
 
@@ -577,62 +576,83 @@ export class Scan extends React.Component {
   componentWillMount(){
     let _this = this;
 
-    if (window.orientation == 90 || window.orientation == -90) {
+    if (window.orientation === 90 || window.orientation === -90) {
       _this.setState({orientation: 'landscape'})
     } else {
       _this.setState({orientation: 'portrait'})
     }
     
     window.addEventListener("orientationchange", function() {
-      if (window.orientation == 90 || window.orientation == -90) {
+      if (window.orientation === 90 || window.orientation === -90) {
         _this.setState({orientation: 'landscape'})
       } else {
         _this.setState({orientation: 'portrait'})
       }
     });
-  
   }
 
 
   componentDidMount(){
-
-
     const search = this.props.location.search; // could be '?foo=bar'
     const params = new URLSearchParams(search);
     const qr_id = params.get('qr_id'); // bar
-
     this.handleScan(qr_id, true)
-
   }
 
 
   render(){
 
     const previewStyle = {}
-    const { match } = this.props
+    //const { match } = this.props
 
-
-      if (this.state.orientation == 'landscape') {
-        return(
-          <div style={{
-          position: "fixed",
-          top: 0,
-          right: 0,
-          left: 0,
-          bottom: 0,
-          backgroundColor: "rgba(161, 25, 125, 1)",
-          overflowX: "hidden",
-          overflowY: "auto",
-          outline: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-          }}>
-            <h3 style={{color: "#fff", fontSize: "14px", textTransform: "uppercase"}}>Please rotate your device to portrait mode</h3>
+    if (this.state.camera === 'inactive') {
+      return(
+        <div style={{
+        position: "fixed",
+        top: 0,
+        right: 0,
+        left: 0,
+        bottom: 0,
+        backgroundColor: "rgba(161, 25, 125, 1)",
+        overflowX: "hidden",
+        overflowY: "auto",
+        outline: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+        }}>
+          <div>
+          <h3 style={{color: "#fff", fontSize: "14px", textTransform: "uppercase"}}>Please allow EPStairs to access your camera</h3><br /><br />
+          <MuiThemeProvider>
+            <RaisedButton label="Scan QR-Code" style={styles.fullwidth} backgroundColor="#fff" labelColor="#a1197d" rippleStyle={styles.button} onClick={(event) => window.location.reload()} />
+          </MuiThemeProvider>
           </div>
-        )
-      } else {
-    
+        </div>
+      )
+    }
+
+
+    if (this.state.orientation === 'landscape') {
+      return(
+        <div style={{
+        position: "fixed",
+        top: 0,
+        right: 0,
+        left: 0,
+        bottom: 0,
+        backgroundColor: "rgba(161, 25, 125, 1)",
+        overflowX: "hidden",
+        overflowY: "auto",
+        outline: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+        }}>
+          <h3 style={{color: "#fff", fontSize: "14px", textTransform: "uppercase"}}>Please rotate your device to portrait mode</h3>
+        </div>
+      )
+    } else {
+  
       if (!this.state.result) {
         return(
           <div className="container">
@@ -690,7 +710,6 @@ export class Scan extends React.Component {
         )
       }
     }
-
   }
 }
 
@@ -865,7 +884,8 @@ export class Stats extends Component {
       scoreResultsAllTime: [],
       avatar: null,
       profileLoaded: false,
-      current_steps: null
+      current_steps: null,
+      weekly_stats: null
     };
 
   }
@@ -929,6 +949,7 @@ export class Stats extends Component {
               total_meters: Math.floor(data.all_time_stats.all_time_meters),
               prestige: data.current_challenge.prestige,
               weekly_stats: data.weekly_stats,
+              weekly_total_steps: data.weekly_stats.total_steps,
               current_steps: data.current_challenge.current_steps,
               current_challenge: data.current_challenge.total_steps
           })
@@ -948,8 +969,6 @@ export class Stats extends Component {
     });
   }
 
-  
-
   render(){
 
     return(
@@ -966,9 +985,9 @@ export class Stats extends Component {
                 <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
               }
               
-              <ScoreResults {...this.props} wallOfFameOnly={false} />
+              <ScoreResults wallOfFameOnly={false} />
 
-              {this.state.challenge_name &&
+              {this.state.weekly_total_steps !== 0 &&
                 <Graph data={this.state.weekly_stats} />
               }
 
@@ -1004,8 +1023,6 @@ export class Wall extends Component {
       scoreResultsAllTime: [],
     };
 
-    
-
     //this.handler = this.handler.bind(this);
 
   }
@@ -1013,7 +1030,6 @@ export class Wall extends Component {
   componentDidMount(){
     this.getTop10Weekly();
     this.getTop10AllTime();
-    
   }
 
   getTop10Weekly() {
@@ -1032,7 +1048,7 @@ export class Wall extends Component {
       }.bind(this),
       complete: function () {
 
-      }.bind(this),
+      },
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);      
       }
@@ -1056,7 +1072,7 @@ export class Wall extends Component {
       }.bind(this),
       complete: function () {
 
-      }.bind(this),
+      },
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);      
       }
@@ -1073,14 +1089,13 @@ export class Wall extends Component {
   render() {
 
     return (
-
       
-      this.state.scoreResults.length > 0 ?
+      this.state.scoreResultsAllTime.length > 0 ?
         <div>
           <TopBar /*action={this.handler}*/ />
           <div className="container">
             <div className="row">
-              <ScoreResults {...this.props} scoreResults={this.state.scoreResults} scoreResultsAllTime={this.state.scoreResultsAllTime} wallOfFameOnly={true} />
+              <ScoreResults scoreResults={this.state.scoreResults} scoreResultsAllTime={this.state.scoreResultsAllTime} wallOfFameOnly={true} />
               <BottomNav history={this.props.history} logged={true} />
             </div>
           </div> 
@@ -1201,25 +1216,30 @@ export class ScoreResults extends Component {
 
   constructor(props){
     super(props);
-    this.state = {
-      scoreResults: [],
-      scoreResultsAllTime: [],
-      wallOfFameSubtitle : 'The one week challenge'
-    };
+
+    this.props.wallOfFameOnly ? 
+      this.state = {
+        scoreResults: this.props.scoreResults,
+        scoreResultsAllTime: this.props.scoreResultsAllTime,
+        wallOfFameSubtitle : 'The one week challenge'
+      }
+    : 
+      this.state = {
+        scoreResults: [],
+        scoreResultsAllTime: [],
+        wallOfFameSubtitle : 'The one week challenge'
+      }
+      this.getTop10Weekly();
+      this.getTop10AllTime();
+
+
     this.handleTab = this.handleTab.bind(this);
 
 
   }
 
   componentWillMount(){
-    this.props.scoreResults ? 
-      this.setState({
-        scoreResults: this.props.scoreResults,
-        scoreResultsAllTime: this.props.scoreResultsAllTime
-      })
-    : 
-      this.getTop10Weekly();
-      this.getTop10AllTime();
+
     
   }
 
@@ -1239,7 +1259,7 @@ export class ScoreResults extends Component {
       }.bind(this),
       complete: function () {
 
-      }.bind(this),
+      },
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);      
       }
@@ -1263,7 +1283,7 @@ export class ScoreResults extends Component {
       }.bind(this),
       complete: function () {
 
-      }.bind(this),
+      },
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);      
       }
@@ -1272,7 +1292,7 @@ export class ScoreResults extends Component {
   
 
   handleTab = (key) => {
-    if(key=="0"){
+    if(key === "0"){
       this.setState({
         wallOfFameSubtitle : 'The one week challenge'
       });
@@ -1283,78 +1303,89 @@ export class ScoreResults extends Component {
     }
   }
 
- 
 
   render(){
 
-      const { history } = this.props;
+    const { history } = this.props;
 
-      var resultItems = this.state.scoreResults.map(function(result, index) {
-          return <ScoreResultItem key={index.toString()} nickname={result.name} steps={result.total_steps} prestige={result.prestige} index={index+1} />
-      });
+    var resultItems = this.state.scoreResults.map(function(result, index) {
+        return <ScoreResultItem key={index.toString()} nickname={result.name} steps={result.total_steps} prestige={result.prestige} index={index+1} />
+    });
 
-      var resultItemsAllTime = this.state.scoreResultsAllTime.map(function(result, index) {
-          return <ScoreResultItem key={index.toString()} nickname={result.name} steps={result.total_steps} prestige={result.prestige} index={index+1} />
-      });
+    var resultItemsAllTime = this.state.scoreResultsAllTime.map(function(result, index) {
+        return <ScoreResultItem key={index.toString()} nickname={result.name} steps={result.total_steps} prestige={result.prestige} index={index+1} />
+    });
 
-      return(
-          <div className="wallOfFame">
+    return(
+      <div className="wallOfFame">
+        
+        <div className={(this.props.wallOfFameOnly ? 'hidden' : '')}>
+          <div className="col-xs-6 sepa"></div>
+          <div className="col-xs-6"></div>
+        </div>
+
+        <div className="col-xs-12 text-center marginVerticalTop20">
+          <SVGInline svg={ icon_rank } style={{marginLeft: '-3px'}} />
+        </div>
+
+        <div className="col-xs-12">
+          <h3 className="title">Walk of fame</h3>
+          <h4 className="subtitle">{this.state.wallOfFameSubtitle}</h4>
+        </div>
+
+
+        <div>
+
+          <div className="col-xs-12 fullwidth">
             
-            <div className={(this.props.wallOfFameOnly ? 'hidden' : '')}>
-              <div className="col-xs-6 sepa"></div>
-              <div className="col-xs-6"></div>
-            </div>
-
-            <div className="col-xs-12 text-center marginVerticalTop20">
-              <SVGInline svg={ icon_rank } style={{marginLeft: '-3px'}} />
-            </div>
-
-            <div className="col-xs-12">
-              <h3 className="title">Walk of fame</h3>
-              <h4 className="subtitle">{this.state.wallOfFameSubtitle}</h4>
-            </div>
-
-            {this.state.scoreResults.length > 0 ?(
-              <div>
-
-                <div className="col-xs-12 fullwidth">
-                  
-                  <SwitchTabs className="tabs-wrapper" onChangeTab={this.handleTab}>
-                    <SwitchTab active="true" title="Week" >
-                      <div className="scoreResultsTitle">
-                        <span className="nick_name">Nickname</span>
-                        <span className="stars">Prestige</span>
-                        <span className="total_meters">Steps</span>
-                      </div>
-                      <ul className="scoreResults">
-                        {resultItems}
-                      </ul>
-                    </SwitchTab>
-                    <SwitchTab title="All time">
-                      <div className="scoreResultsTitle">
-                        <span className="nick_name">Nickname</span>
-                        <span className="stars">Prestige</span>
-                        <span className="total_meters">Steps</span>
-                      </div>
-                      <ul className="scoreResults">
-                          {resultItemsAllTime}
-                      </ul>
-                    </SwitchTab>
-                  </SwitchTabs>
-
+            <SwitchTabs className="tabs-wrapper" onChangeTab={this.handleTab}>
+              <SwitchTab active="true" title="Week" >
+                <div className="scoreResultsTitle">
+                  <span className="nick_name">Nickname</span>
+                  <span className="stars">Prestige</span>
+                  <span className="total_meters">Steps</span>
                 </div>
-              </div>
-            ):(
-              <div className="col-xs-12 col-sm-6 col-sm-offset-3">
-                <p className="content">Be the first to figure on this weekly top ten</p>
-                <MuiThemeProvider>
-                  <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
-                </MuiThemeProvider>
-              </div>
-            )}
 
-          </div>     
-      );
+                {this.state.scoreResults.length > 0 ?(
+                  <ul className="scoreResults">
+                    {resultItems}
+                  </ul>
+                ):(
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                    <Climber />
+                    <p className="content">Be the first to figure on this weekly top ten</p>
+                    <MuiThemeProvider>
+                      <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
+                    </MuiThemeProvider>
+                  </div>
+                )}
+              </SwitchTab>
+              <SwitchTab title="All time">
+                <div className="scoreResultsTitle">
+                  <span className="nick_name">Nickname</span>
+                  <span className="stars">Prestige</span>
+                  <span className="total_meters">Steps</span>
+                </div>
+
+                {this.state.scoreResultsAllTime.length > 0 ?(
+                  <ul className="scoreResults">
+                      {resultItemsAllTime}
+                  </ul>
+                ):(
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                    <Climber />
+                    <p className="content">Be the first to figure on this all time top ten</p>
+                    <MuiThemeProvider>
+                      <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
+                    </MuiThemeProvider>
+                  </div>
+                )}
+              </SwitchTab>
+            </SwitchTabs>
+          </div>
+        </div>
+      </div>     
+    );
   }
 };
 
@@ -1376,16 +1407,18 @@ export class ScoreResultItem extends Component {
   }
 
   render(){
-      return (
-        <li>
-          <span className="badge"><span>{this.props.index}</span></span>
-          <span className="nick_name">{this.props.nickname}</span>
-          <span className="stars">{this.getStars()}</span>
-          <span className="total_meters">{this.props.steps}</span>
-        </li>
-      );
+    return (
+      <li>
+        <span className="badge"><span>{this.props.index}</span></span>
+        <span className="nick_name">{this.props.nickname}</span>
+        <span className="stars">{this.getStars()}</span>
+        <span className="total_meters">{this.props.steps}</span>
+      </li>
+    );
   }
 };
+
+
 
 
 function compareNumbers(a, b) {  
@@ -1623,10 +1656,10 @@ export class Edit extends React.Component {
            //console.log("nickname correctly updated on DB");
            self.props.history.push('/Stats')
         }
-      }.bind(this),
+      },
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);
-      }.bind(this)
+      }
     });
     
   }
@@ -1656,7 +1689,7 @@ export class Edit extends React.Component {
          
               <div className="editprofile">
 
-                {this.state.showCameraPreview == 'true' ? (
+                {this.state.showCameraPreview === 'true' ? (
                   <div>
                     <div className="preview">
                       <Webcam
@@ -1780,7 +1813,7 @@ class SwitchTabs extends React.Component {
     let active = this.state.activeIndex;
     let tabs = React.Children.map(this.props.children, function (child) {
         return React.cloneElement(child, {
-            active : child.props.active === true ? true : (active == index++)
+            active : child.props.active == true ? true : (active == index++)
         });
     });
     return (
