@@ -7,12 +7,15 @@ from models import AuthToken, User
 from datetime import datetime
 from django.views.decorators.cache import cache_page
 
+
 def validate_token(request):
     email_param = request.GET.get('email')
     validation_key_param = request.GET.get('validation_key', None)
 
     if email_param is None or validation_key_param is None:
         return HttpResponseBadRequest('email & validation_key parameters are required')
+
+    email_param = email_param.lower()
 
     token = AuthToken.objects.get(validation_key=validation_key_param)
 
@@ -51,6 +54,8 @@ def update_profile(request):
 def auth(request):
     token_param = request.GET.get('token')
     email_param = request.GET['email']
+
+    email_param = email_param.lower()
 
     if token_param is None:  # register new token
         user_list = User.objects.filter(email=email_param)
