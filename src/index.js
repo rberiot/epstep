@@ -373,7 +373,7 @@ export class Main extends React.Component {
     return (
       <Router>
         <div>
-            <Route exact path='/' component={Scan} />
+            <PrivateRoute exact path='/' component={Scan} />
             <Route path='/Login' component={Login} />
             <Route path='/Authlogin' component={Authlogin} />
             <PrivateRoute exact path='/Scan' component={Scan} />

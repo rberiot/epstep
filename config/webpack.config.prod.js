@@ -90,7 +90,8 @@ module.exports = {
     // for React Native Web.
     extensions: ['.web.js', '.mjs', '.js', '.json', '.web.jsx', '.jsx'],
     alias: {
-      
+      swiper$: 'swiper/dist/js/swiper.js',
+      dom7$: 'dom7/dist/dom7.js',
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
@@ -115,6 +116,8 @@ module.exports = {
       // It's important to do this before Babel processes the JS.
       {
         test: /\.(js|jsx|mjs)$/,
+        exclude: /node_modules\/(?!(dom7|swiper)\/).*/,
+        //loader: 'babel-loader',
         enforce: 'pre',
         use: [
           {
