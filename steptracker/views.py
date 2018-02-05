@@ -62,6 +62,7 @@ def auth(request):
 
         if not user_list:
             u = User(email=email_param)
+            u.reset_public_name()
             u.save()
         else:
             u = user_list[0]
