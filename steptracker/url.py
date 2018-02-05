@@ -15,4 +15,7 @@ urlpatterns = [
     url(r'^top_ten', views.top_ten, name='top_ten'),
     url(r'^all_time_top_ten', views.all_time_top_ten, name='all_time_top_ten'),
     url(r'^qr_list', views.qr_list, name='qr_list'),
+    url(r'^my_ranking_all_time', views.my_ranking_all_time, name='my_ranking_all_time'),
+    url(r'^my_ranking_weekly', views.my_ranking_weekly, name='my_ranking_weekly'),
+
 ]

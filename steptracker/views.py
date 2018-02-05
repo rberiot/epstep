@@ -187,7 +187,6 @@ def weekly_stat(request):
                          })
 
 
-# todo: cache this
 def top_ten(request):
     week = request.GET.get('week')
     if week:
@@ -215,7 +214,6 @@ def top_ten(request):
                          })
 
 
-# todo: cache this
 def all_time_top_ten(request):
     from models import UserStats
 
@@ -235,6 +233,68 @@ def all_time_top_ten(request):
 
     return JsonResponse({'status': 'OK',
                          'top_10': top10,
+                         })
+
+
+def my_ranking_weekly(request):
+    from models import UserStats
+
+    week = request.GET.get('week')
+    token_param = request.GET.get('token')
+    if not AuthToken.is_token_valid(token_param) and settings.DEBUG is False:
+        return JsonResponse({'status': 'INVALID_TOKEN'})
+
+    token = AuthToken.objects.get(token_string=token_param)
+
+    if week:
+        try:
+            week = datetime.strptime(week, '%m-%d-%Y')
+        except:
+            return JsonResponse({'status': 'ILLEGAL_DATE_FORMAT'})
+
+    ranking_list = []
+
+    for ranking, user, total_steps, isUser in UserStats.get_weekly_ranking(token.user, week):
+        all_time_stats = UserStats.get_all_time_stats(user)
+        prestige, challenge_progress = divmod(all_time_stats.get('all_time_steps'), 1000)
+
+        ranking_list.append({'name': user.public_name,
+                             'id': user.pk,
+                             'prestige': prestige,
+                             'total_steps': total_steps,
+                             'isUser': isUser,
+                             'ranking': ranking,
+                             })
+
+    return JsonResponse({'status': 'OK',
+                         'ranking': ranking_list,
+                         })
+
+
+def my_ranking_all_time(request):
+    from models import UserStats
+
+    token_param = request.GET.get('token')
+    if not AuthToken.is_token_valid(token_param) and settings.DEBUG is False:
+        return JsonResponse({'status': 'INVALID_TOKEN'})
+
+    token = AuthToken.objects.get(token_string=token_param)
+
+    ranking_list = []
+
+    for ranking, user, total_steps, isUser in UserStats.get_all_time_ranking(token.user):
+        prestige, challenge_progress = divmod(total_steps, 1000)
+
+        ranking_list.append({'name': user.public_name,
+                             'id': user.pk,
+                             'prestige': prestige,
+                             'total_steps': total_steps,
+                             'isUser': isUser,
+                             'ranking': ranking,
+                             })
+
+    return JsonResponse({'status': 'OK',
+                         'ranking': ranking_list,
                          })
 
 

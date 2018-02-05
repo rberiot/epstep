@@ -356,3 +356,69 @@ class AllTimeTop10Test(TestCase):
 
         response = all_time_top_ten(rq)
         self.assertIsNotNone(response)
+
+
+class RankingTest(TestCase):
+    def test_all_time_ranking(self):
+        from models import User, AuthToken, UserStats
+        from django.test import RequestFactory
+        from django.core.urlresolvers import reverse
+        from views import my_ranking_all_time
+        import random
+
+        users = []
+        for i in range(10):
+            u = User()
+            u.email = 'test@test.com' + str(i)
+            u.public_name = 'TEST' + str(i)
+            u.save()
+            users.append(u)
+            UserStats.record_stats(u, random.randint(1, 600), datetime.date.today())
+
+        auth = AuthToken()
+        auth.token_string = AuthToken.gen_token_string('test@test.com')
+        auth.user = users[0]
+        auth.valid = True
+        auth.save()
+
+        factory = RequestFactory()
+
+        rq = factory.get(reverse('my_ranking_all_time'), data={'token': auth.token_string})
+
+        response = my_ranking_all_time(rq)
+
+        data = json.loads(response.content)
+
+        self.assertEqual(data['status'], 'OK')
+
+    def test_my_ranking_weekly(self):
+        from models import User, AuthToken, UserStats
+        from django.test import RequestFactory
+        from django.core.urlresolvers import reverse
+        from views import my_ranking_weekly
+        import random
+
+        users = []
+        for i in range(10):
+            u = User()
+            u.email = 'test@test.com' + str(i)
+            u.public_name = 'TEST' + str(i)
+            u.save()
+            users.append(u)
+            UserStats.record_stats(u, random.randint(1, 600), datetime.date.today())
+
+        auth = AuthToken()
+        auth.token_string = AuthToken.gen_token_string('test@test.com')
+        auth.user = users[0]
+        auth.valid = True
+        auth.save()
+
+        factory = RequestFactory()
+
+        rq = factory.get(reverse('my_ranking_weekly'), data={'token': auth.token_string})
+
+        response = my_ranking_weekly(rq)
+
+        data = json.loads(response.content)
+
+        self.assertEqual(data['status'], 'OK')

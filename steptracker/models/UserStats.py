@@ -96,6 +96,58 @@ class UserStats(models.Model):
         return sorted_stats[:10]
 
     @classmethod
+    def get_weekly_ranking(cls, user, week=None):
+        """
+        :return: an array with each elements being a tuple (ranking, user, total_steps, isUser)
+        """
+        # first lets get the range of date which starts on monday.
+        if not week:
+            week = datetime.date.today()
+
+        if week.weekday() != 0:
+            week = week - datetime.timedelta(days=week.weekday())
+
+        all_stats = UserStats.objects.filter(start_date=week)
+        sorted_stats = sorted(all_stats, key=lambda s: s.total_steps(), reverse=True)
+
+        positions = [i for i, stat in enumerate(sorted_stats) if stat.user == user]
+        my_pos = positions[0]
+
+        # slice the result to show only 2 players above and 2 players below
+        sliced_stats = sorted_stats[max(0, my_pos-3): min(my_pos+2, len(sorted_stats))]
+
+        result = []
+        for s in sliced_stats:
+            result.append((sorted_stats.index(s), s.user, s.total_steps(), s.user == user))
+
+        return result
+
+    @classmethod
+    def get_all_time_ranking(cls, user):
+        """
+        :return: an array with each elements being a tuple (ranking, user, total_steps, isUser)
+        """
+        global_top = []
+        for u in User.objects.all():
+            user_stats = UserStats.objects.filter(user=u)
+            global_top.append((u, sum(map((lambda x: x.total_steps()), user_stats))))
+
+        sorted_top = sorted(global_top, key=lambda (_, total_steps): total_steps, reverse=True)
+
+        positions = [i for i, (usr, _) in enumerate(sorted_top) if usr == user]
+        my_pos = positions[0]
+
+        # slice the result to show only 2 players above and 2 players below
+        sliced_top = sorted_top[max(0, my_pos-3): min(my_pos+2, len(sorted_top))]
+
+        result = []
+        for t in sliced_top:
+            u, steps = t
+            result.append((sorted_top.index(t), u, steps, u == user))
+
+        return result
+
+    @classmethod
     def get_all_time_stats(cls, user):
         all_stats = cls.objects.filter(user=user)
         total_steps = sum(map((lambda x: x.total_steps()), all_stats))
