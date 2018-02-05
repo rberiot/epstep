@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
 import VisibilitySensor from 'react-visibility-sensor';
 import PropTypes from 'prop-types';
-
 import {
   withRouter
 } from 'react-router-dom';
-
 import QrReader from 'react-qr-reader';
 import $ from 'jquery'; 
 import Swiper from 'swiper';
-
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 import {Tabs, Tab} from 'material-ui/Tabs';
@@ -20,20 +17,12 @@ import Confetti from 'react-dom-confetti';
 import Webcam from 'react-webcam';
 import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
-
 import './App.css';
 import './Loader.css';
 import 'swiper/dist/css/swiper.min.css';
-
-
-import {IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, Filter, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo, Climber} from './SVGicon';
-
-import SVGInline from "react-svg-inline"
-import icon_rank from './icon_rank.svg'
-
+import {IconRank, IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, Filter, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo, Climber} from './SVGicon';
 //import logo from './logo.png';
 import '../node_modules/material-components-web/dist/material-components-web.css';
-
 
 /* for correct path after build */
 const baseUrl = process.env.PUBLIC_URL;
@@ -175,7 +164,10 @@ export class TourMsg extends Component {
     mySwiper.init()
   }
 
-  dismiss = () =>  toast.dismiss(this.toastId);
+  dismiss = () => {
+    toast.dismiss(this.toastId);
+    localStorage.setItem('acceptTour', 'true');
+  }; 
 
   render() {
 
@@ -207,7 +199,7 @@ export class TourMsg extends Component {
 
                   <div className="swiper-slide">  
                     <div className="head"> 
-                      <SVGInline svg={ icon_rank } style={{marginLeft: '-3px'}} />
+                      <IconRank />
                       <h3 className="title">THIRD STEP</h3>
                       <h4 className="subtitle">CHECK YOUR STATS</h4>
                     </div>     
@@ -233,7 +225,7 @@ export class Header extends Component {
   render() {
     return (
       <div className="text-center">
-        {/*<img src={logo} alt="Logo" style={styles.logo}  />*/}
+        {/*<img src={logo} alt="Logo" style={styles.logo} />*/}
         <Logo />
       </div>
     );
@@ -256,7 +248,7 @@ class Topbar extends React.Component {
     }
 
     handleDeleteAccount() {
-      let self = this;
+      //let self = this;
       
       localStorage.removeItem("email");
       localStorage.removeItem("firstVisit");
@@ -328,8 +320,6 @@ class Topbar extends React.Component {
             </div>
           :
             <p>You're not logged</p>
-          
-
         )
     }
 }
@@ -391,10 +381,8 @@ export class BottomNav extends Component {
               value='/Scan'
               data-route="/Scan"
               onActive={(event) => this.handleActive(event)}
-              className={this.state.activeTabIndex === '/Scan' ? "tab active" : "tab"}
+              className={this.state.activeTabIndex === '/Scan' || this.state.activeTabIndex === '/' ? "tab active" : "tab"}
             />
-
-            
 
             <Tab
               icon={<IconUserTab />}
@@ -448,7 +436,6 @@ export class Scan extends React.Component {
   componentWillReceiveProps(nextProps){
     this.setState({result: false})
   }
-
 
   handleScan(data, directAccess){
 
@@ -731,18 +718,15 @@ class ChangingProgressbar extends Component {
   }
 
   componentDidMount(){
-
     setTimeout(() => {
       this.setState({
         currentPercentageIndex: (this.state.currentPercentageIndex + 1) % this.props.percentages.length
       });
-    }, 300);
+    }, 100);
 
     localStorage.setItem('previous_percentage', this.props.percentages[1]);
-
     //this.handleConfetti();
     //this.handleToast();
-    
   }
 
   handleConfetti() {
@@ -763,7 +747,6 @@ class ChangingProgressbar extends Component {
   render() {
 
     const { history } = this.props;
-
     const confetti_config = {
       angle: 90,
       spread: 37,
@@ -795,14 +778,15 @@ class ChangingProgressbar extends Component {
       return (<div>{stars}</div>);
     }
 
-    challenge_star = prestigeConfig()
+    challenge_star = prestigeConfig();
 
     const onCountUpComplete = () => {
       console.log('Completed! 👏'+'--previous percentage:'+Math.floor(this.props.percentages[0])+'--current percentage:'+Math.floor(this.props.percentages[1]));
       if(this.state.prestige > 0 && (Math.floor(this.props.percentages[1]) < Math.floor(this.props.percentages[0]))){
         this.handleConfetti();
-      } else {
         this.setState({showStars: true});
+      } else {
+        this.setState({showStars: false});
       }
     };
     
@@ -811,17 +795,17 @@ class ChangingProgressbar extends Component {
 
         <div style={{ position: 'relative', width: '100%', height: '100%'}} className="CircularProgressdata">
           <div style={{ position: 'absolute', width: '100%' }}>
-            <CircularProgressbar className="" {...this.props} percentage={this.props.percentages[this.state.currentPercentageIndex]} initialAnimation={this.props.startFrom0} strokeWidth={5} />
+            <CircularProgressbar className="" {...this.props} percentage={this.props.percentages[this.state.currentPercentageIndex]} initialAnimation={this.props.startFrom0} strokeWidth={5} counterClockwise={false} />
             <CountUp
               className="account-balance CircularProgressbar-text"
-              start={0}
+              start={this.props.percentages[0]}
               end={this.props.percentages[1]}
-              duration={1}
+              duration={1.5}
               useEasing={true}
-              useGrouping={true}
+              useGrouping={false}
               separator=" "
-              decimals={0}
-              decimal=","
+              decimals={this.props.percentages[1] % 1 === 0 ? 0 : 1}
+              decimal="."
               suffix="%"
               onComplete={onCountUpComplete}
             />
@@ -845,11 +829,21 @@ class ChangingProgressbar extends Component {
               </div>
             )}
          
-
             {this.props.total_meters &&
               <div className="challenge_meters">
-                <h4 className="value">{this.props.current_steps}/{this.props.current_challenge}</h4>
-                <h5 className="value">Steps</h5>
+                <h4 className="value">
+                  <CountUp
+                    start={this.props.percentages[0]*10}
+                    end={this.props.current_steps}
+                    duration={1.5}
+                    useEasing={true}
+                    useGrouping={true}
+                    separator=""
+                    decimals={0}
+                    suffix={"/"+this.props.current_challenge}
+                  />
+                </h4>
+                <h5 className="value">Stairs</h5>
               </div>
             }
 
@@ -886,11 +880,7 @@ export class Stats extends Component {
       current_steps: null,
       weekly_stats: null
     };
-
   }
-
-  min = 1;
-  max = 100;
 
   handleToast4tour(tab) {
     setTimeout(() => {
@@ -900,10 +890,15 @@ export class Stats extends Component {
     }, 1000);
   }
 
-
   componentDidMount(){
     this.setState({profileResults: false});
+
+    if(localStorage.getItem('acceptTour') === null || localStorage.getItem('acceptTour') === 'false'){
+      this.handleToast4tour();
+    }
+
     if(localStorage.getItem('firstVisit') === null || localStorage.getItem('firstVisit') === 'true'){
+      
       this.setState({
           challenge_name: null,
           current_percent: '0',
@@ -913,22 +908,20 @@ export class Stats extends Component {
           total_meters: null,
           prestige: null,
           weekly_stats: null,
+          weekly_total_steps: null,
           avatar:<UserPicturePlaceholder />,
           profileLoaded: true,
           current_steps: '0',
           current_challenge: '0'
 
       })
-
-      this.handleToast4tour();
-
+      
+      //this.getStatsData();
     } else {
       this.getStatsData();
       //this.handleToast4tour();
     }
-    
   }
-
 
   getStatsData() {
     $.ajax({
@@ -936,21 +929,21 @@ export class Stats extends Component {
       dataType : 'json',
       data: { email: localStorage.getItem('email'), token: localStorage.getItem('token') },
       type: "GET",
-      cache: false, 
+      cache: false,
       success: function (data) {
         if (data && data.status === "OK") {
           this.setState({
-              challenge_name: data.current_challenge.name,
-              current_percent: (data.current_challenge.current_steps/data.current_challenge.total_steps)*100,
-              nick_name: data.nick_name,
-              total_calories: data.all_time_stats.all_time_cal,
-              total_steps: data.all_time_stats.all_time_steps,
-              total_meters: Math.floor(data.all_time_stats.all_time_meters),
-              prestige: data.current_challenge.prestige,
-              weekly_stats: data.weekly_stats,
-              weekly_total_steps: data.weekly_stats.total_steps,
-              current_steps: data.current_challenge.current_steps,
-              current_challenge: data.current_challenge.total_steps
+            challenge_name: data.current_challenge.name,
+            current_percent: (data.current_challenge.current_steps/data.current_challenge.total_steps)*100,
+            nick_name: data.nick_name,
+            total_calories: data.all_time_stats.all_time_cal,
+            total_steps: data.all_time_stats.all_time_steps,
+            total_meters: Math.floor(data.all_time_stats.all_time_meters),
+            prestige: data.current_challenge.prestige,
+            weekly_stats: data.weekly_stats,
+            weekly_total_steps: data.weekly_stats.total_steps,
+            current_steps: data.current_challenge.current_steps,
+            current_challenge: data.current_challenge.total_steps
           })
         }
         this.setState({
@@ -972,42 +965,41 @@ export class Stats extends Component {
 
     return(
       this.state.profileLoaded ?
-        <div>
-          <TopBar />
-          <div className="container">
-            <div className="row">
-              <ProfileResult nick_name={this.state.nick_name} total_calories={this.state.total_calories} total_steps={this.state.total_steps} total_meters={this.state.total_meters} avatar={this.state.avatar} />
-             
-              {this.state.current_percent <= this.state.previous_percent ?
-                <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={true} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
-              :
-                <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
-              }
-              
-              <ScoreResults wallOfFameOnly={false} />
+      <div>
+        <TopBar />
+        <div className="container">
+          <div className="row">
+            <ProfileResult nick_name={this.state.nick_name} total_calories={this.state.total_calories} total_steps={this.state.total_steps} total_meters={this.state.total_meters} avatar={this.state.avatar} />
+           
+            {this.state.current_percent <= this.state.previous_percent ?
+              <ChangingProgressbar history={this.props.history} percentages={[0, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
+            :
+              <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
+            }
+            
+            <TopTen wallOfFameOnly={false} />
 
-              {this.state.weekly_total_steps !== 0 &&
-                <Graph data={this.state.weekly_stats} />
-              }
+            {this.state.weekly_stats &&
+              <Graph data={this.state.weekly_stats} />
+            }
 
-              <BottomNav history={this.props.history} logged={true} />
-              <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'tourToast'} autoClose={false} closeOnClick={false} closeButton={false}  />
-
-            </div>
-          </div>
-        </div>
-      :
-        <div>
-          <TopBar />
-          <div className="container">
-            <div className="row text-center">
-              <div className="marginVerticalTop40">
-                <Loader />
-              </div>
-            </div>
             <BottomNav history={this.props.history} logged={true} />
+            <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'tourToast'} autoClose={false} closeOnClick={false} closeButton={false} />
           </div>
         </div>
+      </div>
+      :
+      <div>
+        <TopBar />
+        <div className="container">
+          <div className="row text-center">
+            <div className="marginVerticalTop40">
+              <Loader />
+            </div>
+          </div>
+          <BottomNav history={this.props.history} logged={true} />
+        </div>
+      </div>
     )
   }
 }
@@ -1020,34 +1012,33 @@ export class Wall extends Component {
     this.state = {
       scoreResults: [],
       scoreResultsAllTime: [],
+      scoreResultsLoaded: false,
+      scoreResultsAllTimeLoaded: false
     };
-
-    //this.handler = this.handler.bind(this);
-
   }
 
-  componentDidMount(){
-    this.getTop10Weekly();
+  componentWillMount(){
+    this.getMyPosition();
     this.getTop10AllTime();
   }
 
-  getTop10Weekly() {
+  getMyPosition() {
     $.ajax({
-      url: wsbaseurl+'/top_ten',
+      url: wsbaseurl+'/my_ranking_weekly',
       dataType : 'json',
+      data: { token: localStorage.getItem('token') },
       type: "GET",
       cache: false, 
       success: function (data) {
         if (data && data.status === "OK") {
-          //console.log(JSON.stringify(data.top_10));
+          console.log(JSON.stringify(data.ranking));
           this.setState({
-              scoreResults: data.top_10,
+              scoreResults: data.ranking,
+              scoreResultsLoaded: true
           })
         }
       }.bind(this),
-      complete: function () {
-
-      },
+      complete: function () {},
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);      
       }
@@ -1065,53 +1056,42 @@ export class Wall extends Component {
           //console.log(JSON.stringify(data.top_10));
           this.setState({
               scoreResultsAllTime: data.top_10,
+              scoreResultsAllTimeLoaded: true
           })
         }
-
       }.bind(this),
-      complete: function () {
-
-      },
+      complete: function () {},
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);      
       }
     });
   }
 
-  // This method will be sent to the child component
-  /*
-  handler() {
-    this.getTop10();
-  }
-  */
-
   render() {
-
     return (
-      
-      this.state.scoreResultsAllTime.length > 0 ?
-        <div>
-          <TopBar /*action={this.handler}*/ />
-          <div className="container">
-            <div className="row">
-              <ScoreResults scoreResults={this.state.scoreResults} scoreResultsAllTime={this.state.scoreResultsAllTime} wallOfFameOnly={true} />
-              <BottomNav history={this.props.history} logged={true} />
-            </div>
-          </div> 
-        </div> 
-      :
-        <div>
-          <TopBar />
-          <div className="container">
-            <div className="row text-center">
-              <Loader />
-            </div>
+      this.state.scoreResultsLoaded && this.state.scoreResultsAllTimeLoaded ?
+      <div>
+        <TopBar />
+        <div className="container">
+          <div className="row">
+            <ScoreResults {...this.props} scoreResults={this.state.scoreResults} scoreResultsAllTime={this.state.scoreResultsAllTime} wallOfFameOnly={true} />
             <BottomNav history={this.props.history} logged={true} />
           </div>
+        </div> 
+      </div> 
+      :
+      <div>
+        <TopBar />
+        <div className="container">
+          <div className="row text-center">
+            <Loader />
+          </div>
+          <BottomNav history={this.props.history} logged={true} />
         </div>
-
+      </div>
     );
   }
+
 }
 
 
@@ -1136,15 +1116,12 @@ export class ProfileResult extends Component {
       total_meters: this.props.total_meters,
       avatar: this.props.avatar
     });
-    
   }
 
   render(){
     return (
       <div className="col-xs-12 col-sm-6 col-sm-offset-3">
-
         <div className="row profile text-center">
-
           <div>
             {localStorage.getItem("avatarImg64") ?(
               <img src={localStorage.getItem("avatarImg64")} alt="" className="img-circle mirror" />
@@ -1153,93 +1130,72 @@ export class ProfileResult extends Component {
             )}
           </div>
 
-          {/*<h3>{this.state.nick_name}</h3>*/}
           <h3>{localStorage.getItem('nickname')}</h3>
          
-            <div className="col-xs-6 calories">
-              <div className="row">
-                
-                <div className="col-xs-4">
-                  <IconCalories />
-                </div>
-
-                <div className="col-xs-8 pull-right">
-                  <h4 className="title text-right">CALORIES</h4>
-                  <h4 className="value text-right">
-                  <CountUp
-                    className="account-balance"
-                    start={0}
-                    end={this.state.total_calories}
-                    duration={1.5}
-                    useEasing={true}
-                    useGrouping={true}
-                    separator=" "
-                    decimals={0}
-                    decimal=","
-                  />
-                  </h4>
-                </div>
+          <div className="col-xs-6 calories">
+            <div className="row">
+              <div className="col-xs-4">
+                <IconCalories />
               </div>
-
+              <div className="col-xs-8 pull-right">
+                <h4 className="title text-right">CALORIES</h4>
+                <h4 className="value text-right">
+                <CountUp
+                  className="account-balance"
+                  start={0}
+                  end={this.state.total_calories}
+                  duration={1.5}
+                  useEasing={true}
+                  useGrouping={true}
+                  separator=" "
+                  decimals={0}
+                  decimal=","
+                />
+                </h4>
+              </div>
             </div>
+          </div>
    
-            <div className="col-xs-6 steps">
-              <div className="row">
-                <div className="col-xs-8 pull-left">
-                  <h4 className="title text-left">STEPS</h4>
-                  <h4 className="value text-left">
-                  <CountUp
-                    start={0}
-                    end={this.state.total_steps}
-                    duration={1.5}
-                    useEasing={true}
-                    useGrouping={true}
-                    separator=""
-                    decimals={0}
-                  />
-                  </h4>
-                </div>
-
-                <div className="col-xs-4">
-                  <IconSteps />
-                </div>
+          <div className="col-xs-6 steps">
+            <div className="row">
+              <div className="col-xs-8 pull-left">
+                <h4 className="title text-left">STEPS</h4>
+                <h4 className="value text-left">
+                <CountUp
+                  start={0}
+                  end={this.state.total_steps}
+                  duration={1.5}
+                  useEasing={true}
+                  useGrouping={true}
+                  separator=""
+                  decimals={0}
+                />
+                </h4>
+              </div>
+              <div className="col-xs-4">
+                <IconSteps />
               </div>
             </div>
+          </div>
         </div>  
       </div> 
     );
   }
 };
 
-export class ScoreResults extends Component {
+export class TopTen extends Component {
 
   constructor(props){
     super(props);
 
-    this.props.wallOfFameOnly ? 
-      this.state = {
-        scoreResults: this.props.scoreResults,
-        scoreResultsAllTime: this.props.scoreResultsAllTime,
-        wallOfFameSubtitle : 'The one week challenge'
-      }
-    : 
-      this.state = {
-        scoreResults: [],
-        scoreResultsAllTime: [],
-        wallOfFameSubtitle : 'The one week challenge'
-      }
-      this.getTop10Weekly();
-      this.getTop10AllTime();
-
-
+    this.state = {
+      scoreResults: [],
+      scoreResultsAllTime: [],
+      wallOfFameSubtitle : 'The one week challenge'
+    }
+    this.getTop10Weekly();
+    this.getTop10AllTime();
     this.handleTab = this.handleTab.bind(this);
-
-
-  }
-
-  componentWillMount(){
-
-    
   }
 
   getTop10Weekly() {
@@ -1252,13 +1208,11 @@ export class ScoreResults extends Component {
         if (data && data.status === "OK") {
           //console.log(JSON.stringify(data.top_10));
           this.setState({
-              scoreResults: data.top_10,
+            scoreResults: data.top_10,
           })
         }
       }.bind(this),
-      complete: function () {
-
-      },
+      complete: function () {},
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);      
       }
@@ -1275,14 +1229,11 @@ export class ScoreResults extends Component {
         if (data && data.status === "OK") {
           //console.log(JSON.stringify(data.top_10));
           this.setState({
-              scoreResultsAllTime: data.top_10,
+            scoreResultsAllTime: data.top_10,
           })
         }
-
       }.bind(this),
-      complete: function () {
-
-      },
+      complete: function () {},
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);      
       }
@@ -1324,14 +1275,13 @@ export class ScoreResults extends Component {
         </div>
 
         <div className="col-xs-12 text-center marginVerticalTop20">
-          <SVGInline svg={ icon_rank } style={{marginLeft: '-3px'}} />
+          <IconRank />
         </div>
 
         <div className="col-xs-12">
           <h3 className="title">Walk of fame</h3>
           <h4 className="subtitle">{this.state.wallOfFameSubtitle}</h4>
         </div>
-
 
         <div>
 
@@ -1388,6 +1338,129 @@ export class ScoreResults extends Component {
   }
 };
 
+// with my rank
+export class ScoreResults extends Component {
+
+  constructor(props){
+    super(props);
+
+    this.state = {
+      scoreResults: [],
+      scoreResultsAllTime: [],
+      wallOfFameSubtitle : 'My rank'
+    }
+
+    //this.getMyPosition();
+    //this.getTop10AllTime();
+
+    this.handleTab = this.handleTab.bind(this);
+
+  }
+
+  componentWillMount(){
+    this.setState({
+      scoreResults: this.props.scoreResults,
+      scoreResultsAllTime: this.props.scoreResultsAllTime
+    });
+  }
+
+  handleTab = (key) => {
+    if(key === "0"){
+      this.setState({
+        wallOfFameSubtitle : 'My rank'
+      });
+    } else {
+      this.setState({
+        wallOfFameSubtitle : 'Best ranks'
+      });
+    }
+  }
+
+  render(){
+
+    const { history } = this.props;
+
+    var resultItems = this.state.scoreResults.map(function(result, index) {
+        return <ScoreResultItem key={index.toString()} nickname={result.name} steps={result.total_steps} prestige={result.prestige} index={index+1} ranking={result.ranking+1} isUser={result.isUser} />
+    });
+
+    var resultItemsAllTime = this.state.scoreResultsAllTime.map(function(result, index) {
+        return <ScoreResultItem key={index.toString()} nickname={result.name} steps={result.total_steps} prestige={result.prestige} index={index+1} ranking={result.ranking+1} isUser={result.isUser} />
+    });
+
+    return(
+      <div className="wallOfFame">
+        
+        <div className={(this.props.wallOfFameOnly ? 'hidden' : '')}>
+          <div className="col-xs-6 sepa"></div>
+          <div className="col-xs-6"></div>
+        </div>
+
+        <div className="col-xs-12 text-center marginVerticalTop20">
+          <IconRank />
+        </div>
+
+        <div className="col-xs-12">
+          <h3 className="title">Walk of fame</h3>
+          <h4 className="subtitle">{this.state.wallOfFameSubtitle}</h4>
+        </div>
+
+
+        <div>
+
+          <div className="col-xs-12 fullwidth">
+            
+            <SwitchTabs className="tabs-wrapper" onChangeTab={this.handleTab}>
+              <SwitchTab active="true" title="My rank" >
+                <div className="scoreResultsTitle">
+                  <span className="nick_name">Nickname</span>
+                  <span className="stars">Prestige</span>
+                  <span className="total_meters">Steps</span>
+                </div>
+
+                {this.state.scoreResults.length > 0 ?(
+                  <ul className="scoreResults">
+                    {resultItems}
+                  </ul>
+                ):(
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                    <Climber />
+                    <p className="content">Be the first to figure on this weekly top ten</p>
+                    <MuiThemeProvider>
+                      <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
+                    </MuiThemeProvider>
+                  </div>
+                )}
+              </SwitchTab>
+              <SwitchTab title="Best ranks">
+                <div className="scoreResultsTitle">
+                  <span className="nick_name">Nickname</span>
+                  <span className="stars">Prestige</span>
+                  <span className="total_meters">Steps</span>
+                </div>
+
+                {this.state.scoreResultsAllTime.length > 0 ?(
+                  <ul className="scoreResults">
+                      {resultItemsAllTime}
+                  </ul>
+                ):(
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                    <Climber />
+                    <p className="content">Be the first to figure on this all time top ten</p>
+                    <MuiThemeProvider>
+                      <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
+                    </MuiThemeProvider>
+                  </div>
+                )}
+              </SwitchTab>
+            </SwitchTabs>
+          </div>
+        </div>
+      </div>     
+    );
+  }
+};
+
 export class ScoreResultItem extends Component {
 
   constructor(props){
@@ -1407,8 +1480,8 @@ export class ScoreResultItem extends Component {
 
   render(){
     return (
-      <li>
-        <span className="badge"><span>{this.props.index}</span></span>
+      <li className={ this.props.isUser ? 'current_user' : ''}>
+        <span className="badge"><span>{this.props.ranking ? this.props.ranking : this.props.index}</span></span>
         <span className="nick_name">{this.props.nickname}</span>
         <span className="stars">{this.getStars()}</span>
         <span className="total_meters">{this.props.steps}</span>
@@ -1560,7 +1633,7 @@ class Charts extends React.Component {
 
     return (
       
-      <div className={ 'Charts' + (this.props.horizontal ? ' horizontal' : '' ) }>
+      <div className={ 'Charts' + (this.props.horizontal ? 'horizontal' : '' ) }>
         { data.map(function (serie, serieIndex) {
           var sortedSerie = serie.slice(0),
             sum;
@@ -1751,7 +1824,7 @@ export class Edit extends React.Component {
                     onChange={this.handleChange}
                     name="email"
                     value={this.state.email}
-                    validators={['required', 'isEmail', 'matchRegexp:^[a-z0-9](.?[a-z0-9]){3,}@europarl.europa.eu|^[a-z0-9](.?[a-z0-9]){3,}@ext.europarl.europa.eu$']}
+                    validators={['required', 'isEmail', 'matchRegexp:^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@europarl.europa.eu|^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@ext.europarl.europa.eu|^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@ep.europa.eu$']}
                     errorMessages={['This field is required', 'Please provide a valid email address', 'Please provide a valid @europarl.europa.eu or @ext.europarl.europa.eu email address']}
                   />
                   <TextValidator

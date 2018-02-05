@@ -17,7 +17,6 @@ select:-webkit-autofill:focus {
     outline: none;
 }
 
-
 .logoSVG {
   max-width: 80%;
   margin-top: 15px;
@@ -57,6 +56,38 @@ button[type=Submit] {
 .marginVerticalTop40{
   margin: 40px auto 0 auto;
 }
+.checkbox{
+  margin-top: 40px;
+}
+.checkbox label{
+  padding-left: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 400;
+  margin-left: -10px;
+}
+.checkbox label span>span{
+  position: relative;
+  z-index: 3;
+  color: rgba(161, 25, 125, 0.7);
+  font-weight: bold;
+  cursor: pointer;
+}
+.checkbox label a{
+
+}
+.checkbox svg{
+  fill: rgba(161, 25, 125, 0.7) !important;
+}
+
+
+/*.checkbox input{
+  width: 24px !important;
+  height: 24px !important;
+}
+.checkbox input+div{
+  width: 24px !important;
+}*/
 .account{
   margin: 5px auto;
 }
@@ -78,13 +109,24 @@ button[type=Submit] {
 .account .sepa{
   border-right:3px solid #a1197d;
   min-height: 20px;
+  width: calc(50% + 3px);
+}
+.account .sepa+div.col-xs-6{
+  width: calc(50% - 3px);
 }
 .account .sepa span{
   margin-left: 8px;
 }
 
+.sepa{
+  width: calc(50% + 3px);
+}
+.sepa+div.col-xs-6{
+  width: calc(50% - 3px);
+}
+
 .profile{
-  margin: 5px 0 10px 0;
+  margin: 5px 0 20px 0;
   overflow: hidden;
 }
 .profile .img-circle{
@@ -174,6 +216,7 @@ button[type=Submit] {
   font-size: 1.125em; /* 18px/16px = 1.125*/
   font-weight: 500;
   text-transform: capitalize;
+  margin-top:10px;
 }
 
 .profile .calories{
@@ -191,12 +234,9 @@ button[type=Submit] {
   font-size: 0.875em; /* 14px/16px = 0.875*/
   margin-bottom: 0px;
 }
-
 .profile svg{
   margin-top: 15px;
 }
-
-
 
 .scoreResults{
   list-style: none;
@@ -225,6 +265,26 @@ button[type=Submit] {
 .scoreResults li:nth-child(even) {
   background-color: rgba(161, 25, 125, 0.1);
 }
+
+.scoreResults li.current_user{
+  /*
+  border-top: 2px solid rgba(161, 25, 125, 0.9);
+  border-bottom: 2px solid rgba(161, 25, 125, 0.9);
+  */
+  background: rgba(161, 25, 125, 0.2);
+  position:relative;
+}
+
+.scoreResults li.current_user:before {
+    content:"";
+    border-style: solid;
+    border-width: 3px 6px 3px 5px;
+    border-color: transparent transparent transparent #a1197d;
+    position: absolute;
+    left: 4px;
+}
+
+
 .scoreResultsTitle{
   margin-top: 15px;
   width: 100%;
@@ -241,6 +301,9 @@ button[type=Submit] {
 .scoreResultsTitle .badge{
   margin: 6px 12px;
   width: 33px;
+
+  
+
 }
 .scoreResultsTitle .nick_name{
   width: calc(60% - 57px);
@@ -256,13 +319,13 @@ button[type=Submit] {
 }
 
 .scoreResults li .badge{
-  margin: 6px 12px;
+  margin: 7px 13px;
   padding: 10px;
   background-color: rgba(161, 25, 125, 1);
   border-radius: 50%;
   position: relative;
-  max-width: 33px;
-  max-height: 33px;
+  max-width: 31px;
+  max-height: 31px;
   flex: 1;
 }
 
@@ -586,7 +649,10 @@ ul.switchtabs-nav li.active a {
   color: rgba(161, 25, 125, 1);
   margin: 10px auto;
 }
-
+.CircularProgressdata{
+  max-width: 300px;
+  margin: 0 auto 15px auto;
+}
 .CircularProgressdata h4.value{
   font-weight: bold;
   color: #a1197d;
@@ -694,7 +760,7 @@ ul.switchtabs-nav li.active a {
 }
 .progress_ctn > div.challenge_icon div.challenge_star div svg {
   animation-timing-function: ease-in-out;
-  transform: scale(0) rotate(0deg);
+  transform: scale(1.2) rotate(0deg);
   transform-origin: center;
   margin-right: 7px;
   -webkit-transform-style: preserve-3d;
@@ -706,6 +772,9 @@ ul.switchtabs-nav li.active a {
   margin-right: 0px; 
 }
 .progress_ctn > div.challenge_icon div.challenge_star.bounce div svg {
+  transform: scale(0) rotate(0deg);
+  transform-origin: center;
+
   animation: bounce 1s 0s both;
 }
 .progress_ctn > div.challenge_icon div.challenge_star.bounce div svg+svg {
@@ -726,7 +795,9 @@ ul.switchtabs-nav li.active a {
 .progress_ctn > div.challenge_icon div.challenge_star.bounce div svg+svg+svg+svg+svg+svg+svg {
   animation: bounce 1s 1.2s both;
 }
-
+.progress_ctn > div.challenge_icon div.challenge_star.bounce div svg+svg+svg+svg+svg+svg+svg+svg {
+  animation: bounce 1s 1.2s both;
+}
 /* WebKit and Opera browsers */
 @-webkit-keyframes spinner {
   from { -webkit-transform: rotateY(0deg);    }
@@ -755,6 +826,7 @@ ul.switchtabs-nav li.active a {
   90% { transform: scale(0.7) rotate(20deg); }
   100% { transform: scale(1.2) rotate(0deg); }
 }
+
 
 .progress_ctn > div.challenge_meters{
   position: absolute;
@@ -881,3 +953,75 @@ ul.switchtabs-nav li.active a {
             transform: scaleY(1);
   }
 }
+
+
+
+
+
+/* Make the element pulse (grow large and small slowly) */
+/* Usage
+    .myElement {
+        animation: pulsate 1s ease-out;
+        animation-iteration-count: infinite;
+        opacity: 1; 
+    }
+*/
+@-webkit-keyframes pulsate {
+    0% {-webkit-transform: scale(0.1, 0.1); opacity: 0.0;}
+    50% {opacity: 1.0;}
+    100% {-webkit-transform: scale(1.2, 1.2); opacity: 0.0;}
+}
+
+/* Make the element's opacity pulse*/
+/* Usage
+    .myElement {
+        animation: opacityPulse 1s ease-out;
+        animation-iteration-count: infinite;
+        opacity: 0; 
+    }
+*/
+@-webkit-keyframes opacityPulse {
+    0% {opacity: 0.0;}
+    50% {opacity: 1.0;}
+    100% {opacity: 0.0;}
+}
+
+/* Make the element's background pulse. I call this alertPulse because it is red. You can call it something more generic. */
+/* Usage
+    .myElement {
+        animation: alertPulse 1s ease-out;
+        animation-iteration-count: infinite;
+        opacity: 1; 
+    }
+*/
+@-webkit-keyframes alertPulse {
+    0% {background-color: #9A2727; opacity: 1;}
+    50% {opacity: red; opacity: 0.75; }
+    100% {opacity: #9A2727; opacity: 1;}
+}
+
+
+/* Make the element rotate infinitely. */
+/* 
+Usage
+    .myElement {
+        animation: rotating 3s linear infinite;
+    }
+*/
+@keyframes rotating {
+  from {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+

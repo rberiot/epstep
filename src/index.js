@@ -5,23 +5,17 @@ import {
   Route,
   Redirect
 } from 'react-router-dom';
-
 import './index.css';
 import {Scan,Stats,Wall,Header,BottomNav,Edit} from './App';
 import registerServiceWorker from './registerServiceWorker';
-
 import $ from 'jquery'; 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
-import { ValidatorForm } from 'react-form-validator-core';
-import { TextValidator} from 'react-material-ui-form-validator';
+import { ValidatorForm, ValidatorComponent } from 'react-form-validator-core';
+import { TextValidator } from 'react-material-ui-form-validator';
+import Checkbox from 'material-ui/Checkbox';
 import { ToastContainer, toast } from 'react-toastify';
-
-import {} from './SVGicon';
-
 import './App.css';
-
-
 
 const styles = {
   loginErrorStyle: {
@@ -67,12 +61,15 @@ const styles = {
     width: '100%',
     height: '48px',
     lineHeight: '48px',
-    marginTop: '50px',
-    marginBottom: '15px',
+    marginTop: '20px',
+    marginBottom: '20px',
   },
   bgAuth: {
     height: 'calc(100vh - 48px)',
     backgroundColor: 'rgba(161, 25, 125, 1)',
+  },
+  checkbox: {
+    borderColor: '#a1197d',
   },
   
 };
@@ -115,13 +112,7 @@ function tokenValidation(self) {
         
         localStorage.setItem("loggedIn", 'true');
         localStorage.setItem("firstVisit", 'true');
-
-        appAuth.authenticate(() => {
-          self.setState(() => ({
-            redirectToReferrer: true
-          }))
-          self.props.history.push('/Stats')
-        })
+        localStorage.setItem("nickname", data.public_name);
 
         $.ajax({
           url: wsbaseurl+'/update_profile',
@@ -137,6 +128,13 @@ function tokenValidation(self) {
             console.log(thrownError);
           }
         });
+
+        appAuth.authenticate(() => {
+          self.setState(() => ({
+            redirectToReferrer: true
+          }))
+          self.props.history.push('/Stats')
+        })
 
 
       } else if (data && data.status === "TOKEN_NOT_ACTIVATED") {
@@ -171,7 +169,6 @@ const CookieMsg = ({ id, undo, closeToast }) => {
     localStorage.setItem("acceptCookie", 'true');
     closeToast();
   }
-
   return (
     <div>
       <h2>Cookie</h2>
@@ -181,6 +178,52 @@ const CookieMsg = ({ id, undo, closeToast }) => {
   );
 }
 
+const TermsMsg = ({ id, undo, closeToast }) => {
+  function handleClick(){
+    closeToast();
+  }
+  return (
+    <div>
+      <h2>Terms & conditions</h2>
+      <p>The cookie settings on this website are set to 'allow all cookies' to give you the very best experience. If you continue without changing these settings, you consent to this - but if you want, you can change your settings at any time at the bottom of this page.</p>
+      <button onClick={handleClick}>Ok</button>
+    </div>
+  );
+}
+
+
+class CheckboxValidatorElement extends ValidatorComponent {
+  render() {
+    const { errorMessages, validators, requiredError, value, ...rest } = this.props;
+    return (
+      <div>
+        <Checkbox
+            {...rest}
+            ref={(r) => { this.input = r; }}
+        />
+        {this.errorText()}
+      </div>
+    );
+  }
+  errorText() {
+    const { isValid } = this.state;
+    if (isValid) {
+        return null;
+    }
+    const style = {
+        fontSize: '12px',
+        color: 'rgb(244, 67, 54)',
+        position: 'relative',
+        marginTop: '2px',
+    };
+    return (
+      <div style={style}>
+          {this.getErrorMessage()}
+      </div>
+    );
+  }
+}
+export default CheckboxValidatorElement;
 
 /* https://medium.com/technoetics/create-basic-login-forms-using-create-react-app-module-in-reactjs-511b9790dede */
 /* material input validation : https://www.npmjs.com/package/react-material-ui-form-validator */
@@ -193,11 +236,18 @@ class Login extends React.Component {
         redirectToReferrer: '',
         email:'',
         nickname:'',
-        token:''
+        token:'',
+        value:'',
+        checked: false,
       }
       this.handleChange = this.handleChange.bind(this);
       this.handleChange2 = this.handleChange2.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
+      this.handleCheck = this.handleCheck.bind(this);
+  }
+
+  componentWillMount() {
+      ValidatorForm.addValidationRule('isTruthy', value => value);
   }
 
   componentDidMount(){
@@ -214,6 +264,12 @@ class Login extends React.Component {
     }, 2000);
   }
 
+  handleToast4terms() {
+    setTimeout(() => {
+      toast(<TermsMsg />);
+    }, 100);
+  }
+
   handleChange(event) {
       const email = event.target.value;
       this.setState({ email });
@@ -223,28 +279,31 @@ class Login extends React.Component {
       this.setState({ nickname });
   }
 
+  handleCheck() {
+    this.setState((oldState) => {
+      return {
+        checked: !oldState.checked,
+      };
+    });
+  }
+
   handleSubmit() {
-
     let self = this;
-
     $.ajax({
       url: wsbaseurl+'/auth',
       dataType : 'json',
-      data: { email: this.state.email, nickname: this.state.nickname },
+      data: { email: this.state.email },
       type: 'GET',
       cache: false,           
       success: function(data) {
         //console.log("status:"+data.status+" / "+"token:"+data.token);
-
         if (data && data.status === "OK") {
           localStorage.setItem("email", this.state.email);
-          localStorage.setItem("nickname", this.state.nickname);
           localStorage.setItem("token", data.token);
           email = this.state.email;
           token = data.token;
           tokenValidation(self, email, token)
         }
-        
         
       }.bind(this),
       error: function(xhr, ajaxOptions, thrownError) {
@@ -292,6 +351,8 @@ class Login extends React.Component {
                   validators={['required', 'isEmail', 'matchRegexp:^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@europarl.europa.eu|^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@ext.europarl.europa.eu|^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@ep.europa.eu$']}
                   errorMessages={['This field is required', 'Please provide a valid email address', 'Please provide a valid @ep.europa.eu, @europarl.europa.eu or @ext.europarl.europa.eu email address']}
                 />
+
+                {/*
                 <TextValidator
                   style={styles.fullwidth}
                   floatingLabelStyle={styles.loginFloatingLabelStyle}
@@ -304,6 +365,23 @@ class Login extends React.Component {
                   value={nickname}
                   validators={['required', 'maxStringLength:12']}
                   errorMessages={['This field is required', 'Maximum 12 characters']}
+                />
+                */}
+
+                <CheckboxValidatorElement
+                    id={1}
+                    name="terms"
+                    label={(<span>I agree to&nbsp;
+                      <span onClick={this.handleToast4terms}>
+                        terms and conditions
+                      </span>
+                    </span>)}
+                    checked={this.state.checked}
+                    onCheck={this.handleCheck}
+                    className="checkbox"
+                    validators={['isTruthy']}
+                    errorMessages={['To continue, please accept terms and conditions']}
+                    value={this.state.checked}
                 />
                 <RaisedButton type="Submit" style={styles.button} label="Authenticate" backgroundColor="#a1197d" labelColor="#fff" />
               </ValidatorForm>
@@ -356,14 +434,11 @@ class Authlogin extends React.Component {
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) => (
-    appAuth.isAuthenticated 
-      ? (<Component {...props} />
-      ) : (
-        <Redirect to={{
-          pathname: '/Login',
-          state: { from: props.location }
-        }} />
-      )
+    appAuth.isAuthenticated ? (
+      <Component {...props} />
+    ):(
+      <Redirect to={{pathname: '/Login', state: { from: props.location }}} />
+    )
   )} />
 )
 
