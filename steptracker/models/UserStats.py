@@ -111,6 +111,10 @@ class UserStats(models.Model):
         sorted_stats = sorted(all_stats, key=lambda s: s.total_steps(), reverse=True)
 
         positions = [i for i, stat in enumerate(sorted_stats) if stat.user == user]
+
+        if not len(positions):
+            return []
+
         my_pos = positions[0]
 
         # slice the result to show only 2 players above and 2 players below
@@ -135,6 +139,10 @@ class UserStats(models.Model):
         sorted_top = sorted(global_top, key=lambda (_, total_steps): total_steps, reverse=True)
 
         positions = [i for i, (usr, _) in enumerate(sorted_top) if usr == user]
+
+        if not len(positions):
+            return []
+
         my_pos = positions[0]
 
         # slice the result to show only 2 players above and 2 players below

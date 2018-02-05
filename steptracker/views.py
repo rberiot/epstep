@@ -84,7 +84,7 @@ def auth(request):
         if token.valid is False:
             return JsonResponse({'status': 'TOKEN_NOT_ACTIVATED'})
         if token.valid and email_param == token.user.email:
-            return JsonResponse({'status': 'OK'})
+            return JsonResponse({'status': 'OK', 'public_name': token.user.public_name})
 
 
 def distance(request):
