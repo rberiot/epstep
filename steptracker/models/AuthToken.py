@@ -50,9 +50,9 @@ class AuthToken(models.Model):
         # todo prevent spamming with a timer
         if settings.EMAILS_ENABLED:
             send_mail(
-                'EpStep Account Validation',
-                'Here is the message. ' + public_url + '/validate_token?validation_key=' +
-                self.validation_key + '&email=' + self.user.email,
+                'EPStairs Account Validation',
+                'Please click the following link to activate your account ' + public_url +
+                '/validate_token?validation_key=' + self.validation_key + '&email=' + self.user.email,
                 settings.EMAIL_FROM_STRING,
                 [self.user.email],
                 fail_silently=False,
