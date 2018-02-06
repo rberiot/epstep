@@ -1020,11 +1020,18 @@ export class Stats extends Component {
               <Graph data={this.state.weekly_stats} />
             }
 
-            <div className="col-xs-12 text-center howto">
-              <h3 className="title">How it works ?</h3>
-              <h4 className="subtitle">Step by step explanation</h4>
-              <div className="small-btn" onClick={() => this.handleToast4tour()}s>Get the tour</div>
+            
 
+            <div className="col-xs-12 text-center howto">
+
+              <div className="col-xs-6 sepa"></div>
+              <div className="col-xs-6"></div>
+
+              <div className="col-xs-12 text-center howto">
+                <h3 className="title">How it works ?</h3>
+                <h4 className="subtitle">Step by step explanation</h4>
+                <div className="small-btn" onClick={() => this.handleToast4tour()}s>Get the tour</div>
+              </div>
             </div>
 
             <BottomNav history={this.props.history} logged={true} />
@@ -1333,18 +1340,19 @@ export class TopTen extends Component {
             
             <SwitchTabs className="tabs-wrapper" onChangeTab={this.handleTab}>
               <SwitchTab active="true" title="Week" >
-                <div className="scoreResultsTitle">
-                  <span className="nick_name">Nickname</span>
-                  <span className="stars">Prestige</span>
-                  <span className="total_meters">Steps</span>
-                </div>
-
                 {this.state.scoreResults.length > 0 ?(
-                  <ul className="scoreResults">
-                    {resultItems}
-                  </ul>
+                  <div>
+                    <div className="scoreResultsTitle">
+                      <span className="nick_name">Nickname</span>
+                      <span className="stars">Prestige</span>
+                      <span className="total_meters">Steps</span>
+                    </div>
+                    <ul className="scoreResults">
+                      {resultItems}
+                    </ul>
+                  </div>
                 ):(
-                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center marginVerticalTop20">
                     <Climber />
                     <p className="content">Be the first to figure on this weekly top ten</p>
                     <MuiThemeProvider>
@@ -1354,18 +1362,19 @@ export class TopTen extends Component {
                 )}
               </SwitchTab>
               <SwitchTab title="All time">
-                <div className="scoreResultsTitle">
-                  <span className="nick_name">Nickname</span>
-                  <span className="stars">Prestige</span>
-                  <span className="total_meters">Steps</span>
-                </div>
-
                 {this.state.scoreResultsAllTime.length > 0 ?(
-                  <ul className="scoreResults">
-                      {resultItemsAllTime}
-                  </ul>
+                  <div>
+                    <div className="scoreResultsTitle">
+                      <span className="nick_name">Nickname</span>
+                      <span className="stars">Prestige</span>
+                      <span className="total_meters">Steps</span>
+                    </div>
+                    <ul className="scoreResults">
+                        {resultItemsAllTime}
+                    </ul>
+                  </div>
                 ):(
-                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center marginVerticalTop20">
                     <Climber />
                     <p className="content">Be the first to figure on this all time top ten</p>
                     <MuiThemeProvider>
@@ -1456,20 +1465,21 @@ export class ScoreResults extends Component {
             
             <SwitchTabs className="tabs-wrapper" onChangeTab={this.handleTab}>
               <SwitchTab active="true" title="My rank" >
-                <div className="scoreResultsTitle">
-                  <span className="nick_name">Nickname</span>
-                  <span className="stars">Prestige</span>
-                  <span className="total_meters">Steps</span>
-                </div>
-
                 {this.state.scoreResults.length > 0 ?(
-                  <ul className="scoreResults">
-                    {resultItems}
-                  </ul>
+                  <div>
+                    <div className="scoreResultsTitle">
+                      <span className="nick_name">Nickname</span>
+                      <span className="stars">Prestige</span>
+                      <span className="total_meters">Steps</span>
+                    </div>
+                    <ul className="scoreResults">
+                      {resultItems}
+                    </ul>
+                  </div>
                 ):(
-                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center marginVerticalTop20">
                     <Climber />
-                    <p className="content">Be the first to figure on this weekly top ten</p>
+                    <p className="content">You're not ranked yet, climb some stairs and come back</p>
                     <MuiThemeProvider>
                       <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
                     </MuiThemeProvider>
@@ -1477,18 +1487,19 @@ export class ScoreResults extends Component {
                 )}
               </SwitchTab>
               <SwitchTab title="Best ranks">
-                <div className="scoreResultsTitle">
-                  <span className="nick_name">Nickname</span>
-                  <span className="stars">Prestige</span>
-                  <span className="total_meters">Steps</span>
-                </div>
-
                 {this.state.scoreResultsAllTime.length > 0 ?(
-                  <ul className="scoreResults">
-                      {resultItemsAllTime}
-                  </ul>
+                  <div>
+                    <div className="scoreResultsTitle">
+                      <span className="nick_name">Nickname</span>
+                      <span className="stars">Prestige</span>
+                      <span className="total_meters">Steps</span>
+                    </div>
+                    <ul className="scoreResults">
+                        {resultItemsAllTime}
+                    </ul>
+                  </div>
                 ):(
-                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center marginVerticalTop20">
                     <Climber />
                     <p className="content">Be the first to figure on this all time top ten</p>
                     <MuiThemeProvider>

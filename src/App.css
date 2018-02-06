@@ -610,7 +610,8 @@ ul.switchtabs-nav li.active a {
 }
 
 .wallOfFame .sepa,
-.history .sepa{
+.history .sepa,
+.howto .sepa{
   border-right:3px solid #a1197d;
   min-height: 40px;
   margin-bottom: 10px;
