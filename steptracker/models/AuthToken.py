@@ -57,6 +57,8 @@ class AuthToken(models.Model):
                 [self.user.email],
                 fail_silently=False,
             )
+        else:
+            self.valid = True
 
     @classmethod
     def is_token_valid(cls, token_string):

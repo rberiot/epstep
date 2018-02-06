@@ -71,7 +71,8 @@ def auth(request):
         token.gen_validation_key()
         token.save()
 
-        token.send_validation_mail(public_url='http://' + request.META.get('HTTP_HOST', settings.PUBLIC_URL))
+        token.send_validation_mail(public_url='https://' + request.META.get('HTTP_HOST', settings.PUBLIC_URL))
+        token.save()
 
         return JsonResponse({'token': token.token_string, 'status': 'OK'})
     else:  # actual auth
