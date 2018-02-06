@@ -22,6 +22,5 @@ import steptracker.url
 urlpatterns = [
     url(r'^app/', include('steptracker.url')),
     url(r'^admin/', admin.site.urls),
-    url(r'^admin/', admin.site.urls),
     url(r'^$', TemplateView.as_view(template_name="static_page.html")),
 ]
