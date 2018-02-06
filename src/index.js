@@ -93,8 +93,8 @@ var token;
 var tokenValidationIntervalId;
 
 //let wsbaseurl = "http://localhost:8000";
-//let wsbaseurl = "https://a2780b8b.ngrok.io";
-let wsbaseurl = "";
+let wsbaseurl = "https://a2780b8b.ngrok.io";
+//let wsbaseurl = "";
 
 
 function tokenValidation(self) {
@@ -409,7 +409,7 @@ class Authlogin extends React.Component {
   }
   render(){
     return (
-      <div className="container">
+      <div>
         <div className="row" style={styles.bgAuth}>
 
           <div className="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">

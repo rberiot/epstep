@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom';
 import QrReader from 'react-qr-reader';
 import $ from 'jquery'; 
+import MobileDetect from 'mobile-detect';
 import Swiper from 'swiper';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -28,8 +29,8 @@ import '../node_modules/material-components-web/dist/material-components-web.css
 const baseUrl = process.env.PUBLIC_URL;
 
 //const wsbaseurl = "http://localhost:8000";
-//let wsbaseurl = "https://a2780b8b.ngrok.io";
-let wsbaseurl = "";
+let wsbaseurl = "https://a2780b8b.ngrok.io";
+//let wsbaseurl = "";
 
 const styles = {
 
@@ -158,9 +159,9 @@ const ToastCloseButton = ({ closeToast }) => (
 */
  
 export class TourMsg extends Component {
-  
+
   componentDidMount() {
-    let mySwiper = new Swiper('.swiper-container', {init:false, loop:false, spaceBetween:40, autoHeight:false, pagination: {el: '.swiper-pagination'} });
+    let mySwiper = new Swiper('.swiper-container', {init:false, loop:false, spaceBetween:40, autoHeight:false, grabCursor:true, pagination: {el: '.swiper-pagination', clickable:true} });
     mySwiper.init()
   }
 
@@ -422,7 +423,8 @@ export class Scan extends React.Component {
       loading: false,
       result: false,
       scansComplete: false,
-      orientation: null
+      orientation: null,
+      platform: null
     }
     // preserve the initial state in a new object
     //this.baseState = this.state;
@@ -562,6 +564,14 @@ export class Scan extends React.Component {
   componentWillMount(){
     let _this = this;
 
+    var md = new MobileDetect(window.navigator.userAgent);
+
+    if (md.phone() !== null || md.tablet() !== null) {
+      _this.setState({platform: 'mobile'})
+    } else {
+      _this.setState({platform: 'desktop'})
+    }
+
     if (window.orientation === 90 || window.orientation === -90) {
       _this.setState({orientation: 'landscape'})
     } else {
@@ -637,12 +647,35 @@ export class Scan extends React.Component {
           <h3 style={{color: "#fff", fontSize: "14px", textTransform: "uppercase"}}>Please rotate your device to portrait mode</h3>
         </div>
       )
+    } else if (this.state.platform === 'desktop') {
+      return(
+        <div>
+          <div style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          left: 0,
+          bottom: 0,
+          backgroundColor: "rgba(161, 25, 125, 1)",
+          overflowX: "hidden",
+          overflowY: "auto",
+          outline: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+          }}>
+            <h3 style={{color: "#fff", fontSize: "14px", textTransform: "uppercase"}}>Please use a mobile device to scan a QR-Code</h3>
+          </div>
+          <BottomNav history={this.props.history} logged={true} />
+        </div>
+      )
     } else {
   
       if (!this.state.result) {
         return(
           <div className="container">
             <div className="row" style={styles.bgQR}>
+
               {this.state.loading &&
               <div className="overallLoader loader_white">
                 <Loader />
@@ -866,6 +899,8 @@ class ChangingProgressbar extends Component {
 /* https://github.com/glennreyes/react-countup */
 export class Stats extends Component {
   
+  toastId = null;
+
   constructor(props){
     super(props);
     this.state = {
@@ -885,9 +920,9 @@ export class Stats extends Component {
   handleToast4tour(tab) {
     setTimeout(() => {
       if (!toast.isActive(this.toastId)) {
-        toast(<TourMsg />);
+        this.toastId = toast(<TourMsg />);
       }
-    }, 1000);
+    }, 200);
   }
 
   componentDidMount(){
@@ -982,6 +1017,10 @@ export class Stats extends Component {
             {this.state.weekly_stats &&
               <Graph data={this.state.weekly_stats} />
             }
+
+            <div className="col-xs-12 text-center howto">
+              <h3 className="title" onClick={() => this.handleToast4tour()}>How it works ?</h3>
+            </div>
 
             <BottomNav history={this.props.history} logged={true} />
             <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'tourToast'} autoClose={false} closeOnClick={false} closeButton={false} />

@@ -30,6 +30,7 @@
     "html-webpack-plugin": "2.29.0",
     "jest": "20.0.4",
     "material-ui": "^0.20.0",
+    "mobile-detect": "^1.4.1",
     "muicss": "^0.9.30",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.2.0",

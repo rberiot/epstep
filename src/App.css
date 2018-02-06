@@ -621,7 +621,8 @@ ul.switchtabs-nav li.active a {
 .history .title,
 .history .subtitle,
 .tourToast .title,
-.tourToast .subtitle{
+.tourToast .subtitle,
+.howto .title{
   color: #a1197d;
   font-size: 1.125em; /* 18px/16px = 1.125*/
   font-weight: 500;
@@ -630,9 +631,14 @@ ul.switchtabs-nav li.active a {
 }
 .wallOfFame .title,
 .history .title,
-.tourToast .title{
+.tourToast .title,
+.howto .title{
   margin-top: 5px;
   margin-bottom: 2px;
+}
+.howto .title{
+  margin-bottom: 15px;
+  cursor: pointer;
 }
 .wallOfFame .subtitle,
 .history .subtitle,
