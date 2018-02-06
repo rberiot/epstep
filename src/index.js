@@ -5,7 +5,6 @@ import {
   Route,
   Redirect
 } from 'react-router-dom';
-
 import {Scan,Stats,Wall,Header,BottomNav,Edit} from './App';
 import registerServiceWorker from './registerServiceWorker';
 import $ from 'jquery'; 
@@ -42,7 +41,6 @@ const styles = {
   fullwidth: {
     width: '100%'
   },
- 
   logo: {
     maxWidth: '80%',
     marginTop: '15px'
@@ -66,13 +64,12 @@ const styles = {
     marginBottom: '20px',
   },
   bgAuth: {
-    height: 'calc(100vh - 48px)',
+    height: '100vh',
     backgroundColor: 'rgba(161, 25, 125, 1)',
   },
   checkbox: {
     borderColor: '#a1197d',
   },
-  
 };
 
 
@@ -404,14 +401,20 @@ class Login extends React.Component {
 
 
 class Authlogin extends React.Component {
-  componentDidMount() {
-     let self = this;
-     tokenValidationIntervalId = setInterval( function() { tokenValidation(self) }, 5000 );
+  componentWillMount(){
+    document.body.style.margin = "0";
+  }
+  componentDidMount(){
+    let self = this;
+    tokenValidationIntervalId = setInterval( function() { tokenValidation(self) }, 5000 );
+  }
+  componentWillUnmount(){
+    document.body.style.margin = null;
   }
   render(){
     return (
       <div>
-        <div style={styles.bgAuth}>
+        <div style={styles.bgAuth} className="auth">
 
           <div className="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">
             <Header />
@@ -424,8 +427,6 @@ class Authlogin extends React.Component {
           </div>
 
         </div>
-
-        <BottomNav history={this.props.history} logged={false} />
 
       </div>
 

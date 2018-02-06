@@ -18,11 +18,9 @@ import Confetti from 'react-dom-confetti';
 import Webcam from 'react-webcam';
 import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
-
 import './Loader.css';
 import 'swiper/dist/css/swiper.min.css';
 import {IconRank, IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, Filter, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo, Climber} from './SVGicon';
-//import logo from './logo.png';
 import '../node_modules/material-components-web/dist/material-components-web.css';
 import './App.css';
 
@@ -34,7 +32,6 @@ const baseUrl = process.env.PUBLIC_URL;
 let wsbaseurl = "";
 
 const styles = {
-
   loginDisabledUnderlineStyle: {
     borderColor: '#ccc',
     borderWidth: '1px',
@@ -85,8 +82,7 @@ const styles = {
     marginTop: '15px',
     marginBottom: '15px',
   },
-  
-  
+
 };
 
 
@@ -243,7 +239,6 @@ class Topbar extends React.Component {
       history: PropTypes.object.isRequired
     }
 
-
     constructor(props){
         super(props);
         this.handleDeleteAccount = this.handleDeleteAccount.bind(this);
@@ -251,7 +246,6 @@ class Topbar extends React.Component {
 
     handleDeleteAccount() {
       //let self = this;
-      
       localStorage.removeItem("email");
       localStorage.removeItem("firstVisit");
       localStorage.removeItem("loggedIn");
@@ -260,7 +254,6 @@ class Topbar extends React.Component {
       localStorage.removeItem("acceptCookie");
       localStorage.removeItem("avatarImg64");
       localStorage.removeItem("timeout");
-
       //self.props.history.push('/');
       window.location.reload();
     }
@@ -277,51 +270,31 @@ class Topbar extends React.Component {
       const { location, history } = this.props
         return (
           localStorage.getItem('loggedIn') === 'true' ?
-            <div className="container account">
-
-              {location.pathname === "/OtherTopBar" ?(
-                <div className="row">
-                  <div className="col-xs-6 sepa">
-                    <div>
-                      <span>Hello <strong>{localStorage.getItem('nickname')}</strong> <span className="hidden">@ {location.pathname}</span></span>
-                    </div>
-                  </div>
-                  <div className="col-xs-6 text-right">
-                    <div>
-                      <span onClick={this.props.action}>All time ranking </span>
-                      <Filter />
-                    </div>
-                  </div>
+          <div className="container account">
+            <div className="row">
+              <div className="col-xs-6 sepa">
+                <div>
+                  <Share />
+                  <span onClick={this.handleShareResults}>Share my results</span>
                 </div>
-
+              </div>
+              <div className="col-xs-6 text-right">
+                {location.pathname === '/Edit' ? (
+                  <div>
+                    <span onClick={this.handleDeleteAccount}>Delete my account </span>
+                    <Bin />
+                  </div>
                 ):(
-
-                <div className="row">
-                  <div className="col-xs-6 sepa">
-                    <div>
-                      <Share />
-                      <span onClick={this.handleShareResults}>Share my results</span>
-                    </div>
+                  <div>
+                    <span onClick={() => history.push('/Edit')}>Edit my account </span>
+                    <IconUserEdit />
                   </div>
-                  <div className="col-xs-6 text-right">
-                    {location.pathname === '/Edit' ? (
-                      <div>
-                        <span onClick={this.handleDeleteAccount}>Delete my account </span>
-                        <Bin />
-                      </div>
-                    ) : (
-                      <div>
-                        <span onClick={() => history.push('/Edit')}>Edit my account </span>
-                        <IconUserEdit />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
                 )}
+              </div>
             </div>
+          </div>
           :
-            <p>You're not logged</p>
+          <p>You're not logged</p>
         )
     }
 }
@@ -939,7 +912,7 @@ export class Stats extends Component {
       this.setState({
           challenge_name: null,
           current_percent: '0',
-          //nick_name: data.nick_name,
+          nick_name: localStorage.getItem('nickname'),
           total_calories: '0',
           total_steps: '0',
           total_meters: null,
@@ -950,13 +923,9 @@ export class Stats extends Component {
           profileLoaded: true,
           current_steps: '0',
           current_challenge: '0'
-
       })
-      
-      //this.getStatsData();
     } else {
       this.getStatsData();
-      //this.handleToast4tour();
     }
   }
 
@@ -1029,7 +998,7 @@ export class Stats extends Component {
 
               <div className="col-xs-12 text-center howto">
                 <h3 className="title">How it works ?</h3>
-                <h4 className="subtitle">Step by step explanation</h4>
+                <h4 className="subtitle">A step by step App explanation</h4>
                 <div className="small-btn" onClick={() => this.handleToast4tour()}s>Get the tour</div>
               </div>
             </div>
@@ -1084,12 +1053,15 @@ export class Wall extends Component {
         if (data && data.status === "OK") {
           console.log(JSON.stringify(data.ranking));
           this.setState({
-              scoreResults: data.ranking,
-              scoreResultsLoaded: true
+            scoreResults: data.ranking,
           })
         }
       }.bind(this),
-      complete: function () {},
+      complete: function () {
+        this.setState({
+          scoreResultsLoaded: true
+        })
+      }.bind(this),
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);      
       }
@@ -1106,12 +1078,15 @@ export class Wall extends Component {
         if (data && data.status === "OK") {
           //console.log(JSON.stringify(data.top_10));
           this.setState({
-              scoreResultsAllTime: data.top_10,
-              scoreResultsAllTimeLoaded: true
+            scoreResultsAllTime: data.top_10,
           })
         }
       }.bind(this),
-      complete: function () {},
+      complete: function () {
+        this.setState({
+          scoreResultsAllTimeLoaded: true
+        })
+      }.bind(this),
       error: function(xhr, ajaxOptions, thrownError) {
         console.log(thrownError);      
       }
@@ -1198,7 +1173,7 @@ export class ProfileResult extends Component {
                   duration={1.5}
                   useEasing={true}
                   useGrouping={true}
-                  separator=" "
+                  separator=""
                   decimals={0}
                   decimal=","
                 />
@@ -1352,12 +1327,14 @@ export class TopTen extends Component {
                     </ul>
                   </div>
                 ):(
-                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center marginVerticalTop20">
-                    <Climber />
-                    <p className="content">Be the first to figure on this weekly top ten</p>
-                    <MuiThemeProvider>
-                      <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
-                    </MuiThemeProvider>
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                    <div className="marginVerticalTop20">
+                      <Climber />
+                      <p className="content">Be the first to figure on this weekly top ten</p>
+                      <MuiThemeProvider>
+                        <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
+                      </MuiThemeProvider>
+                    </div>
                   </div>
                 )}
               </SwitchTab>
@@ -1374,12 +1351,14 @@ export class TopTen extends Component {
                     </ul>
                   </div>
                 ):(
-                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center marginVerticalTop20">
-                    <Climber />
-                    <p className="content">Be the first to figure on this all time top ten</p>
-                    <MuiThemeProvider>
-                      <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
-                    </MuiThemeProvider>
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                    <div className="marginVerticalTop20">
+                      <Climber />
+                      <p className="content">Be the first to figure on this all time top ten</p>
+                      <MuiThemeProvider>
+                        <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
+                      </MuiThemeProvider>
+                    </div>
                   </div>
                 )}
               </SwitchTab>
@@ -1477,12 +1456,14 @@ export class ScoreResults extends Component {
                     </ul>
                   </div>
                 ):(
-                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center marginVerticalTop20">
-                    <Climber />
-                    <p className="content">You're not ranked yet, climb some stairs and come back</p>
-                    <MuiThemeProvider>
-                      <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
-                    </MuiThemeProvider>
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                    <div className="marginVerticalTop20">
+                      <Climber />
+                      <p className="content">You're not ranked yet,<br /> climb some stairs and come back</p>
+                      <MuiThemeProvider>
+                        <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
+                      </MuiThemeProvider>
+                    </div>
                   </div>
                 )}
               </SwitchTab>
@@ -1499,12 +1480,14 @@ export class ScoreResults extends Component {
                     </ul>
                   </div>
                 ):(
-                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center marginVerticalTop20">
-                    <Climber />
-                    <p className="content">Be the first to figure on this all time top ten</p>
-                    <MuiThemeProvider>
-                      <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
-                    </MuiThemeProvider>
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
+                    <div className="marginVerticalTop20">
+                      <Climber />
+                      <p className="content">Be the first to figure on this all time top ten</p>
+                      <MuiThemeProvider>
+                        <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
+                      </MuiThemeProvider>
+                    </div>
                   </div>
                 )}
               </SwitchTab>
@@ -1619,7 +1602,7 @@ export class Graph extends React.Component {
             <VisibilitySensor
               delayedCall={true}
               partialVisibility='bottom'
-              offset={{bottom:70}}
+              offset={{bottom:60}}
               onChange={this.onChange}
             >
 
