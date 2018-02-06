@@ -622,7 +622,8 @@ ul.switchtabs-nav li.active a {
 .history .subtitle,
 .tourToast .title,
 .tourToast .subtitle,
-.howto .title{
+.howto .title,
+.howto .subtitle{
   color: #a1197d;
   font-size: 1.125em; /* 18px/16px = 1.125*/
   font-weight: 500;
@@ -636,13 +637,11 @@ ul.switchtabs-nav li.active a {
   margin-top: 5px;
   margin-bottom: 2px;
 }
-.howto .title{
-  margin-bottom: 15px;
-  cursor: pointer;
-}
+
 .wallOfFame .subtitle,
 .history .subtitle,
-.tourToast .subtitle{
+.tourToast .subtitle,
+.howto .subtitle{
   font-size: 0.625em; /* 10px/16px = 0.625*/
   font-weight: 700;
   color: rgba(161, 25, 125, 0.5);
@@ -939,6 +938,24 @@ ul.switchtabs-nav li.active a {
   color: rgba(161, 25, 125, 0.8);
   margin: 0 0 0 5px;
 }
+
+.small-btn {
+  display: inline-block;
+  color: #fff;
+  background: rgba(161,25,125,1);
+  height: 24px;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 10px;
+  border: 0;
+  border-radius: 3px;
+  line-height: 26px;
+  padding: 0 24px;
+  margin-top: 10px;
+  margin-bottom: 30px;
+  cursor: pointer;
+}
+
 @-webkit-keyframes slideUp {
   from {
     -webkit-transform: scaleY(0);

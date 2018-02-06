@@ -5,7 +5,7 @@ import {
   Route,
   Redirect
 } from 'react-router-dom';
-import './index.css';
+
 import {Scan,Stats,Wall,Header,BottomNav,Edit} from './App';
 import registerServiceWorker from './registerServiceWorker';
 import $ from 'jquery'; 
@@ -15,6 +15,7 @@ import { ValidatorForm, ValidatorComponent } from 'react-form-validator-core';
 import { TextValidator } from 'react-material-ui-form-validator';
 import Checkbox from 'material-ui/Checkbox';
 import { ToastContainer, toast } from 'react-toastify';
+import './index.css';
 import './App.css';
 
 const styles = {
@@ -93,8 +94,8 @@ var token;
 var tokenValidationIntervalId;
 
 //let wsbaseurl = "http://localhost:8000";
-let wsbaseurl = "https://a2780b8b.ngrok.io";
-//let wsbaseurl = "";
+//let wsbaseurl = "https://a2780b8b.ngrok.io";
+let wsbaseurl = "";
 
 
 function tokenValidation(self) {
@@ -410,7 +411,7 @@ class Authlogin extends React.Component {
   render(){
     return (
       <div>
-        <div className="row" style={styles.bgAuth}>
+        <div style={styles.bgAuth}>
 
           <div className="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">
             <Header />

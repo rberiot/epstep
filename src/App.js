@@ -18,19 +18,20 @@ import Confetti from 'react-dom-confetti';
 import Webcam from 'react-webcam';
 import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
-import './App.css';
+
 import './Loader.css';
 import 'swiper/dist/css/swiper.min.css';
 import {IconRank, IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, Filter, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo, Climber} from './SVGicon';
 //import logo from './logo.png';
 import '../node_modules/material-components-web/dist/material-components-web.css';
+import './App.css';
 
 /* for correct path after build */
 const baseUrl = process.env.PUBLIC_URL;
 
 //const wsbaseurl = "http://localhost:8000";
-let wsbaseurl = "https://a2780b8b.ngrok.io";
-//let wsbaseurl = "";
+//let wsbaseurl = "https://a2780b8b.ngrok.io";
+let wsbaseurl = "";
 
 const styles = {
 
@@ -564,7 +565,8 @@ export class Scan extends React.Component {
   componentWillMount(){
     let _this = this;
 
-    var md = new MobileDetect(window.navigator.userAgent);
+    //https://github.com/hgoebl/mobile-detect.js/
+    let md = new MobileDetect(window.navigator.userAgent);
 
     if (md.phone() !== null || md.tablet() !== null) {
       _this.setState({platform: 'mobile'})
@@ -1019,7 +1021,10 @@ export class Stats extends Component {
             }
 
             <div className="col-xs-12 text-center howto">
-              <h3 className="title" onClick={() => this.handleToast4tour()}>How it works ?</h3>
+              <h3 className="title">How it works ?</h3>
+              <h4 className="subtitle">Step by step explanation</h4>
+              <div className="small-btn" onClick={() => this.handleToast4tour()}s>Get the tour</div>
+
             </div>
 
             <BottomNav history={this.props.history} logged={true} />
