@@ -136,8 +136,9 @@ STATIC_ROOT = 'static/'
 
 
 STATICFILES_DIRS = (
-    #This lets Django's collectstatic store our webpack bundles
+    # This lets Django's collectstatic store our webpack bundles
     os.path.join(BASE_DIR, 'build/static'),
+    os.path.join(BASE_DIR, 'landing/app/static/'),
 )
 
 PUBLIC_URL = ''
