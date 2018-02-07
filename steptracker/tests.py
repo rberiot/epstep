@@ -99,10 +99,11 @@ class AuthViewTest(TestCase):
         self.assertIsNotNone(internal_token)
 
         # phase 2. check that login is denied before token is activated
-        rq = factory.get(reverse('auth'), data={'email': 'ee@ext.europarl.europa.eu', 'token': token_string})
-        response = auth(rq)
-        data = json.loads(response.content)
-        self.assertEqual(data['status'], 'TOKEN_NOT_ACTIVATED')
+        if settings.EMAILS_ENABLED: # this will not work if emails are disabled
+            rq = factory.get(reverse('auth'), data={'email': 'ee@ext.europarl.europa.eu', 'token': token_string})
+            response = auth(rq)
+            data = json.loads(response.content)
+            self.assertEqual(data['status'], 'TOKEN_NOT_ACTIVATED')
 
         internal_token.valid = True
         internal_token.save()

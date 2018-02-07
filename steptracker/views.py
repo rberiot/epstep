@@ -102,7 +102,9 @@ def distance(request):
     level_from = Level.objects.get(pk=qr1_param_id)
     level_to = Level.objects.get(pk=qr2_param_id)
 
-    return JsonResponse({'status': 'OK', 'distance': Level.distance(level_from, level_to)})
+    dst, status = Level.distance(level_from, level_to)
+
+    return JsonResponse({'status': status, 'distance': dst})
 
 
 def qr_info(request):
