@@ -92,7 +92,7 @@ var tokenValidationIntervalId;
 
 //let wsbaseurl = "http://localhost:8000";
 //let wsbaseurl = "https://a2780b8b.ngrok.io/app";
-let wsbaseurl = "";
+let wsbaseurl = "/app";
 
 
 function tokenValidation(self) {
