@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.conf import settings
+from django.shortcuts import redirect
+
 from models import AuthToken, User
 from datetime import datetime
 from django.views.decorators.cache import cache_page
@@ -26,7 +28,7 @@ def validate_token(request):
     token.save()
 
     if token.valid:
-        return HttpResponse(status=200)
+        return redirect(settings.PUBLIC_URL)
 
 
 def update_profile(request):
