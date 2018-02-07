@@ -312,7 +312,7 @@ def qr_list_json(request):
                     'building': qr.stairwell.building,
                     'shaft': qr.stairwell.shaft,
                     'level': qr.floorNumber,
-                    'url': settings.PUBLIC_URL + '/#/Scan?qr_id=' + str(qr.pk)})
+                    'url': settings.PUBLIC_URL + 'app/#/scan?qr_id=' + str(qr.pk)})
     return JsonResponse({'status': 'OK', 'qr': res})
 
 
@@ -330,6 +330,6 @@ def qr_list(request):
                          qr.stairwell.building,
                          qr.stairwell.shaft,
                          qr.floorNumber,
-                         settings.PUBLIC_URL + '/#/Scan?qr_id=' + str(qr.pk)
+                         settings.PUBLIC_URL + 'app/#/scan?qr_id=' + str(qr.pk)
                          ])
     return response
