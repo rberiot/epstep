@@ -16,7 +16,5 @@ class User(models.Model):
         except:
             self.first_name = 'Jane Doe'
 
-
-
     def __str__(self):
         return str(self.email) + ' - ' + str(self.public_name)

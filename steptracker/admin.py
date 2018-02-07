@@ -8,6 +8,7 @@ import models
 class LevelInline(admin.TabularInline):
     model = models.Level
     can_delete = True
+    ordering = ['floorNumber']
 
 @admin.register(models.StairWell)
 class StairwellAdmin(admin.ModelAdmin):
@@ -16,4 +17,3 @@ class StairwellAdmin(admin.ModelAdmin):
     ]
 
 #admin.site.register(models.StairWell)
-#admin.site.register(models.Level)

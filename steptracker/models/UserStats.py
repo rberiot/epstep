@@ -118,7 +118,7 @@ class UserStats(models.Model):
         my_pos = positions[0]
 
         # slice the result to show only 2 players above and 2 players below
-        sliced_stats = sorted_stats[max(0, my_pos-3): min(my_pos+2, len(sorted_stats))]
+        sliced_stats = sorted_stats[max(0, my_pos-2): min(my_pos+3, len(sorted_stats))]
 
         result = []
         for s in sliced_stats:
@@ -146,7 +146,7 @@ class UserStats(models.Model):
         my_pos = positions[0]
 
         # slice the result to show only 2 players above and 2 players below
-        sliced_top = sorted_top[max(0, my_pos-3): min(my_pos+2, len(sorted_top))]
+        sliced_top = sorted_top[max(0, my_pos-2): min(my_pos+3, len(sorted_top))]
 
         result = []
         for t in sliced_top:

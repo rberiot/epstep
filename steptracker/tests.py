@@ -396,7 +396,6 @@ class RankingTest(TestCase):
         from django.test import RequestFactory
         from django.core.urlresolvers import reverse
         from views import my_ranking_weekly
-        import random
 
         users = []
         for i in range(10):
@@ -405,11 +404,11 @@ class RankingTest(TestCase):
             u.public_name = 'TEST' + str(i)
             u.save()
             users.append(u)
-            UserStats.record_stats(u, random.randint(1, 600), datetime.date.today())
+            UserStats.record_stats(u, i * 100, datetime.date.today())
 
         auth = AuthToken()
         auth.token_string = AuthToken.gen_token_string('test@test.com')
-        auth.user = users[0]
+        auth.user = users[9]
         auth.valid = True
         auth.save()
 
