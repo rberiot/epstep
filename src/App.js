@@ -459,6 +459,15 @@ export class Scan extends React.Component {
           success: function(data){
             if (data && data.status === "OK") {
 
+              if (data.distance === "STAIRWELL_MISSMATCH"){
+                this.setState({
+                  message: 'Please scan QR code from the same stairwell',
+                  scansComplete: true,
+                  loading: false
+                })
+                return;
+              }
+
               if ("vibrate" in navigator) {
                 window.navigator.vibrate([100,50]);
               }
@@ -1186,7 +1195,7 @@ export class ProfileResult extends Component {
           <div className="col-xs-6 steps">
             <div className="row">
               <div className="col-xs-8 pull-left">
-                <h4 className="title text-left">STEPS</h4>
+                <h4 className="title text-left">STAIRS</h4>
                 <h4 className="value text-left">
                 <CountUp
                   start={0}

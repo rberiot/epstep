@@ -342,7 +342,7 @@ class Login extends React.Component {
                   floatingLabelFocusStyle={styles.loginFloatingLabelFocusStyle}
                   underlineFocusStyle={styles.loginUnderlineStyle}
                   floatingLabelText="Enter your email"
-                  hintText="xyz.xyz@europarl.europa.eu"
+                  hintText="Your europarl email address"
                   onChange={this.handleChange}
                   name="email"
                   value={email}
@@ -450,7 +450,7 @@ export class Main extends React.Component {
     return (
       <Router>
         <div>
-            <PrivateRoute exact path='/' component={Scan} />
+            <PrivateRoute exact path='/' component={Stats} />
             <Route path='/Login' component={Login} />
             <Route path='/Authlogin' component={Authlogin} />
             <PrivateRoute exact path='/Scan' component={Scan} />
