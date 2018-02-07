@@ -1,0 +1,93 @@
+/*------------------------------------------------------------------
+[Stylesheet]
+Color Palette - Blue
+
+name           |  normal   |  hover 
+
+Red            - #e53935    #f44336
+Pink           - #d81b60    #e91e63
+Purple         - #8e24aa    #9c27b0
+Deep Purple    - #5e35b1    #673ab7
+Indigo         - #3949ab    #3f51b5
+Blue           - #1e88e5    #2196f3
+Light Blue     - #039be5    #03a9f4
+Cyan           - #00acc1    #00bcd4
+Teal           - #00897b    #009688
+Green          - #43a047    #4caf50
+Light Green    - #7cb342    #8bc34a    
+Lime           - #c0ca33    #cddc39
+Yellow         - #ffd600    #ffea00 
+Amber          - #ffb300    #ffc107
+Orange         - #fb8c00    #ff9800
+Brown          - #6d4c41    #795548
+Gray           - #757575    #9e9e9e
+Blue-gray      - #546e7a    #607d8b
+
+-------------------------------------------------------------------*/
+
+.btn,
+.btn-large {
+	background-color: #a1197d;
+}
+
+.btn:hover,
+.btn-large:hover {
+	background-color: #ae2189;
+}
+
+input[type=text]:focus,
+input[type=password]:focus,
+input[type=email]:focus,
+input[type=date]:focus,
+textarea:focus {
+	border-bottom: 1px solid #a1197d;
+    -webkit-box-shadow: 0 1px 0 0 #a1197d;
+    -moz-box-shadow: 0 1px 0 0 #a1197d;
+    box-shadow: 0 1px 0 0 #a1197d; 
+}
+
+.hero_fullscreen.gradient_overlay {
+	/* IE10 Consumer Preview */ 
+	background-image: -ms-linear-gradient(top left, #2196F3 0%, #311B92 100%);
+	
+	/* Mozilla Firefox */ 
+	background-image: -moz-linear-gradient(top left, #2196F3 0%, #311B92 100%);
+	
+	/* Opera */ 
+	background-image: -o-linear-gradient(top left, #2196F3 0%, #311B92 100%);
+	
+	/* Webkit (Safari/Chrome 10) */ 
+	background-image: -webkit-gradient(linear, left top, right bottom, color-stop(0, #2196F3), color-stop(1, #311B92));
+	
+	/* Webkit (Chrome 11+) */ 
+	background-image: -webkit-linear-gradient(top left, #2196F3 0%, #311B92 100%);	
+}
+
+.hero_fullscreen.background_solid {
+	background: url(../../images/home_backgrounds/home_bg_01_mountain_full-preview.jpg);
+	background-position:50% 100%;
+	background-size: 100% auto;	
+	background-repeat: no-repeat;
+	background-color: #ebcce5;
+}
+/*@media (max-width: 479px) {
+	.hero_fullscreen.background_solid {
+		background: url(../../images/home_backgrounds/home_bg_01_mountain.jpg);
+		background-position:50% 100%;
+		background-size: 100% auto;	
+		background-repeat: no-repeat;
+		background-color: #ebcce5;
+	}
+}*/
+a, .menu_bar_navigation ul li a:hover, .menu_bar_navigation ul li.active a, .cbp-spmenu a:hover{
+	color:#a1197d
+}
+
+.background_color3 {
+	background: #a1197d;
+	color:white;	
+}
+
+.pricing_box.pricing_box_featured {
+	border: solid 2px #a1197d;
+}

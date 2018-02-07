@@ -107,7 +107,7 @@ ENV/
 db.sqlite3
 node_modules/
 build/
-static/
+/static/
 templates/
 .DS_Store
 settings_local.py
