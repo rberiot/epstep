@@ -28,7 +28,7 @@ import './App.css';
 const baseUrl = process.env.PUBLIC_URL;
 
 //const wsbaseurl = "http://localhost:8000";
-//let wsbaseurl = "https://a2780b8b.ngrok.io";
+//let wsbaseurl = "https://a2780b8b.ngrok.io/app";
 let wsbaseurl = "";
 
 const styles = {
@@ -82,7 +82,8 @@ const styles = {
     marginTop: '15px',
     marginBottom: '15px',
   },
-
+  
+  
 };
 
 
@@ -998,7 +999,7 @@ export class Stats extends Component {
 
               <div className="col-xs-12 text-center howto">
                 <h3 className="title">How it works ?</h3>
-                <h4 className="subtitle">A step by step App explanation</h4>
+                <h4 className="subtitle">A 3 steps App explanation</h4>
                 <div className="small-btn" onClick={() => this.handleToast4tour()}s>Get the tour</div>
               </div>
             </div>
