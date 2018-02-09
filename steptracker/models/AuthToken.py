@@ -52,7 +52,7 @@ class AuthToken(models.Model):
             send_mail(
                 'EPStairs Account Validation',
                 'Please click the following link to activate your account ' + public_url +
-                '/validate_token?validation_key=' + self.validation_key + '&email=' + self.user.email,
+                '/app/validate_token?validation_key=' + self.validation_key + '&email=' + self.user.email,
                 settings.EMAIL_FROM_STRING,
                 [self.user.email],
                 fail_silently=False,

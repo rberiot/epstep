@@ -41,6 +41,10 @@ def update_profile(request):
     if not name:
         return HttpResponseBadRequest('nickname get parameter is required')
 
+    nickname_max_size = 25
+    if len(name) > nickname_max_size:
+        return JsonResponse({'status': 'NICKNAME_TOO_LONG', 'max_size': nickname_max_size})
+
     from django.utils.html import strip_tags, escape
     name = escape(strip_tags(name))
 
