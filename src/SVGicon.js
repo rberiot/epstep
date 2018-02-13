@@ -8,7 +8,7 @@ export class Logo extends React.Component {
                   <polygon id="path-1l" points="0 0.0808053597 168.919195 0.0808053597 168.919195 169 0 169"></polygon>
                   <polygon id="path-3l" points="0 169 169 169 169 0 0 0"></polygon>
               </defs>
-              <g id="STEP2" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
+              <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                   <g id="Home/login-Copy" transform="translate(-96.000000, -27.000000)">
                       <g id="logo" transform="translate(95.000000, 26.000000)">
                           <g id="Page-1" transform="translate(1.000000, 1.000000)">

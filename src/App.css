@@ -668,6 +668,9 @@ ul.switchtabs-nav li.active a {
 .CircularProgressdata{
   max-width: 300px;
   margin: 0 auto 15px auto;
+  /* for edge 
+  min-height: 280px;
+  */ 
 }
 .CircularProgressdata h4.value{
   font-weight: bold;
@@ -760,10 +763,12 @@ ul.switchtabs-nav li.active a {
 }
 .progress_ctn > div.challenge_first{
   width: 90%; 
-  padding-top: 30%;
+  /*padding-top: 30%;*/
   padding-bottom: 55%; 
-  height: 1px; 
-  overflow: visible 
+  height: 185px; 
+  overflow: visible ;
+  position: relative;
+  top: 40px;
 }
 .progress_ctn > div.challenge_first h4{
   position: relative;

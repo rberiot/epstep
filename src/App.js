@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {
   withRouter
 } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 import QrReader from 'react-qr-reader';
 import $ from 'jquery'; 
 import MobileDetect from 'mobile-detect';
@@ -20,9 +21,11 @@ import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
 import './Loader.css';
 import 'swiper/dist/css/swiper.min.css';
-import {IconRank, IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, Filter, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, MontEuropa, IconStats, Star, Medal, Logo, Climber} from './SVGicon';
+import {IconRank, IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, IconStats, Star, Medal, Logo, Climber} from './SVGicon';
 import '../node_modules/material-components-web/dist/material-components-web.css';
 import './App.css';
+
+const cookies = new Cookies();
 
 /* for correct path after build */
 const baseUrl = process.env.PUBLIC_URL;
@@ -165,7 +168,8 @@ export class TourMsg extends Component {
 
   dismiss = () => {
     toast.dismiss(this.toastId);
-    localStorage.setItem('acceptTour', 'true');
+    //localStorage.setItem('acceptTour', 'true');
+    cookies.set('acceptTour', 'true', { path: '/' });
   }; 
 
   render() {
@@ -184,25 +188,30 @@ export class TourMsg extends Component {
                       <h3 className="title">FIRST STEP</h3>
                       <h4 className="subtitle">SCAN A QR CODE</h4>
                     </div>     
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                    <p>You will find QR codes next to the entrances of the staircases.<br /><br />
+                    Before entering the staircase, scan your first QR code by clicking the QR code symbol in the middle of the toolbar.<br /><br />
+                    Scan the exit QR code when leaving the staircase and the total amount of stairs you took will be automatically added to your total!</p>
+                  </div>
+
+                  <div className="swiper-slide">  
+                    <div className="head">
+                      <IconRank />
+                      <h3 className="title">SECOND STEP</h3>
+                      <h4 className="subtitle">Check your stats and share your results!</h4>
+                    </div>     
+                    <p>Check your ranking in the "Walk of Fame" by clicking the stats symbol on the left of the toolbar.<br /><br />
+                    Setup a stair climbing challenge with your colleagues by clicking "Share my results" on the top left of the screen!<br /><br />
+                    Your colleague(s) will receive an email challenging them to participate.</p>
                   </div>
 
                   <div className="swiper-slide">  
                     <div className="head"> 
                       <IconUser /> 
-                      <h3 className="title">SECOND STEP</h3>
-                      <h4 className="subtitle">CREATE YOUR PROFILE</h4>
-                    </div>     
-                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                  </div>
-
-                  <div className="swiper-slide">  
-                    <div className="head"> 
-                      <IconRank />
                       <h3 className="title">THIRD STEP</h3>
-                      <h4 className="subtitle">CHECK YOUR STATS</h4>
+                      <h4 className="subtitle">Edit your profile</h4>
                     </div>     
-                    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    <p>Add your picture to your profile or edit your nickname.<br /><br />
+                    Make the EP climbing challenge more personal and more fun by adding your profile picture! Just click the person icon on the right of the toolbar and choose “Edit my account” on the top right of the screen. <br /><br />Click the grey logo to add your picture!</p>
                   </div>
                   
               </div>
@@ -247,6 +256,7 @@ class Topbar extends React.Component {
 
     handleDeleteAccount() {
       //let self = this;
+      /*
       localStorage.removeItem("email");
       localStorage.removeItem("firstVisit");
       localStorage.removeItem("loggedIn");
@@ -255,6 +265,18 @@ class Topbar extends React.Component {
       localStorage.removeItem("acceptCookie");
       localStorage.removeItem("avatarImg64");
       localStorage.removeItem("timeout");
+      */
+      cookies.remove("email", { path: '/' });
+      cookies.remove("firstVisit", { path: '/' });
+      cookies.remove("loggedIn", { path: '/' });
+      cookies.remove("loggedInServer", { path: '/' });
+      cookies.remove("nickname", { path: '/' });
+      cookies.remove("token", { path: '/' });
+      cookies.remove("acceptCookie", { path: '/' });
+      cookies.remove("acceptTour", { path: '/' });
+      //cookies.remove("avatarImg64");
+      cookies.remove("timeout", { path: '/' });
+
       //self.props.history.push('/');
       window.location.reload();
     }
@@ -263,14 +285,16 @@ class Topbar extends React.Component {
       var page = window.location.protocol+"//"+window.location.hostname;
       var email = "";
       var subject = "Invitation to join a stair challenge on EPStairs";
-      var body = "Hey!"+"\r\n\r\n"+"I've just setup a mini stair climbing challenge with EPStairs."+"\r\n"+"Join me and let's compare our results."+"\r\n\r\n"+page;
+      var body = `Hey! \r\n\r\n I've just setup a mini stair climbing challenge with EPStairs. \r\n Join me and let's compare our results. \r\n\r\n ${page}`;
       window.location.href = "mailto:"+email+"?Subject=" + subject + "&body=" + encodeURIComponent(body);
     }
 
     render() {
       const { location, history } = this.props
         return (
-          localStorage.getItem('loggedIn') === 'true' ?
+          //localStorage.getItem('loggedIn') === 'true' ?
+          cookies.get('loggedIn') === 'true' ?
+          
           <div className="container account">
             <div className="row">
               <div className="col-xs-6 sepa">
@@ -357,7 +381,7 @@ export class BottomNav extends Component {
               value='/Scan'
               data-route="/Scan"
               onActive={(event) => this.handleActive(event)}
-              className={this.state.activeTabIndex === '/Scan' || this.state.activeTabIndex === '/' ? "tab active" : "tab"}
+              className={this.state.activeTabIndex === '/Scan' ? "tab active" : "tab"}
             />
 
             <Tab
@@ -366,7 +390,7 @@ export class BottomNav extends Component {
               value='/Stats'
               data-route="/Stats"
               onActive={(event) => this.handleActive(event)}
-              className={this.state.activeTabIndex === '/Stats' ? "tab active" : "tab"}
+              className={this.state.activeTabIndex === '/Stats' || this.state.activeTabIndex === '/' ? "tab active" : "tab"}
             />
             
           </Tabs>
@@ -404,7 +428,9 @@ export class Scan extends React.Component {
     // preserve the initial state in a new object
     //this.baseState = this.state;
     
-    localStorage.removeItem('qrcode_in');
+    //localStorage.removeItem('qrcode_in');
+    cookies.remove('qrcode_in', { path: '/' });
+
     this.handleScan = this.handleScan.bind(this);
     this.handleError = this.handleError.bind(this);
     
@@ -431,7 +457,8 @@ export class Scan extends React.Component {
       scan_qr = data;
     }
 
-    if(scan_qr === localStorage.getItem('qrcode_in'))
+    //if(scan_qr === localStorage.getItem('qrcode_in'))
+    if(scan_qr === cookies.get('qrcode_in'))
       return;
 
     if(!scan_qr)
@@ -444,9 +471,12 @@ export class Scan extends React.Component {
       window.navigator.vibrate([100,30]);
     }
 
-    if(localStorage.getItem('qrcode_in') == null || new Date().getTime() > localStorage.getItem('timeout')){
-      localStorage.setItem('qrcode_in', scan_qr)
-      localStorage.setItem('timeout', new Date().getTime() + 5*60*1000)
+    //if(localStorage.getItem('qrcode_in') == null || new Date().getTime() > localStorage.getItem('timeout')){
+    if(cookies.get('qrcode_in') === undefined || new Date().getTime() > cookies.get('timeout')){
+      //localStorage.setItem('qrcode_in', scan_qr)
+      //localStorage.setItem('timeout', new Date().getTime() + 5*60*1000)
+      cookies.set('qrcode_in', scan_qr, { path: '/' });
+      cookies.set('timeout', new Date().getTime() + 5*60*1000, { path: '/' });
       this.setState({
           message: 'PLEASE TAKE THE STAIRS AND SCAN THE EXIT QR CODE...',
           loading: true
@@ -455,7 +485,8 @@ export class Scan extends React.Component {
       $.ajax({
           url: wsbaseurl+'/distance',
           type: "GET",
-          data: { qr_id_1: localStorage.getItem('qrcode_in'), qr_id_2: scan_qr },
+          //data: { qr_id_1: localStorage.getItem('qrcode_in'), qr_id_2: scan_qr },
+          data: { qr_id_1: cookies.get('qrcode_in'), qr_id_2: scan_qr },
           success: function(data){
             if (data && data.status === "OK") {
 
@@ -478,16 +509,20 @@ export class Scan extends React.Component {
                 loading: false
               })
 
-              localStorage.removeItem('qrcode_in');
+              //localStorage.removeItem('qrcode_in');
+              cookies.remove('qrcode_in', { path: '/' });
 
-              if(localStorage.getItem('firstVisit') === 'true'){
-                localStorage.setItem('firstVisit', 'false');
+              //if(localStorage.getItem('firstVisit') === 'true'){
+              if(cookies.get('firstVisit') === 'true'){
+                //localStorage.setItem('firstVisit', 'false');
+                cookies.set('firstVisit', 'false', { path: '/' });
               }
 
               $.ajax({
                   url: wsbaseurl+'/log_distance',
                   type: "GET",
-                  data: { steps: this.state.distance, token: localStorage.getItem('token') },
+                  //data: { steps: this.state.distance, token: localStorage.getItem('token') },
+                  data: { steps: this.state.distance, token: cookies.get('token') },
                   success: function(data){
                     //console.log(data.status);
                     if (data && data.status === "OK") {
@@ -575,9 +610,16 @@ export class Scan extends React.Component {
 
   componentDidMount(){
     const search = this.props.location.search; // could be '?foo=bar'
-    const params = new URLSearchParams(search);
-    const qr_id = params.get('qr_id'); // bar
-    this.handleScan(qr_id, true)
+    // to DEBUG for edge 17- (URLSearchParams is undefined)
+    if (window.URLSearchParams !== undefined){
+      const params = new URLSearchParams(search);
+      const qr_id = params.get('qr_id'); // bar
+      this.handleScan(qr_id, true)
+    } else {
+      return
+    }
+
+    
   }
 
 
@@ -742,12 +784,15 @@ class ChangingProgressbar extends Component {
       });
     }, 100);
 
-    localStorage.setItem('previous_percentage', this.props.percentages[1]);
+    //localStorage.setItem('previous_percentage', this.props.percentages[1]);
+    cookies.set('previous_percentage', this.props.percentages[1], { path: '/' });
+
     //this.handleConfetti();
     //this.handleToast();
   }
 
   handleConfetti() {
+    console.log('show confetti')
     setTimeout(() => {
       this.setState({showConfetti: true});
       this.setState({showStars: true});
@@ -757,7 +802,7 @@ class ChangingProgressbar extends Component {
   handleToast = () => {
     setTimeout(() => {
       if (! toast.isActive(this.toastId)) {
-        this.toastId = toast("Happy to see you again "+localStorage.getItem('nickname')+"!");
+        this.toastId = toast("Happy to see you again "+cookies.get('nickname')+"!");
       }
     }, 3000);
   }
@@ -799,7 +844,7 @@ class ChangingProgressbar extends Component {
     challenge_star = prestigeConfig();
 
     const onCountUpComplete = () => {
-      console.log('Completed! 👏'+'--previous percentage:'+Math.floor(this.props.percentages[0])+'--current percentage:'+Math.floor(this.props.percentages[1]));
+      console.log(`Completed! 👏 --PRESTIGE:${this.state.prestige} --previous percentage:${Math.floor(this.props.percentages[0])} --current percentage:${Math.floor(this.props.percentages[1])}`);
       if(this.state.prestige > 0 && (Math.floor(this.props.percentages[1]) < Math.floor(this.props.percentages[0]))){
         this.handleConfetti();
         this.setState({showStars: true});
@@ -891,7 +936,8 @@ export class Stats extends Component {
     this.state = {
       challenge_name: null,
       total_meters: null,
-      previous_percent: localStorage.getItem('previous_percentage'),
+      //previous_percent: localStorage.getItem('previous_percentage'),
+      previous_percent: cookies.get('previous_percentage'),
       current_percent: null,
       scoreResults: [],
       scoreResultsAllTime: [],
@@ -913,16 +959,18 @@ export class Stats extends Component {
   componentDidMount(){
     this.setState({profileResults: false});
 
-    if(localStorage.getItem('acceptTour') === null || localStorage.getItem('acceptTour') === 'false'){
+    //if(localStorage.getItem('acceptTour') === null || localStorage.getItem('acceptTour') === 'false'){
+    if(cookies.get('acceptTour') === undefined || cookies.get('acceptTour') === 'false'){
       this.handleToast4tour();
     }
 
-    if(localStorage.getItem('firstVisit') === null || localStorage.getItem('firstVisit') === 'true'){
-      
+    //if(localStorage.getItem('firstVisit') === null || localStorage.getItem('firstVisit') === 'true'){
+    if(cookies.get('firstVisit') === undefined || cookies.get('firstVisit') === 'true'){
       this.setState({
           challenge_name: null,
           current_percent: '0',
-          nick_name: localStorage.getItem('nickname'),
+          //nick_name: localStorage.getItem('nickname'),
+          nick_name: cookies.get('nickname'),
           total_calories: '0',
           total_steps: '0',
           total_meters: null,
@@ -943,7 +991,8 @@ export class Stats extends Component {
     $.ajax({
       url: wsbaseurl+'/profile',
       dataType : 'json',
-      data: { email: localStorage.getItem('email'), token: localStorage.getItem('token') },
+      //data: { email: localStorage.getItem('email'), token: localStorage.getItem('token') },
+      data: { email: cookies.get('email'), token: cookies.get('token') },
       type: "GET",
       cache: false,
       success: function (data) {
@@ -988,7 +1037,7 @@ export class Stats extends Component {
             <ProfileResult nick_name={this.state.nick_name} total_calories={this.state.total_calories} total_steps={this.state.total_steps} total_meters={this.state.total_meters} avatar={this.state.avatar} />
            
             {this.state.current_percent <= this.state.previous_percent ?
-              <ChangingProgressbar history={this.props.history} percentages={[0, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
+              <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={true} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
             :
               <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
             }
@@ -1009,7 +1058,7 @@ export class Stats extends Component {
               <div className="col-xs-12 text-center howto">
                 <h3 className="title">How it works ?</h3>
                 <h4 className="subtitle">A 3 steps App explanation</h4>
-                <div className="small-btn" onClick={() => this.handleToast4tour()}s>Get the tour</div>
+                <div className="small-btn" onClick={() => this.handleToast4tour()}>Get the tour</div>
               </div>
             </div>
 
@@ -1056,7 +1105,8 @@ export class Wall extends Component {
     $.ajax({
       url: wsbaseurl+'/my_ranking_weekly',
       dataType : 'json',
-      data: { token: localStorage.getItem('token') },
+      //data: { token: localStorage.getItem('token') },
+      data: { token: cookies.get('token') },
       type: "GET",
       cache: false, 
       success: function (data) {
@@ -1166,7 +1216,7 @@ export class ProfileResult extends Component {
             )}
           </div>
 
-          <h3>{localStorage.getItem('nickname')}</h3>
+          <h3>{cookies.get('nickname')}</h3>
          
           <div className="col-xs-6 calories">
             <div className="row">
@@ -1354,7 +1404,7 @@ export class TopTen extends Component {
                     <div className="scoreResultsTitle">
                       <span className="nick_name">Nickname</span>
                       <span className="stars">Prestige</span>
-                      <span className="total_meters">Steps</span>
+                      <span className="total_meters">Stairs</span>
                     </div>
                     <ul className="scoreResults">
                         {resultItemsAllTime}
@@ -1459,7 +1509,7 @@ export class ScoreResults extends Component {
                     <div className="scoreResultsTitle">
                       <span className="nick_name">Nickname</span>
                       <span className="stars">Prestige</span>
-                      <span className="total_meters">Steps</span>
+                      <span className="total_meters">Stairs</span>
                     </div>
                     <ul className="scoreResults">
                       {resultItems}
@@ -1469,7 +1519,7 @@ export class ScoreResults extends Component {
                   <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
                     <div className="marginVerticalTop20">
                       <Climber />
-                      <p className="content">You're not ranked yet,<br /> climb some stairs and come back</p>
+                      <p className="content">You're not ranked yet this week,<br /> climb some stairs and come back</p>
                       <MuiThemeProvider>
                         <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
                       </MuiThemeProvider>
@@ -1483,7 +1533,7 @@ export class ScoreResults extends Component {
                     <div className="scoreResultsTitle">
                       <span className="nick_name">Nickname</span>
                       <span className="stars">Prestige</span>
-                      <span className="total_meters">Steps</span>
+                      <span className="total_meters">Stairs</span>
                     </div>
                     <ul className="scoreResults">
                         {resultItemsAllTime}
@@ -1564,7 +1614,7 @@ export class Graph extends React.Component {
     this.setState({
       weekly_stats: this.props.data,
       series: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
-      labels: ['Daily steps', 'Maximum weekly steps'],
+      labels: ['Daily stairs', 'Maximum weekly stairs'],
       colors: ['#A1197D', '#F5E8F1']
     });
   }
@@ -1743,8 +1793,10 @@ export class Edit extends React.Component {
   constructor(props){
       super(props);
       this.state={
-        email: localStorage.getItem("email"),
-        nickname: localStorage.getItem("nickname"),
+        //email: localStorage.getItem("email"),
+        //nickname: localStorage.getItem("nickname"),
+        email: cookies.get("email"),
+        nickname: cookies.get("nickname"),
         showCameraPreview: null,
         avatarImg64: null
       }
@@ -1765,12 +1817,14 @@ export class Edit extends React.Component {
   handleSubmit() {
 
     let self = this;
-    localStorage.setItem("nickname", this.state.nickname);
+    //localStorage.setItem("nickname", this.state.nickname);
+    cookies.set('nickname', this.state.nickname, { path: '/' });
 
     $.ajax({
       url: wsbaseurl+'/update_profile',
       type: "GET",
-      data: { nickname: this.state.nickname, token: localStorage.getItem('token') },
+      //data: { nickname: this.state.nickname, token: localStorage.getItem('token') },
+      data: { nickname: this.state.nickname, token: cookies.get('token') },
       success: function(data){
         if (data && data.status === "OK") {
            //console.log("nickname correctly updated on DB");

@@ -5,6 +5,7 @@ import {
   Route,
   Redirect
 } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 import {Scan,Stats,Wall,Header,BottomNav,Edit} from './App';
 import registerServiceWorker from './registerServiceWorker';
 import $ from 'jquery'; 
@@ -16,6 +17,8 @@ import Checkbox from 'material-ui/Checkbox';
 import { ToastContainer, toast } from 'react-toastify';
 import './index.css';
 import './App.css';
+
+const cookies = new Cookies();
 
 const styles = {
   loginErrorStyle: {
@@ -77,12 +80,13 @@ const styles = {
 const appAuth = {
   authenticate(cb) {
     this.isAuthenticated = true
-    setTimeout(cb, 10)
+    setTimeout(cb, 100) // fake async
   },
   signout(cb) {
     this.isAuthenticated = false
-    localStorage.removeItem("loggedIn")
-    setTimeout(cb, 10)
+    //localStorage.removeItem("loggedIn")
+    cookies.remove("loggedIn", { path: '/' });
+    setTimeout(cb, 100)
   }
 }
 
@@ -94,9 +98,7 @@ var tokenValidationIntervalId;
 //let wsbaseurl = "https://a2780b8b.ngrok.io/app";
 let wsbaseurl = "/app";
 
-
-function tokenValidation(self) {
-
+function getAuth(self, email, token){
   $.ajax({
     url: wsbaseurl+'/auth',
     dataType : 'json',
@@ -104,18 +106,23 @@ function tokenValidation(self) {
     type: "GET",
     cache: false, 
     success: function (data) {
-
       if (data && data.status === "OK") {
         clearInterval(tokenValidationIntervalId)
-        
-        localStorage.setItem("loggedIn", 'true');
-        localStorage.setItem("firstVisit", 'true');
-        localStorage.setItem("nickname", data.public_name);
+        //localStorage.setItem("loggedIn", 'true');
+        //localStorage.setItem("firstVisit", 'true');
+        //localStorage.setItem("nickname", data.public_name);
 
+        cookies.set('loggedIn', 'true', { path: '/' });
+        cookies.set('nickname', data.public_name, { path: '/' });
+
+        if(cookies.get('firstVisit') === undefined){
+          cookies.set('firstVisit', 'true', { path: '/' });
+        }
         $.ajax({
           url: wsbaseurl+'/update_profile',
           type: "GET",
-          data: { nickname: localStorage.getItem('nickname'), token: localStorage.getItem('token') },
+          //data: { nickname: localStorage.getItem('nickname'), token: localStorage.getItem('token') },
+          data: { nickname: cookies.get('nickname'), token: cookies.get('token') },
           success: function(data){
             console.log(data.status);
             if (data && data.status === "OK") {
@@ -133,12 +140,9 @@ function tokenValidation(self) {
           }))
           self.props.history.push('/Stats')
         })
-
-
       } else if (data && data.status === "TOKEN_NOT_ACTIVATED") {
         self.props.history.push('/Authlogin')
       }
-
     },
     error: function(xhr, ajaxOptions, thrownError) {
       console.log('ajax error:'+xhr.responseText);      
@@ -146,12 +150,17 @@ function tokenValidation(self) {
   });
 }
 
-
-if (localStorage.getItem("loggedIn") === 'true') {
-  appAuth.authenticate();
-} else {
-  appAuth.signout();
+function tokenValidation(self, email, token) {
+  if (cookies.get("loggedIn") === 'true') {
+    appAuth.authenticate();
+    self.props.history.push('/Stats')
+  } else {
+    appAuth.signout();
+    getAuth(self, email, token);
+  }
 }
+
+//if (localStorage.getItem("loggedIn") === 'true') {
 
 
 /* !!! TO REMOVE !!! */
@@ -159,12 +168,10 @@ if (localStorage.getItem("loggedIn") === 'true') {
 //appAuth.authenticate();
 /* !!! TO REMOVE !!! */
 
-
-
-
 const CookieMsg = ({ id, undo, closeToast }) => {
   function handleClick(){
-    localStorage.setItem("acceptCookie", 'true');
+    //localStorage.setItem("acceptCookie", 'true');
+    cookies.set('acceptCookie', 'true', { path: '/' });
     closeToast();
   }
   return (
@@ -189,10 +196,9 @@ const TermsMsg = ({ id, undo, closeToast }) => {
   );
 }
 
-
 class CheckboxValidatorElement extends ValidatorComponent {
   render() {
-    const { errorMessages, validators, requiredError, value, ...rest } = this.props;
+    const { errorMessages, validators, value, validatorListener, ...rest } = this.props;
     return (
       <div>
         <Checkbox
@@ -227,11 +233,11 @@ export default CheckboxValidatorElement;
 /* material input validation : https://www.npmjs.com/package/react-material-ui-form-validator */
 /* core input validation : https://www.npmjs.com/package/react-form-validator-core */
 class Login extends React.Component {
-
+  toastId = null;
   constructor(props){
       super(props);
       this.state={
-        redirectToReferrer: '',
+        redirectToReferrer: false,
         email:'',
         nickname:'',
         token:'',
@@ -243,17 +249,15 @@ class Login extends React.Component {
       this.handleSubmit = this.handleSubmit.bind(this);
       this.handleCheck = this.handleCheck.bind(this);
   }
-
   componentWillMount() {
       ValidatorForm.addValidationRule('isTruthy', value => value);
   }
-
   componentDidMount(){
-    if(localStorage.getItem('acceptCookie') === null || localStorage.getItem('acceptCookie') === 'false'){
+    //if(localStorage.getItem('acceptCookie') === null || localStorage.getItem('acceptCookie') === 'false'){
+    if(cookies.get('acceptCookie') === undefined || cookies.get('acceptCookie') === 'false'){
       this.handleToast4cookie();
     }
   }
-
   handleToast4cookie(tab) {
     setTimeout(() => {
       if (! toast.isActive(this.toastId)) {
@@ -261,13 +265,11 @@ class Login extends React.Component {
       }
     }, 2000);
   }
-
   handleToast4terms() {
     setTimeout(() => {
       toast(<TermsMsg />);
     }, 100);
   }
-
   handleChange(event) {
       const email = event.target.value;
       this.setState({ email });
@@ -276,7 +278,6 @@ class Login extends React.Component {
       const nickname = event.target.value;
       this.setState({ nickname });
   }
-
   handleCheck() {
     this.setState((oldState) => {
       return {
@@ -284,7 +285,6 @@ class Login extends React.Component {
       };
     });
   }
-
   handleSubmit() {
     let self = this;
     $.ajax({
@@ -296,29 +296,30 @@ class Login extends React.Component {
       success: function(data) {
         //console.log("status:"+data.status+" / "+"token:"+data.token);
         if (data && data.status === "OK") {
-          localStorage.setItem("email", this.state.email);
-          localStorage.setItem("token", data.token);
+          //localStorage.setItem("email", this.state.email);
+          //localStorage.setItem("token", data.token);
+          cookies.set('email', this.state.email, { path: '/' });
+          cookies.set('token', data.token, { path: '/' });
+
           email = this.state.email;
           token = data.token;
           tokenValidation(self, email, token)
         }
-        
       }.bind(this),
       error: function(xhr, ajaxOptions, thrownError) {
         console.log('ajax error:'+xhr.responseText);      
       }
     });
-
   }
 
   render() {
     const { from } = this.props.location.state || { from: { pathname: '/' } }
     const { redirectToReferrer } = this.state;
     const { email } = this.state;
-    const { nickname } = this.state;
+    //const { nickname } = this.state;
 
     if (redirectToReferrer) {
-      <Redirect to={from} />
+      return <Redirect to={from} push={true} />
     }
 
     return (
@@ -398,15 +399,13 @@ class Login extends React.Component {
   }
 }
 
-
-
 class Authlogin extends React.Component {
   componentWillMount(){
     document.body.style.margin = "0";
   }
   componentDidMount(){
     let self = this;
-    tokenValidationIntervalId = setInterval( function() { tokenValidation(self) }, 5000 );
+    tokenValidationIntervalId = setInterval( function() { tokenValidation(self, cookies.get('email'), cookies.get('token')) }, 5000 );
   }
   componentWillUnmount(){
     document.body.style.margin = null;
@@ -435,8 +434,10 @@ class Authlogin extends React.Component {
 }
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
+
+
   <Route {...rest} render={(props) => (
-    appAuth.isAuthenticated ? (
+    appAuth.isAuthenticated || cookies.get("loggedIn") === 'true' ? (
       <Component {...props} />
     ):(
       <Redirect to={{pathname: '/Login', state: { from: props.location }}} />
