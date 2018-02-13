@@ -28,7 +28,9 @@ def validate_token(request):
     token.save()
 
     if token.valid:
-        return redirect(settings.PUBLIC_URL)
+        response = redirect(settings.PUBLIC_URL + 'app/#/Stats')
+        response.set_cookie('loggedIn', 'true')
+        return response
 
 
 def update_profile(request):
