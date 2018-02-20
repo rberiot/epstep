@@ -24,12 +24,19 @@ def validate_token(request):
     if token.user.email != email_param:
         return HttpResponseBadRequest('given token does not match email address')
 
-    token.validate(validation_key=validation_key_param)
-    token.save()
+    cookie_max_age = 365 * 24 * 60 * 60
+    cookie_expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=cookie_max_age),
+                                         "%a, %d-%b-%Y %H:%M:%S GMT")
+    try:
+        token.validate(validation_key=validation_key_param)
+        token.save()
+    except Exception as e:
+        response = redirect(settings.PUBLIC_URL + 'app/#/Stats?alreadyvalid=true')
+        response.set_cookie('loggedIn', 'true', max_age=cookie_max_age, expires=cookie_expires)
 
     if token.valid:
         response = redirect(settings.PUBLIC_URL + 'app/#/Stats')
-        response.set_cookie('loggedIn', 'true')
+        response.set_cookie('loggedIn', 'true', max_age=cookie_max_age, expires=cookie_expires)
         return response
 
 
@@ -162,7 +169,7 @@ def profile(request):
     token = AuthToken.objects.get(token_string=token_param)
     weekly_stats = UserStats.get_weekly_stats(token.user)
     all_time_stats = UserStats.get_all_time_stats(token.user)
-    prestige, challenge_progress = divmod(all_time_stats.get('all_time_steps'), 1000)
+    prestige, challenge_progress = divmod(all_time_stats.get('all_time_steps'), 100)
     return JsonResponse({'status': 'OK',
                          'nick_name': token.user.public_name,
                          'all_time_stats': all_time_stats,
@@ -171,7 +178,7 @@ def profile(request):
                              'id': '1',
                              'prestige': prestige,
                              'name': 'mount_europa',
-                             'total_steps': '1000',
+                             'total_steps': '100',
                              'current_steps': challenge_progress,
                          },
                          })
@@ -213,7 +220,7 @@ def top_ten(request):
     top10 = []
     for s in top10_stats:
         all_time_stats = UserStats.get_all_time_stats(s.user)
-        prestige, challenge_progress = divmod(all_time_stats.get('all_time_steps'), 1000)
+        prestige, challenge_progress = divmod(all_time_stats.get('all_time_steps'), 100)
 
         top10.append({'name': s.user.public_name,
                       'id': s.user.pk,
@@ -235,7 +242,7 @@ def all_time_top_ten(request):
         if steps == 0:
             continue
 
-        prestige, challenge_progress = divmod(steps, 1000)
+        prestige, challenge_progress = divmod(steps, 100)
 
         top10.append({'name': user.public_name,
                       'id': user.pk,
@@ -268,7 +275,7 @@ def my_ranking_weekly(request):
 
     for ranking, user, total_steps, isUser in UserStats.get_weekly_ranking(token.user, week):
         all_time_stats = UserStats.get_all_time_stats(user)
-        prestige, challenge_progress = divmod(all_time_stats.get('all_time_steps'), 1000)
+        prestige, challenge_progress = divmod(all_time_stats.get('all_time_steps'), 100)
 
         ranking_list.append({'name': user.public_name,
                              'id': user.pk,
@@ -295,7 +302,7 @@ def my_ranking_all_time(request):
     ranking_list = []
 
     for ranking, user, total_steps, isUser in UserStats.get_all_time_ranking(token.user):
-        prestige, challenge_progress = divmod(total_steps, 1000)
+        prestige, challenge_progress = divmod(total_steps, 100)
 
         ranking_list.append({'name': user.public_name,
                              'id': user.pk,

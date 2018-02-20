@@ -24,5 +24,7 @@ urlpatterns = [
     url(r'^app/', include('steptracker.url')),
     url(r'^admin/', admin.site.urls),
     url(r'^$', TemplateView.as_view(template_name="landing.html")),
-    url(r'^favicon\.ico$', RedirectView.as_view(url=settings.STATIC_URL + 'favicon.ico'))
+    url(r'^favicon\.ico$', RedirectView.as_view(url=settings.STATIC_URL + 'favicon.ico')),
+    url(r'^manifest\.json$', RedirectView.as_view(url=settings.STATIC_URL + 'favicons/manifest.json')),
+    url(r'^service-work\.js$', RedirectView.as_view(url=settings.STATIC_URL + 'favicons/service-worker.js'))
 ]
