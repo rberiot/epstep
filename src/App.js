@@ -14,14 +14,14 @@ import RaisedButton from 'material-ui/RaisedButton';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import CircularProgressbar from 'react-circular-progressbar';
 import CountUp from 'react-countup';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import Confetti from 'react-dom-confetti';
 import Webcam from 'react-webcam';
 import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
 import './Loader.css';
 import 'swiper/dist/css/swiper.min.css';
-import {IconRank, IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, Bin, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, IconStats, Star, Medal, Logo, Climber} from './SVGicon';
+import {IconRank, IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, IconStats, Star, Medal, Logo, Climber} from './SVGicon';
 import '../node_modules/material-components-web/dist/material-components-web.css';
 import './App.css';
 
@@ -89,7 +89,6 @@ const styles = {
   
 };
 
-
 function getAllUrlParams(url) {
   // get query string from url (optional) or window
   var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
@@ -153,12 +152,60 @@ const Loader = () => (
   </div>
 );
 
-/*
+
 const ToastCloseButton = ({ closeToast }) => (
-  <span onClick={closeToast}>CLOSE</span>
+  <span className="closeToastButton" onClick={closeToast}>X</span>
 )
-*/
- 
+
+export class NavLockedMsg extends Component {
+
+  handleClickCancel = () => {
+    toast.dismiss(this.toastId);
+  }; 
+
+  handleClickUnlock = () => {
+    let fromPath = this.props.path
+    navLocked = false;
+    toast.dismiss(this.toastId);
+    setTimeout(() => {
+      this.props.history.push(fromPath);
+    }, 500)
+  }; 
+
+  render() {
+    return (
+      <div>
+        <h2>Are you sure?</h2>
+        <p>If you change tab now, your current scanning will be lost</p>
+        <button onClick={this.handleClickCancel}>Cancel</button>
+        <button onClick={this.handleClickUnlock}>Change anyway</button>
+      </div>
+    );
+  }
+}
+
+
+
+export class AlreadyValid extends Component {
+
+  dismiss = () => {
+    toast.dismiss(this.toastId);
+    window.history.pushState({}, document.title, "/" + "#/Stats");
+  }; 
+
+  render() {
+    return (
+      <div>
+        <div className="content">
+          <h2>Hello, {cookies.get('nickname')}</h2>
+          <p>Your token is already valid</p>
+        </div>
+        <button onClick={this.dismiss}>OK</button>
+      </div>
+    )
+  }
+}
+
 export class TourMsg extends Component {
 
   componentDidMount() {
@@ -169,7 +216,7 @@ export class TourMsg extends Component {
   dismiss = () => {
     toast.dismiss(this.toastId);
     //localStorage.setItem('acceptTour', 'true');
-    cookies.set('acceptTour', 'true', { path: '/' });
+    cookies.set('acceptTour', 'true', { path: '/', expires: new Date(2030, 0, 1)});
   }; 
 
   render() {
@@ -255,29 +302,17 @@ class Topbar extends React.Component {
     }
 
     handleDeleteAccount() {
-      //let self = this;
-      /*
-      localStorage.removeItem("email");
-      localStorage.removeItem("firstVisit");
-      localStorage.removeItem("loggedIn");
-      localStorage.removeItem("nickname");
-      localStorage.removeItem("token");
-      localStorage.removeItem("acceptCookie");
-      localStorage.removeItem("avatarImg64");
-      localStorage.removeItem("timeout");
-      */
       cookies.remove("email", { path: '/' });
-      cookies.remove("firstVisit", { path: '/' });
       cookies.remove("loggedIn", { path: '/' });
       cookies.remove("loggedInServer", { path: '/' });
       cookies.remove("nickname", { path: '/' });
       cookies.remove("token", { path: '/' });
       cookies.remove("acceptCookie", { path: '/' });
       cookies.remove("acceptTour", { path: '/' });
-      //cookies.remove("avatarImg64");
       cookies.remove("timeout", { path: '/' });
+      cookies.remove("firstVisit", { path: '/' });
+      localStorage.removeItem("avatarImg64");
 
-      //self.props.history.push('/');
       window.location.reload();
     }
 
@@ -298,20 +333,22 @@ class Topbar extends React.Component {
           <div className="container account">
             <div className="row">
               <div className="col-xs-6 sepa">
-                <div>
+                <div onClick={this.handleShareResults} className="pointer">
                   <Share />
-                  <span onClick={this.handleShareResults}>Share my results</span>
+                  <span>Share my results</span>
                 </div>
               </div>
               <div className="col-xs-6 text-right">
                 {location.pathname === '/Edit' ? (
-                  <div>
-                    <span onClick={this.handleDeleteAccount}>Delete my account </span>
-                    <Bin />
+                  
+                  <div onClick={() => history.push('/Stats')} className="pointer">
+                    <span>Back to my profile </span>
+                    <IconUser />
                   </div>
+                  
                 ):(
-                  <div>
-                    <span onClick={() => history.push('/Edit')}>Edit my account </span>
+                  <div onClick={() => history.push('/Edit')} className="pointer">
+                    <span>Edit my account </span>
                     <IconUserEdit />
                   </div>
                 )}
@@ -325,7 +362,7 @@ class Topbar extends React.Component {
 }
 
 const TopBar = withRouter(Topbar);
-
+let navLocked = false;
 
 export class BottomNav extends Component {
 
@@ -343,19 +380,29 @@ export class BottomNav extends Component {
   }
 
   handleChange = (value) => {
-    this.setState({
-      activeTabIndex: value,
-    });
+    if(!navLocked){
+      this.setState({
+        activeTabIndex: value,
+      });
+    }
   };
     
   handleActive(tab) {
+    //check if nav is locked between scans
+    if(navLocked){
+      if (! toast.isActive(this.toastId)) {
+        this.toastId = toast(<NavLockedMsg history={this.props.history} path={tab.props['data-route']} />, {className:'confirmToast'});
+      }
+      return
+    }
+
     var route = tab.props['data-route'];
     this.setState({
         activeTabIndex: tab.props['value']
     })
     setTimeout(() => {
       this.props.history.push(route);
-    }, 200)
+    }, 150)
   }
 
   render() {
@@ -395,7 +442,10 @@ export class BottomNav extends Component {
             
           </Tabs>
         </MuiThemeProvider>
+
       </footer>
+
+
       :
       <footer id="bottomnav">
         <div className="text-center">
@@ -428,8 +478,8 @@ export class Scan extends React.Component {
     // preserve the initial state in a new object
     //this.baseState = this.state;
     
-    //localStorage.removeItem('qrcode_in');
-    cookies.remove('qrcode_in', { path: '/' });
+    localStorage.removeItem('qrcode_in');
+    //cookies.remove('qrcode_in', { path: '/' });
 
     this.handleScan = this.handleScan.bind(this);
     this.handleError = this.handleError.bind(this);
@@ -443,7 +493,7 @@ export class Scan extends React.Component {
   handleScan(data, directAccess){
 
     this.setState({
-        camera: 'active'
+      camera: 'active'
     })
 
     var scan_qr;
@@ -457,8 +507,7 @@ export class Scan extends React.Component {
       scan_qr = data;
     }
 
-    //if(scan_qr === localStorage.getItem('qrcode_in'))
-    if(scan_qr === cookies.get('qrcode_in'))
+    if(scan_qr === localStorage.getItem('qrcode_in'))
       return;
 
     if(!scan_qr)
@@ -471,22 +520,21 @@ export class Scan extends React.Component {
       window.navigator.vibrate([100,30]);
     }
 
-    //if(localStorage.getItem('qrcode_in') == null || new Date().getTime() > localStorage.getItem('timeout')){
-    if(cookies.get('qrcode_in') === undefined || new Date().getTime() > cookies.get('timeout')){
-      //localStorage.setItem('qrcode_in', scan_qr)
-      //localStorage.setItem('timeout', new Date().getTime() + 5*60*1000)
-      cookies.set('qrcode_in', scan_qr, { path: '/' });
-      cookies.set('timeout', new Date().getTime() + 5*60*1000, { path: '/' });
+    if(localStorage.getItem('qrcode_in') == null || new Date().getTime() > cookies.get('timeout')){
+      localStorage.setItem('qrcode_in', scan_qr)
+      cookies.set('timeout', new Date().getTime() + 5*60*1000, { path: '/', expires: new Date(2030, 0, 1)});
       this.setState({
           message: 'PLEASE TAKE THE STAIRS AND SCAN THE EXIT QR CODE...',
           loading: true
       })
+      navLocked = true;
     } else {
       $.ajax({
           url: wsbaseurl+'/distance',
           type: "GET",
           //data: { qr_id_1: localStorage.getItem('qrcode_in'), qr_id_2: scan_qr },
-          data: { qr_id_1: cookies.get('qrcode_in'), qr_id_2: scan_qr },
+          //data: { qr_id_1: cookies.get('qrcode_in'), qr_id_2: scan_qr },
+          data: { qr_id_1: localStorage.getItem('qrcode_in'), qr_id_2: scan_qr },
           success: function(data){
             if (data && data.status === "OK") {
 
@@ -509,23 +557,25 @@ export class Scan extends React.Component {
                 loading: false
               })
 
-              //localStorage.removeItem('qrcode_in');
-              cookies.remove('qrcode_in', { path: '/' });
+              localStorage.setItem('lastDistance', data.distance);
 
-              //if(localStorage.getItem('firstVisit') === 'true'){
-              if(cookies.get('firstVisit') === 'true'){
-                //localStorage.setItem('firstVisit', 'false');
-                cookies.set('firstVisit', 'false', { path: '/' });
+              //cookies.remove('qrcode_in', { path: '/' });
+              localStorage.removeItem('qrcode_in');
+
+              if(cookies.get('firstVisit') === undefined || cookies.get('firstVisit') === "true"){
+                cookies.set('firstVisit', 'false', { path: '/', expires: new Date(2030, 0, 1)});
               }
 
               $.ajax({
                   url: wsbaseurl+'/log_distance',
                   type: "GET",
-                  //data: { steps: this.state.distance, token: localStorage.getItem('token') },
                   data: { steps: this.state.distance, token: cookies.get('token') },
                   success: function(data){
                     //console.log(data.status);
                     if (data && data.status === "OK") {
+
+                      navLocked = false;
+
                       this.setState({
                         message: 'THANK YOU, LOOK AT YOUR STATS !',
                         scansComplete: true
@@ -533,27 +583,35 @@ export class Scan extends React.Component {
                       })
                       setTimeout(() => {
                         this.props.history.push('/Stats');
-                      }, 700)
+                      }, 800);
+
                     }
 
                   }.bind(this),
                   error: function(xhr, ajaxOptions, thrownError) {
-                    console.log(thrownError);
+                   
+                    const errorMsg = <div><h2>Oops...</h2><p>Error message: {xhr.status} ({thrownError})</p><p>Please try later</p></div>;
+                    if (! toast.isActive(this.toastId)) {
+                      this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+                    }
                     this.setState({
-                        message: xhr.responseText,
+                        message: errorMsg,
                         loading: false
-                    })
+                    }) 
                   }.bind(this)
               });
 
             }
           }.bind(this),
           error: function(xhr, ajaxOptions, thrownError) {
-            console.log(xhr.responseText);
+            const errorMsg = <div><h2>Oops...</h2><p>Error message: {xhr.status} ({thrownError})</p><p>Please try later</p></div>;
+            if (! toast.isActive(this.toastId)) {
+              this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+            }
             this.setState({
-                message: xhr.responseText,
+                message: errorMsg,
                 loading: false
-            })
+            })  
           }.bind(this)
       });
     }
@@ -563,10 +621,16 @@ export class Scan extends React.Component {
     console.log(err);
     //this.props.history.push('/Stats');
     this.setState({
-        message: err,
-        loading: false,
-        camera: 'inactive'
+      //message: err,
+      loading: false,
+      camera: 'inactive'
     })
+    
+    const errorMsg = <div><h2>Oops...</h2><p>Please be sure you're connected over https and activate your camera</p></div>;
+    if (! toast.isActive(this.toastId)) {
+      this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+    }
+
   }
 
   handleCheckStats(event){
@@ -607,16 +671,28 @@ export class Scan extends React.Component {
     });
   }
 
+  getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  }
+
 
   componentDidMount(){
     const search = this.props.location.search; // could be '?foo=bar'
-    // to DEBUG for edge 17- (URLSearchParams is undefined)
-    if (window.URLSearchParams !== undefined){
+    // fallback for edge 17- (URLSearchParams is undefined)
+    if (typeof URLSearchParams !== undefined){
       const params = new URLSearchParams(search);
-      const qr_id = params.get('qr_id'); // bar
+      const qr_id = params.get('qr_id');
       this.handleScan(qr_id, true)
     } else {
-      return
+      console.log(`Your browser ${navigator.appVersion} does not support URLSearchParams so we trying fallback...`);
+      const qr_id = this.getParameterByName('qr_id')
+      this.handleScan(qr_id, true)
     }
 
     
@@ -650,10 +726,10 @@ export class Scan extends React.Component {
             <RaisedButton label="Scan QR-Code" style={styles.fullwidth} backgroundColor="#fff" labelColor="#a1197d" rippleStyle={styles.button} onClick={(event) => window.location.reload()} />
           </MuiThemeProvider>
           </div>
+          <BottomNav history={this.props.history} logged={true} />
         </div>
       )
     }
-
 
     if (this.state.orientation === 'landscape') {
       return(
@@ -769,15 +845,25 @@ class ChangingProgressbar extends Component {
     super(props);
     this.state = {
       showConfetti: false,
-      showStars: false,
+      showStars: null,
       currentPercentageIndex: 0,
-      current_steps: this.props.current_steps,
-      //percentage: this.props.percentages,
-      prestige: this.props.prestige,
+      current_steps: 0,
+      prestige: 0,
+
+      start_count: 0,
+      end_count: 0,
     };
   }
 
-  componentDidMount(){
+  componentWillMount(){
+
+    this.setState({
+      start_count: this.props.percentages[0] || 0,
+      end_count: this.props.percentages[1],
+      current_steps: this.props.current_steps,
+      prestige: this.props.prestige
+    });
+
     setTimeout(() => {
       this.setState({
         currentPercentageIndex: (this.state.currentPercentageIndex + 1) % this.props.percentages.length
@@ -785,7 +871,7 @@ class ChangingProgressbar extends Component {
     }, 100);
 
     //localStorage.setItem('previous_percentage', this.props.percentages[1]);
-    cookies.set('previous_percentage', this.props.percentages[1], { path: '/' });
+    cookies.set('previous_percentage', this.props.percentages[1], { path: '/', expires: new Date(2030, 0, 1)});
 
     //this.handleConfetti();
     //this.handleToast();
@@ -795,7 +881,7 @@ class ChangingProgressbar extends Component {
     console.log('show confetti')
     setTimeout(() => {
       this.setState({showConfetti: true});
-      this.setState({showStars: true});
+      //this.setState({showStars: true});
     }, 200);
   }
 
@@ -808,7 +894,6 @@ class ChangingProgressbar extends Component {
   }
 
   render() {
-
     const { history } = this.props;
     const confetti_config = {
       angle: 90,
@@ -844,13 +929,14 @@ class ChangingProgressbar extends Component {
     challenge_star = prestigeConfig();
 
     const onCountUpComplete = () => {
-      console.log(`Completed! 👏 --PRESTIGE:${this.state.prestige} --previous percentage:${Math.floor(this.props.percentages[0])} --current percentage:${Math.floor(this.props.percentages[1])}`);
-      if(this.state.prestige > 0 && (Math.floor(this.props.percentages[1]) < Math.floor(this.props.percentages[0]))){
+      console.log(`Completed! 👏 --PRESTIGE:${this.state.prestige} --previous percentage:${this.props.percentages[0]} / ${this.props.prev_percent} --current percentage:${this.props.percentages[1]}`);
+      if(this.state.prestige > 0 && (this.props.percentages[1] < this.props.prev_percent)){
         this.handleConfetti();
         this.setState({showStars: true});
       } else {
         this.setState({showStars: false});
       }
+      
     };
     
     return (
@@ -859,13 +945,13 @@ class ChangingProgressbar extends Component {
         <div style={{ position: 'relative', width: '100%', height: '100%'}} className="CircularProgressdata">
           <div style={{ position: 'absolute', width: '100%' }}>
             <CircularProgressbar className="" {...this.props} percentage={this.props.percentages[this.state.currentPercentageIndex]} initialAnimation={this.props.startFrom0} strokeWidth={5} counterClockwise={false} />
+            
             <CountUp
               className="account-balance CircularProgressbar-text"
-              start={this.props.percentages[0]}
-              end={this.props.percentages[1]}
-              duration={1.5}
+              start={this.state.start_count}
+              end={this.state.end_count}
+              duration={1.2}
               useEasing={true}
-              useGrouping={false}
               separator=" "
               decimals={this.props.percentages[1] % 1 === 0 ? 0 : 1}
               decimal="."
@@ -884,7 +970,9 @@ class ChangingProgressbar extends Component {
             {challenge_icon !== null ? (
               <div className={"challenge_icon "+ (this.state.showConfetti ? '' : '')}>
                 {challenge_icon}
+                
                 <div className={"challenge_star "+ (this.state.showStars ? 'bounce' : '')}>{challenge_star}</div>
+                
               </div>
             ):(
               <div className="challenge_first">
@@ -896,8 +984,8 @@ class ChangingProgressbar extends Component {
               <div className="challenge_meters">
                 <h4 className="value">
                   <CountUp
-                    start={this.props.percentages[0]*10}
-                    end={this.props.current_steps}
+                    start={this.state.start_count*10}
+                    end={this.state.current_steps}
                     duration={1.5}
                     useEasing={true}
                     useGrouping={true}
@@ -936,55 +1024,58 @@ export class Stats extends Component {
     this.state = {
       challenge_name: null,
       total_meters: null,
+      total_steps: null,
       //previous_percent: localStorage.getItem('previous_percentage'),
       previous_percent: cookies.get('previous_percentage'),
       current_percent: null,
       scoreResults: [],
       scoreResultsAllTime: [],
       avatar: null,
+      current_steps: 0,
+      weekly_stats: null,
       profileLoaded: false,
-      current_steps: null,
-      weekly_stats: null
+      scoreResultsLoaded: false,
+      scoreResultsAllTimeLoaded: false
     };
+
+    this.getStatsData();
+
   }
 
-  handleToast4tour(tab) {
+  getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  }
+
+  componentWillMount(props){
+    const search = this.props.location.search;
+    // fallback for edge 17- (URLSearchParams is undefined)
+    if (typeof URLSearchParams !== undefined){
+      const params = new URLSearchParams(search);
+      let alreadyValid = params.get('alreadyvalid');
+      if(alreadyValid == 'true'){
+        this.handleToast4alreadyValid();
+      }
+    } else {
+      console.log(`Your browser ${navigator.appVersion} does not support URLSearchParams so we trying fallback...`);
+      let alreadyValid = this.getParameterByName('alreadyvalid')
+      if(alreadyValid == 'true'){
+        this.handleToast4alreadyValid();
+      }
+    }
+  }
+
+  handleToast4alreadyValid() {
     setTimeout(() => {
       if (!toast.isActive(this.toastId)) {
-        this.toastId = toast(<TourMsg />);
+        this.toastId = toast(<AlreadyValid />, {className:'cookieToast'});
       }
     }, 200);
-  }
-
-  componentDidMount(){
-    this.setState({profileResults: false});
-
-    //if(localStorage.getItem('acceptTour') === null || localStorage.getItem('acceptTour') === 'false'){
-    if(cookies.get('acceptTour') === undefined || cookies.get('acceptTour') === 'false'){
-      this.handleToast4tour();
-    }
-
-    //if(localStorage.getItem('firstVisit') === null || localStorage.getItem('firstVisit') === 'true'){
-    if(cookies.get('firstVisit') === undefined || cookies.get('firstVisit') === 'true'){
-      this.setState({
-          challenge_name: null,
-          current_percent: '0',
-          //nick_name: localStorage.getItem('nickname'),
-          nick_name: cookies.get('nickname'),
-          total_calories: '0',
-          total_steps: '0',
-          total_meters: null,
-          prestige: null,
-          weekly_stats: null,
-          weekly_total_steps: null,
-          avatar:<UserPicturePlaceholder />,
-          profileLoaded: true,
-          current_steps: '0',
-          current_challenge: '0'
-      })
-    } else {
-      this.getStatsData();
-    }
   }
 
   getStatsData() {
@@ -992,7 +1083,7 @@ export class Stats extends Component {
       url: wsbaseurl+'/profile',
       dataType : 'json',
       //data: { email: localStorage.getItem('email'), token: localStorage.getItem('token') },
-      data: { email: cookies.get('email'), token: cookies.get('token') },
+      data: { token: cookies.get('token') },
       type: "GET",
       cache: false,
       success: function (data) {
@@ -1008,76 +1099,180 @@ export class Stats extends Component {
             weekly_stats: data.weekly_stats,
             weekly_total_steps: data.weekly_stats.total_steps,
             current_steps: data.current_challenge.current_steps,
-            current_challenge: data.current_challenge.total_steps
+            current_challenge: data.current_challenge.total_steps,
+            profileLoaded: true
           })
+          cookies.set('nickname', data.nick_name, { path: '/', expires: new Date(2030, 0, 1)});
         }
         this.setState({
           avatar:<UserPicturePlaceholder />
         });
       }.bind(this),
       complete: function () {
-        this.setState({
+        if(this.state.total_steps !== null && this.state.total_steps > 0){
+          this.getMyPositionWeekly();
+          this.getMyPositionAlltime();
+        } else {
+          this.setState({
+            challenge_name: null,
+            current_percent: '0',
+            nick_name: cookies.get('nickname'),
+            total_calories: '0',
+            total_steps: '0',
+            total_meters: null,
+            prestige: null,
+            weekly_stats: null,
+            weekly_total_steps: null,
+            avatar:<UserPicturePlaceholder />,
             profileLoaded: true,
-        })
+            scoreResultsLoaded: true,
+            scoreResultsAllTimeLoaded: true,
+            current_steps: '0',
+            current_challenge: '0'
+          })
+        }
       }.bind(this),
-      error: function(xhr, ajaxOptions, thrownError) {
-        console.log(thrownError);      
-      }
+      error: function(xhr, ajaxOptions, thrownError, data) {
+        const errorMsg = <div><h2>Oops...</h2><p>Error message: {xhr.status} ({thrownError})</p></div>;
+        if (! toast.isActive(this.toastId)) {
+          this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+        }     
+      }.bind(this)
     });
   }
 
-  render(){
 
-    return(
-      this.state.profileLoaded ?
-      <div>
-        <TopBar />
-        <div className="container">
-          <div className="row">
-            <ProfileResult nick_name={this.state.nick_name} total_calories={this.state.total_calories} total_steps={this.state.total_steps} total_meters={this.state.total_meters} avatar={this.state.avatar} />
-           
-            {this.state.current_percent <= this.state.previous_percent ?
-              <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={true} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
-            :
-              <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
-            }
-            
-            <TopTen wallOfFameOnly={false} />
+  handleToast4tour(tab) {
+    setTimeout(() => {
+      if (!toast.isActive(this.toastId)) {
+        this.toastId = toast(<TourMsg />, {className:'tourToast'});
+      }
+    }, 200);
+  }
 
-            {this.state.weekly_stats &&
-              <Graph data={this.state.weekly_stats} />
-            }
+  handleGoToWebsite(tab) {
+    window.location.href = "https://epstairs.europarl.europa.eu/";
+  }
 
-            
 
-            <div className="col-xs-12 text-center howto">
+  componentDidMount(){
+    if(cookies.get('acceptTour') === undefined || cookies.get('acceptTour') === 'false'){
+      this.handleToast4tour();
+    }
+  }
 
-              <div className="col-xs-6 sepa"></div>
-              <div className="col-xs-6"></div>
+  getMyPositionWeekly() {
+    $.ajax({
+      url: wsbaseurl+'/my_ranking_weekly',
+      dataType : 'json',
+      data: { token: cookies.get('token') },
+      type: "GET",
+      cache: false, 
+      success: function (data) {
+        if (data && data.status === "OK") {
+          this.setState({
+            scoreResults: data.ranking,
+            scoreResultsLoaded: true
+          })
+        }
+      }.bind(this),
+      error: function(xhr, ajaxOptions, thrownError) {
+        const errorMsg = <div><h2>Oops...</h2><p>Error message: {xhr.status} ({thrownError})</p></div>;
+        if (! toast.isActive(this.toastId)) {
+          this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+        }     
+      }.bind(this)
+    });
+  }
+
+  getMyPositionAlltime() {
+    $.ajax({
+      url: wsbaseurl+'/my_ranking_all_time',
+      dataType : 'json',
+      data: { token: cookies.get('token') },
+      type: "GET",
+      cache: false, 
+      success: function (data) {
+        if (data && data.status === "OK") {
+          this.setState({
+            scoreResultsAllTime: data.ranking,
+            scoreResultsAllTimeLoaded: true
+          })
+        }
+      }.bind(this),
+      error: function(xhr, ajaxOptions, thrownError) {
+        const errorMsg = <div><h2>Oops...</h2><p>Error message: {xhr.status} ({thrownError})</p></div>;
+        if (! toast.isActive(this.toastId)) {
+          this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+        }     
+      }.bind(this)
+    });
+  }
+
+  
+
+  renderProfile(){
+    if (this.state.scoreResultsLoaded && this.state.scoreResultsAllTimeLoaded && this.state.profileLoaded){
+      return (
+        <div>
+          <TopBar />
+          <div className="container">
+            <div className="row">
+              <ProfileResult nick_name={this.state.nick_name} total_calories={this.state.total_calories} total_steps={this.state.total_steps} total_meters={this.state.total_meters} avatar={this.state.avatar} />
+             
+              {this.state.current_percent <= this.state.previous_percent ?
+                <ChangingProgressbar history={this.props.history} percentages={[0, this.state.current_percent]} prev_percent={this.state.previous_percent} startFrom0={true} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
+              :
+                <ChangingProgressbar history={this.props.history} percentages={[this.state.previous_percent, this.state.current_percent]} prev_percent={this.state.previous_percent} startFrom0={false} challenge_name={this.state.challenge_name} total_meters={this.state.total_meters} current_steps={this.state.current_steps} current_challenge={this.state.current_challenge} prestige={this.state.prestige} />
+              }
+              
+              <ScoreResults {...this.props} scoreResults={this.state.scoreResults} scoreResultsAllTime={this.state.scoreResultsAllTime} wallOfFameOnly={false} />
+
+              {this.state.weekly_stats &&
+                <Graph data={this.state.weekly_stats} />
+              }
 
               <div className="col-xs-12 text-center howto">
-                <h3 className="title">How it works ?</h3>
-                <h4 className="subtitle">A 3 steps App explanation</h4>
-                <div className="small-btn" onClick={() => this.handleToast4tour()}>Get the tour</div>
+
+                <div className="col-xs-6 sepa"></div>
+                <div className="col-xs-6"></div>
+
+                <div className="col-xs-12 text-center howto">
+                  <h3 className="title">Learn more?</h3>
+                  <h4 className="subtitle">About the app and the initiative</h4>
+                  <div className="small-btn" onClick={() => this.handleToast4tour()}>Get the tour</div><br />
+                  <div className="small-btn" onClick={() => this.handleGoToWebsite()}>Go to website</div>
+                </div>
+
+              </div>
+
+              <BottomNav history={this.props.history} logged={true} />
+
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <TopBar />
+          <div className="container">
+            <div className="row text-center">
+              <div className="marginVerticalTop40">
+                <Loader />
               </div>
             </div>
-
             <BottomNav history={this.props.history} logged={true} />
-            <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'tourToast'} autoClose={false} closeOnClick={false} closeButton={false} />
           </div>
         </div>
-      </div>
-      :
+      );
+    }
+  }
+
+  render(){
+    return(
       <div>
-        <TopBar />
-        <div className="container">
-          <div className="row text-center">
-            <div className="marginVerticalTop40">
-              <Loader />
-            </div>
-          </div>
-          <BottomNav history={this.props.history} logged={true} />
-        </div>
+        { this.renderProfile() }
       </div>
     )
   }
@@ -1094,26 +1289,21 @@ export class Wall extends Component {
       scoreResultsLoaded: false,
       scoreResultsAllTimeLoaded: false
     };
-  }
-
-  componentWillMount(){
-    this.getMyPosition();
+    this.getTop10Weekly();
     this.getTop10AllTime();
   }
 
-  getMyPosition() {
+  getTop10Weekly() {
     $.ajax({
-      url: wsbaseurl+'/my_ranking_weekly',
+      url: wsbaseurl+'/top_ten',
       dataType : 'json',
-      //data: { token: localStorage.getItem('token') },
-      data: { token: cookies.get('token') },
       type: "GET",
       cache: false, 
       success: function (data) {
         if (data && data.status === "OK") {
-          console.log(JSON.stringify(data.ranking));
+          //console.log(JSON.stringify(data.top_10));
           this.setState({
-            scoreResults: data.ranking,
+            scoreResults: data.top_10,
           })
         }
       }.bind(this),
@@ -1123,8 +1313,11 @@ export class Wall extends Component {
         })
       }.bind(this),
       error: function(xhr, ajaxOptions, thrownError) {
-        console.log(thrownError);      
-      }
+        const errorMsg = <div><h2>Oops...</h2><p>Error message: {xhr.status} ({thrownError})</p></div>;
+        if (! toast.isActive(this.toastId)) {
+          this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+        }     
+      }.bind(this)
     });
   }
 
@@ -1146,12 +1339,10 @@ export class Wall extends Component {
         this.setState({
           scoreResultsAllTimeLoaded: true
         })
-      }.bind(this),
-      error: function(xhr, ajaxOptions, thrownError) {
-        console.log(thrownError);      
-      }
+      }.bind(this)
     });
   }
+
 
   render() {
     return (
@@ -1160,7 +1351,9 @@ export class Wall extends Component {
         <TopBar />
         <div className="container">
           <div className="row">
-            <ScoreResults {...this.props} scoreResults={this.state.scoreResults} scoreResultsAllTime={this.state.scoreResultsAllTime} wallOfFameOnly={true} />
+            
+            <TopTen {...this.props} scoreResults={this.state.scoreResults} scoreResultsAllTime={this.state.scoreResultsAllTime} wallOfFameOnly={true} />
+
             <BottomNav history={this.props.history} logged={true} />
           </div>
         </div> 
@@ -1186,22 +1379,44 @@ export class ProfileResult extends Component {
   constructor(props){
     super(props);
     this.state = {
-      nick_name: null,
+      nick_name: this.props.nick_name,
       total_calories: null,
       total_steps: null,
+      last_calories: null,
+      last_steps: null,
       total_meters: null,
       avatar: null
     };
+    
   }
 
   componentDidMount(){
-    this.setState({
-      nick_name: this.props.nick_name,
-      total_calories: this.props.total_calories,
-      total_steps: this.props.total_steps,
-      total_meters: this.props.total_meters,
-      avatar: this.props.avatar
-    });
+
+    let last_distance = localStorage.getItem('lastDistance');
+    let last_calories = Math.floor(last_distance*0.17);
+
+    if (last_distance !== null){
+      this.setState({
+        total_calories: Math.floor(this.props.total_calories - last_calories),
+        total_steps: this.props.total_steps - last_distance,
+        total_meters: this.props.total_meters,
+        avatar: this.props.avatar,
+        last_calories: last_calories,
+        last_steps: last_distance
+      });
+    } else {
+      this.setState({
+        total_calories: Math.floor(this.props.total_calories),
+        total_steps: this.props.total_steps,
+        total_meters: this.props.total_meters,
+        avatar: this.props.avatar
+      });
+    }
+
+  }
+
+  componentWillUnmount(){
+    localStorage.removeItem('lastDistance');
   }
 
   render(){
@@ -1216,7 +1431,7 @@ export class ProfileResult extends Component {
             )}
           </div>
 
-          <h3>{cookies.get('nickname')}</h3>
+          <h3>{this.state.nick_name}</h3>
          
           <div className="col-xs-6 calories">
             <div className="row">
@@ -1226,18 +1441,23 @@ export class ProfileResult extends Component {
               <div className="col-xs-8 pull-right">
                 <h4 className="title text-right">CALORIES</h4>
                 <h4 className="value text-right">
-                <CountUp
-                  className="account-balance"
-                  start={0}
-                  end={this.state.total_calories}
-                  duration={1.5}
-                  useEasing={true}
-                  useGrouping={true}
-                  separator=""
-                  decimals={0}
-                  decimal=","
-                />
+                  <span>{this.state.total_calories}</span>
+                  {this.state.last_calories &&
+                    <CountUp
+                      className="last-calories"
+                      start={0}
+                      end={this.state.last_calories}
+                      duration={1.5}
+                      useEasing={true}
+                      useGrouping={true}
+                      prefix="+"
+                      separator=""
+                      decimals={0}
+                      decimal=","
+                    />
+                  }
                 </h4>
+
               </div>
             </div>
           </div>
@@ -1247,16 +1467,22 @@ export class ProfileResult extends Component {
               <div className="col-xs-8 pull-left">
                 <h4 className="title text-left">STAIRS</h4>
                 <h4 className="value text-left">
-                <CountUp
-                  start={0}
-                  end={this.state.total_steps}
-                  duration={1.5}
-                  useEasing={true}
-                  useGrouping={true}
-                  separator=""
-                  decimals={0}
-                />
+                  <span>{this.state.total_steps}</span>
+                  {this.state.last_steps &&
+                    <CountUp
+                      className="last-steps"
+                      start={0}
+                      end={this.state.last_steps}
+                      duration={1.5}
+                      useEasing={true}
+                      useGrouping={true}
+                      prefix="+"
+                      separator=""
+                      decimals={0}
+                    />
+                  }
                 </h4>
+                
               </div>
               <div className="col-xs-4">
                 <IconSteps />
@@ -1269,63 +1495,21 @@ export class ProfileResult extends Component {
   }
 };
 
+
+
 export class TopTen extends Component {
 
   constructor(props){
     super(props);
 
     this.state = {
-      scoreResults: [],
-      scoreResultsAllTime: [],
+      scoreResults: this.props.scoreResults,
+      scoreResultsAllTime: this.props.scoreResultsAllTime,
       wallOfFameSubtitle : 'The one week challenge'
     }
-    this.getTop10Weekly();
-    this.getTop10AllTime();
+
     this.handleTab = this.handleTab.bind(this);
   }
-
-  getTop10Weekly() {
-    $.ajax({
-      url: wsbaseurl+'/top_ten',
-      dataType : 'json',
-      type: "GET",
-      cache: false, 
-      success: function (data) {
-        if (data && data.status === "OK") {
-          //console.log(JSON.stringify(data.top_10));
-          this.setState({
-            scoreResults: data.top_10,
-          })
-        }
-      }.bind(this),
-      complete: function () {},
-      error: function(xhr, ajaxOptions, thrownError) {
-        console.log(thrownError);      
-      }
-    });
-  }
-
-  getTop10AllTime() {
-    $.ajax({
-      url: wsbaseurl+'/all_time_top_ten',
-      dataType : 'json',
-      type: "GET",
-      cache: false, 
-      success: function (data) {
-        if (data && data.status === "OK") {
-          //console.log(JSON.stringify(data.top_10));
-          this.setState({
-            scoreResultsAllTime: data.top_10,
-          })
-        }
-      }.bind(this),
-      complete: function () {},
-      error: function(xhr, ajaxOptions, thrownError) {
-        console.log(thrownError);      
-      }
-    });
-  }
-  
 
   handleTab = (key) => {
     if(key === "0"){
@@ -1380,7 +1564,7 @@ export class TopTen extends Component {
                     <div className="scoreResultsTitle">
                       <span className="nick_name">Nickname</span>
                       <span className="stars">Prestige</span>
-                      <span className="total_meters">Steps</span>
+                      <span className="total_meters">Stairs</span>
                     </div>
                     <ul className="scoreResults">
                       {resultItems}
@@ -1395,6 +1579,7 @@ export class TopTen extends Component {
                         <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
                       </MuiThemeProvider>
                     </div>
+
                   </div>
                 )}
               </SwitchTab>
@@ -1442,14 +1627,11 @@ export class ScoreResults extends Component {
       wallOfFameSubtitle : 'My rank'
     }
 
-    //this.getMyPosition();
-    //this.getTop10AllTime();
-
     this.handleTab = this.handleTab.bind(this);
 
   }
 
-  componentWillMount(){
+  componentDidMount(){
     this.setState({
       scoreResults: this.props.scoreResults,
       scoreResultsAllTime: this.props.scoreResultsAllTime
@@ -1463,7 +1645,7 @@ export class ScoreResults extends Component {
       });
     } else {
       this.setState({
-        wallOfFameSubtitle : 'Best ranks'
+        wallOfFameSubtitle : 'My rank'
       });
     }
   }
@@ -1493,8 +1675,7 @@ export class ScoreResults extends Component {
         </div>
 
         <div className="col-xs-12">
-          <h3 className="title">Walk of fame</h3>
-          <h4 className="subtitle">{this.state.wallOfFameSubtitle}</h4>
+          <h3 className="title">{this.state.wallOfFameSubtitle}</h3>
         </div>
 
 
@@ -1503,7 +1684,7 @@ export class ScoreResults extends Component {
           <div className="col-xs-12 fullwidth">
             
             <SwitchTabs className="tabs-wrapper" onChangeTab={this.handleTab}>
-              <SwitchTab active="true" title="My rank" >
+              <SwitchTab active="true" title="Weekly" >
                 {this.state.scoreResults.length > 0 ?(
                   <div>
                     <div className="scoreResultsTitle">
@@ -1527,7 +1708,7 @@ export class ScoreResults extends Component {
                   </div>
                 )}
               </SwitchTab>
-              <SwitchTab title="Best ranks">
+              <SwitchTab title="All time">
                 {this.state.scoreResultsAllTime.length > 0 ?(
                   <div>
                     <div className="scoreResultsTitle">
@@ -1543,7 +1724,7 @@ export class ScoreResults extends Component {
                   <div className="col-xs-12 col-sm-6 col-sm-offset-3 center">
                     <div className="marginVerticalTop20">
                       <Climber />
-                      <p className="content">Be the first to figure on this all time top ten</p>
+                      <p className="content">You're not ranked yet,<br /> climb some stairs and come back</p>
                       <MuiThemeProvider>
                         <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
                       </MuiThemeProvider>
@@ -1712,6 +1893,7 @@ class Charts extends React.Component {
 
   render() {
 
+    //console.log(JSON.stringify(this.props.data))
 
     var self = this,
       data = this.props.data,
@@ -1764,9 +1946,6 @@ class Charts extends React.Component {
                 style['height'] = size + '%';           
               }
 
-
-
-
               return (
                <div
                 className={ 'Charts--item ' + (self.props.grouping) }
@@ -1808,17 +1987,50 @@ export class Edit extends React.Component {
       this.editPlaceholder = this.editPlaceholder.bind(this);
   }
 
+  componentWillMount(){
+    /*
+    let self = this;
+    
+    function getAuth(self, email, token){
+      $.ajax({
+        url: wsbaseurl+'/auth',
+        dataType : 'json',
+        data: { email: email, token: token },
+        type: "GET",
+        cache: false, 
+        success: function (data) {
+          if (data && data.status === "OK") {
+            cookies.set('nickname', data.public_name, { path: '/', expires: new Date(2030, 0, 1)});
+          }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          const errorMsg = <div><h2>Oops...</h2><p>Error message: {xhr.status} ({thrownError})</p></div>;
+          if (! toast.isActive(self.toastId)) {
+            self.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+          }     
+        }
+      });
+    }
+    getAuth(self, cookies.get('email'), cookies.get('token'));
+    */
+  }
+
+  handleContactUs() {
+    var email = "epstairs@europarl.europa.eu";
+    var subject = "Request from EPStairs ";
+    window.location.href = "mailto:"+email+"?Subject=" + subject;
+  }
 
   handleChange2(event) {
-      const nickname = event.target.value;
-      this.setState({ nickname });
+    const nickname = event.target.value;
+    this.setState({ nickname });
   }
 
   handleSubmit() {
 
     let self = this;
     //localStorage.setItem("nickname", this.state.nickname);
-    cookies.set('nickname', this.state.nickname, { path: '/' });
+    cookies.set('nickname', this.state.nickname, { path: '/', expires: new Date(2030, 0, 1)});
 
     $.ajax({
       url: wsbaseurl+'/update_profile',
@@ -1828,11 +2040,14 @@ export class Edit extends React.Component {
       success: function(data){
         if (data && data.status === "OK") {
            //console.log("nickname correctly updated on DB");
-           self.props.history.push('/Stats')
+           self.props.history.push('/Stats');
         }
       },
       error: function(xhr, ajaxOptions, thrownError) {
-        console.log(thrownError);
+        const errorMsg = <div><h2>Oops...</h2><p>Error message: {xhr.status} ({thrownError})</p></div>;
+        if (! toast.isActive(self.toastId)) {
+          self.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+        }     
       }
     });
     
@@ -1878,8 +2093,7 @@ export class Edit extends React.Component {
                     <button onClick={this.capture}>Capture photo</button>
                   </div>
                 ):(
-                  <div className="editPlaceholder" onClick={this.editPlaceholder}>
-
+                  <div className="editPlaceholder pointer" onClick={this.editPlaceholder}>
                   {localStorage.getItem("avatarImg64") ?(
                     <div>
                       <img src={localStorage.getItem("avatarImg64")} alt="" className="img-circle mirror" />
@@ -1888,15 +2102,12 @@ export class Edit extends React.Component {
                   ):(
                     <EditPlaceholder />
                   )}
-                  
-
                   </div>
                 )} 
                 
                 {this.state.avatarImg64 &&
                   <div>
-                  <img src={this.state.avatarImg64} alt="" className="img-circle resized" />
-                  
+                    <img src={this.state.avatarImg64} alt="" className="img-circle resized" />
                   </div>
                 }
 
@@ -1945,6 +2156,10 @@ export class Edit extends React.Component {
                   <RaisedButton type="Submit" style={styles.button} label="Save" backgroundColor="#a1197d" labelColor="#fff" />
                 </ValidatorForm>
               </MuiThemeProvider>
+            </div>
+
+            <div className="col-xs-12 col-md-4 col-md-offset-4">
+              <p className="default_text text-center nonbold marginVerticalTop20">For any further request, contact us by <span className="bold underline" onClick={this.handleContactUs}>email</span></p>
             </div>
           </div>
            

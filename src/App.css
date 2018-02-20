@@ -53,8 +53,21 @@ button[type=Submit] {
   font-weight: 500;
   text-transform: uppercase;
 }
+.nonbold{
+  font-weight: normal;
+}
+.bold{
+  font-weight: bold;
+}
+.underline{
+  text-decoration: underline;
+  cursor: pointer;
+}
 .uppercase{
   text-transform: uppercase;
+}
+.pointer{
+  cursor: pointer;
 }
 .marginVertical20{
   margin: 20px auto;
@@ -71,11 +84,12 @@ button[type=Submit] {
 .checkbox label{
   padding-left: 0;
   font-size: 12px;
+  line-height: 22px !important;
   text-transform: uppercase;
   font-weight: 400;
   margin-left: -10px;
 }
-.checkbox label span>span{
+.checkbox label span>a{
   position: relative;
   z-index: 3;
   color: rgba(161, 25, 125, 0.7);
@@ -88,8 +102,10 @@ button[type=Submit] {
 .checkbox svg{
   fill: rgba(161, 25, 125, 0.7) !important;
 }
-
-
+.checkbox div div div span{
+  /* to investigate : custom ripple effect when uncheck */
+  color: rgba(161, 25, 125, 1) !important;
+}
 /*.checkbox input{
   width: 24px !important;
   height: 24px !important;
@@ -112,7 +128,7 @@ button[type=Submit] {
 }
 .account svg{
   vertical-align: middle;
-  margin-top: -6px;
+  margin-top: -2px;
   max-width: 24px;
 }
 .account .sepa{
@@ -156,8 +172,6 @@ button[type=Submit] {
   border-radius: 50%;
   overflow: hidden;
   margin: 10px auto;
-
-
 }
 .editprofile video{
   border-radius: 50%;
@@ -244,9 +258,12 @@ button[type=Submit] {
   margin-bottom: 0px;
 }
 .profile svg{
+  margin-top: 0;
+}
+.profile .calories svg,
+.profile .steps svg{
   margin-top: 15px;
 }
-
 .scoreResults{
   list-style: none;
   padding: 0;
@@ -376,23 +393,29 @@ div[data-css-npp5qg]{
     padding: 0;
   }
 }
-.helloToast[data-css-k0o5uw]{
-  font-family: 'Roboto', sans-serif;
-  color: #fff;
-  background-color: #a1197d;
-  padding: 0 20px;
-  margin: 0 auto;
+.helloToast{
+  font-family: 'Roboto', sans-serif !important;
+  color: #fff !important;
+  background-color: #a1197d !important;
+  padding: 0 20px !important;
+  margin: 0 auto !important;
+}
+.helloToast>div{
+
 }
 .helloToast span{
-  opacity: 0.5;
-  display: block;
-  line-height: 48px;
+  opacity: 0.5 !important;
+  display: block !important;
+  line-height: 48px !important;
 }
 .helloToast span:hover{
-  opacity: 1;
+  opacity: 1 !important;
 }
-/*  !important to force overriding Toast.js component inline styles */
-.cookieToast{
+
+/*  !important to force overriding Toast.js component (cfr node_modules) inline styles */
+.cookieToast,
+.confirmToast,
+.errorToast{
   font-family: 'Roboto', sans-serif !important;
   color: #333 !important;
   background-color: #fff !important;
@@ -401,14 +424,42 @@ div[data-css-npp5qg]{
   box-shadow: 0 1px 10px 0 rgba(0, 0, 0, .3), 0 4px 20px 0 rgba(0, 0, 0, .4) !important;
   border-radius: 0 !important;
 }
-.cookieToast > div{
+.cookieToast > div,
+.confirmToast > div,
+.errorToast > div{
   margin-bottom: 20px;
 }
 .cookieToast h2,
-.cookieToast p{
+.confirmToast h2{
+  font-size: 20px;
   color: #333;
+  margin-bottom: 20px;
 }
-.cookieToast button{
+.errorToast h2{
+  font-size: 20px;
+  color: rgba(161, 25, 125, 1);
+  margin-bottom: 20px;
+}
+.cookieToast p,
+.confirmToast p{
+  color: rgba(51, 51, 51, 1);
+  font-size: 12px;
+  text-transform: uppercase;
+  line-height: 20px;
+}
+.errorToast p{
+  color: rgba(161, 25, 125, 1);
+  font-size: 12px;
+  text-transform: uppercase;
+  line-height: 20px;
+}
+
+.cookieToast a,
+.confirmToast a{
+  color: rgba(161, 25, 125, 1);
+}
+.cookieToast button,
+.confirmToast button{
   color: #a1197d;
   text-transform: uppercase;
   float: right;
@@ -417,7 +468,17 @@ div[data-css-npp5qg]{
   border:none;
   background: none;
 }
-/*  !important to force overriding Toast.js component inline styles */
+.confirmToast button{
+  float: left;
+  margin-left: 0px;
+}
+.confirmToast button+button{
+  float: right;
+}
+.whiteProgress {
+  background: rgba(161, 25, 125, 0.5);
+}
+/*  !important to force overriding Toast.js component (cfr node_modules) inline styles */
 .tourToast{
   font-family: 'Roboto', sans-serif !important;
   font-size: 16px !important;
@@ -469,6 +530,12 @@ div[data-css-npp5qg]{
   background: rgba(161, 25, 125, 1);
 }
 
+.closeToastButton{
+  position: relative;
+  top: 10px;
+  font-weight: bold;
+  color: rgba(161, 25, 125, 1);
+}
 
 #bottomnav .tabs .active path,
 #bottomnav .tabs .active g{
@@ -482,7 +549,7 @@ div[data-css-npp5qg]{
 
 .overallTitle{
   position: absolute;
-  z-index: 9998;
+  z-index: 998;
   width: calc(100% - 0px);
   padding: 0 15px;
   text-align: center;
@@ -492,7 +559,7 @@ div[data-css-npp5qg]{
 .overallLoader{
   position: absolute;
   padding-top: 45%;
-  z-index: 9998;
+  z-index: 998;
   width: calc(100% - 0px);
 }
 
@@ -557,6 +624,9 @@ ul.switchtabs-nav li.active a {
     visibility: visible;
 }
 
+.account-balance{
+  position: relative;
+}
 
 
 
@@ -580,6 +650,18 @@ ul.switchtabs-nav li.active a {
   display: block;
 }
 
+.last-calories,
+.last-steps{
+  background: rgba(161, 25, 125, 1);
+  padding: 2px 5px 2px 5px;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 12px;
+  line-height: 14px;
+  display: inline-block;
+  margin-left: 3px;
+}
+
 /*
  * react-circular-progressbar styles
  *
@@ -593,8 +675,9 @@ ul.switchtabs-nav li.active a {
    *
    * If you're not using "display: flex", you can remove this style.
    */
-  width: 98%;
+
   position: relative;
+
 }
 
 .CircularProgressbar .CircularProgressbar-path {
@@ -621,11 +704,13 @@ ul.switchtabs-nav li.active a {
 
 .wallOfFame .sepa,
 .history .sepa,
-.howto .sepa{
+.howto .sepa,
+.visitsite .sepa{
   border-right:3px solid #a1197d;
   min-height: 40px;
   margin-bottom: 10px;
 }
+
 
 .wallOfFame .title,
 .wallOfFame .subtitle,
@@ -634,7 +719,9 @@ ul.switchtabs-nav li.active a {
 .tourToast .title,
 .tourToast .subtitle,
 .howto .title,
-.howto .subtitle{
+.howto .subtitle,
+.visitsite .title,
+.visitsite .subtitle{
   color: #a1197d;
   font-size: 1.125em; /* 18px/16px = 1.125*/
   font-weight: 500;
@@ -644,7 +731,8 @@ ul.switchtabs-nav li.active a {
 .wallOfFame .title,
 .history .title,
 .tourToast .title,
-.howto .title{
+.howto .title,
+.visitsite .title{
   margin-top: 5px;
   margin-bottom: 2px;
 }
@@ -652,7 +740,8 @@ ul.switchtabs-nav li.active a {
 .wallOfFame .subtitle,
 .history .subtitle,
 .tourToast .subtitle,
-.howto .subtitle{
+.howto .subtitle,
+.visitsite .subtitle{
   font-size: 0.625em; /* 10px/16px = 0.625*/
   font-weight: 700;
   color: rgba(161, 25, 125, 0.5);
@@ -666,7 +755,7 @@ ul.switchtabs-nav li.active a {
   margin: 10px auto;
 }
 .CircularProgressdata{
-  max-width: 300px;
+  max-width: 298px;
   margin: 0 auto 15px auto;
   /* for edge 
   min-height: 280px;
@@ -971,6 +1060,14 @@ ul.switchtabs-nav li.active a {
   margin-bottom: 30px;
   cursor: pointer;
 }
+.howto .small-btn{
+  display: inline-block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.howto .small-btn:last-child{
+  margin-bottom: 40px;
+}
 
 @-webkit-keyframes slideUp {
   from {
@@ -992,6 +1089,5 @@ ul.switchtabs-nav li.active a {
             transform: scaleY(1);
   }
 }
-
 
 

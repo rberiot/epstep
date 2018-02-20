@@ -17,9 +17,24 @@ footer {
     bottom: 0;
     height: 48px;
     width: 100%;
-
     background: #a1197d;
 }
 
 
  
+/* for iphone 5-*/
+@media only screen and (max-width : 320px){
+  body {
+    font-size: 14px;
+  }
+  .progress_ctn > div.challenge_icon > svg {
+    width: 42%;
+  }
+  .progress_ctn > div.challenge_icon div.challenge_star div svg {
+    width: 8px;
+    height: 8px;
+  }
+  .tourToast .swiper-container {
+    width: 220px;
+  }
+}

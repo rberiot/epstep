@@ -19,7 +19,7 @@ import './index.css';
 import './App.css';
 
 const cookies = new Cookies();
-
+const privacy_statement_link = "https://epstairs.europarl.europa.eu/app/static/privacy_statement.html";
 const styles = {
   loginErrorStyle: {
     color: '#ccc',
@@ -75,7 +75,6 @@ const styles = {
   },
 };
 
-
 /* https://tylermcginnis.com/react-router-protected-routes-authentication/ */
 const appAuth = {
   authenticate(cb) {
@@ -84,7 +83,6 @@ const appAuth = {
   },
   signout(cb) {
     this.isAuthenticated = false
-    //localStorage.removeItem("loggedIn")
     cookies.remove("loggedIn", { path: '/' });
     setTimeout(cb, 100)
   }
@@ -108,31 +106,14 @@ function getAuth(self, email, token){
     success: function (data) {
       if (data && data.status === "OK") {
         clearInterval(tokenValidationIntervalId)
-        //localStorage.setItem("loggedIn", 'true');
-        //localStorage.setItem("firstVisit", 'true');
-        //localStorage.setItem("nickname", data.public_name);
 
-        cookies.set('loggedIn', 'true', { path: '/' });
-        cookies.set('nickname', data.public_name, { path: '/' });
+        cookies.set('loggedIn', 'true', { path: '/', expires: new Date(2030, 0, 1)});
+        cookies.set('nickname', data.public_name, { path: '/', expires: new Date(2030, 0, 1)});
+
 
         if(cookies.get('firstVisit') === undefined){
-          cookies.set('firstVisit', 'true', { path: '/' });
+          cookies.set('firstVisit', 'true', { path: '/', expires: new Date(2030, 0, 1)});
         }
-        $.ajax({
-          url: wsbaseurl+'/update_profile',
-          type: "GET",
-          //data: { nickname: localStorage.getItem('nickname'), token: localStorage.getItem('token') },
-          data: { nickname: cookies.get('nickname'), token: cookies.get('token') },
-          success: function(data){
-            console.log(data.status);
-            if (data && data.status === "OK") {
-               console.log("nickname correctly updated on DB");
-            }
-          },
-          error: function(xhr, ajaxOptions, thrownError) {
-            console.log(thrownError);
-          }
-        });
 
         appAuth.authenticate(() => {
           self.setState(() => ({
@@ -145,8 +126,11 @@ function getAuth(self, email, token){
       }
     },
     error: function(xhr, ajaxOptions, thrownError) {
-      console.log('ajax error:'+xhr.responseText);      
-    }
+      const errorMsg = <div><h2>Oops...</h2><p>Error message: {xhr.status} ({thrownError})</p></div>;
+      if (! toast.isActive(this.toastId)) {
+        this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+      }     
+    }.bind(this)
   });
 }
 
@@ -160,25 +144,24 @@ function tokenValidation(self, email, token) {
   }
 }
 
-//if (localStorage.getItem("loggedIn") === 'true') {
-
-
 /* !!! TO REMOVE !!! */
-//appAuth.signout();
-//appAuth.authenticate();
+/*
+appAuth.signout();
+appAuth.authenticate();
+*/
 /* !!! TO REMOVE !!! */
 
 const CookieMsg = ({ id, undo, closeToast }) => {
   function handleClick(){
     //localStorage.setItem("acceptCookie", 'true');
-    cookies.set('acceptCookie', 'true', { path: '/' });
+    cookies.set('acceptCookie', 'true', { path: '/', expires: new Date(2030, 0, 1)});
     closeToast();
   }
   return (
     <div>
-      <h2>Cookie</h2>
-      <p>The cookie settings on this website are set to 'allow all cookies' to give you the very best experience. If you continue without changing these settings, you consent to this - but if you want, you can change your settings at any time at the bottom of this page.</p>
-      <button onClick={handleClick}>Ok</button>
+      <h2>Cookies</h2>
+      <p>EPStairs application uses <a className="bold underline" href={privacy_statement_link+'#cookies'} target="_blank">cookies and similar technologies</a> for the sole purpose of carrying out and facilitating the running of this application. Please find more details <a className="bold underline" href={privacy_statement_link+'#cookies'} target="_blank">here</a>.</p>
+      <button onClick={handleClick} className="pointer">Ok</button>
     </div>
   );
 }
@@ -261,9 +244,9 @@ class Login extends React.Component {
   handleToast4cookie(tab) {
     setTimeout(() => {
       if (! toast.isActive(this.toastId)) {
-        toast(<CookieMsg />);
+        toast(<CookieMsg />, {className:'cookieToast'});
       }
-    }, 2000);
+    }, 500);
   }
   handleToast4terms() {
     setTimeout(() => {
@@ -298,17 +281,20 @@ class Login extends React.Component {
         if (data && data.status === "OK") {
           //localStorage.setItem("email", this.state.email);
           //localStorage.setItem("token", data.token);
-          cookies.set('email', this.state.email, { path: '/' });
-          cookies.set('token', data.token, { path: '/' });
+          cookies.set('email', this.state.email, { path: '/', expires: new Date(2030, 0, 1)});
+          cookies.set('token', data.token, { path: '/', expires: new Date(2030, 0, 1)});
 
           email = this.state.email;
           token = data.token;
-          tokenValidation(self, email, token)
+          tokenValidation(self, email, token);
         }
       }.bind(this),
       error: function(xhr, ajaxOptions, thrownError) {
-        console.log('ajax error:'+xhr.responseText);      
-      }
+        const errorMsg = <div><h2>Oops...</h2><p>Error message: {xhr.status} ({thrownError})</p></div>;
+        if (! toast.isActive(this.toastId)) {
+          this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+        }     
+      }.bind(this)
     });
   }
 
@@ -326,10 +312,10 @@ class Login extends React.Component {
 
       <div className="container">
         <div className="row">
-          <div className="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">
+          <div className="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4">
             <Header />
           </div>
-          <div className="col-xs-12 col-md-4 col-md-offset-4">
+          <div className="col-xs-12 col-sm-6 col-sm-offset-3">
             <MuiThemeProvider>
               <ValidatorForm
                 ref="form"
@@ -348,7 +334,7 @@ class Login extends React.Component {
                   name="email"
                   value={email}
                   validators={['required', 'isEmail', 'matchRegexp:^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@europarl.europa.eu|^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@ext.europarl.europa.eu|^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@ep.europa.eu$']}
-                  errorMessages={['This field is required', 'Please provide a valid email address', 'Please provide a valid @ep.europa.eu, @europarl.europa.eu or @ext.europarl.europa.eu email address']}
+                  errorMessages={['Your email address is required', 'Please provide a valid email address', 'Please provide a valid @ep.europa.eu, @europarl.europa.eu or @ext.europarl.europa.eu email address']}
                 />
 
                 {/*
@@ -370,16 +356,18 @@ class Login extends React.Component {
                 <CheckboxValidatorElement
                     id={1}
                     name="terms"
-                    label={(<span>I agree to&nbsp;
-                      <span onClick={this.handleToast4terms}>
+                    label={(<span>By checking this box, you declare having read the <a className="bold underline" href={privacy_statement_link} target="_blank">Privacy Statement</a> and accepting the
+processing of your personal data in these conditions.
+                      {/*<span onClick={this.handleToast4terms}>
                         terms and conditions
-                      </span>
+                      </span>*/}
                     </span>)}
                     checked={this.state.checked}
                     onCheck={this.handleCheck}
                     className="checkbox"
+                    checkedColor="#a1197d"
                     validators={['isTruthy']}
-                    errorMessages={['To continue, please accept terms and conditions']}
+                    errorMessages={['To continue, please accept the privacy statement']}
                     value={this.state.checked}
                 />
                 <RaisedButton type="Submit" style={styles.button} label="Authenticate" backgroundColor="#a1197d" labelColor="#fff" />
@@ -393,13 +381,13 @@ class Login extends React.Component {
           <BottomNav history={this.props.history} logged={true} />
         }
 
-        <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'cookieToast'} autoClose={false} closeOnClick={false} closeButton={false}  />
       </div>
     );
   }
 }
 
 class Authlogin extends React.Component {
+
   componentWillMount(){
     document.body.style.margin = "0";
   }
@@ -421,7 +409,7 @@ class Authlogin extends React.Component {
 
           <div className="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">
             <div className="marginVertical20 text-center">
-              <h4 className="contrast_text">Please check your mailbox <br/> to activate your account...</h4>
+              <h4 className="contrast_text">Please check your mailbox in a few minutes to activate your account...</h4>
             </div>
           </div>
 
@@ -433,9 +421,11 @@ class Authlogin extends React.Component {
   }
 }
 
+const ToastCloseButton = ({ closeToast }) => (
+  <span className="closeToastButton" onClick={closeToast}>X</span>
+)
+
 const PrivateRoute = ({ component: Component, ...rest }) => (
-
-
   <Route {...rest} render={(props) => (
     appAuth.isAuthenticated || cookies.get("loggedIn") === 'true' ? (
       <Component {...props} />
@@ -455,10 +445,13 @@ export class Main extends React.Component {
             <Route path='/Login' component={Login} />
             <Route path='/Authlogin' component={Authlogin} />
             <PrivateRoute exact path='/Scan' component={Scan} />
-            <PrivateRoute path='/Stats' component={Stats} />
+            <PrivateRoute exact path='/Stats' component={Stats} />
             <PrivateRoute path='/Wall' component={Wall} />
             <PrivateRoute path='/Edit' component={Edit} />
             <PrivateRoute path='/scan:qr_id' component={Scan} />
+
+            <ToastContainer position={'top-center'} hideProgressBar={true} toastClassName={'tourToast'} autoClose={false} closeOnClick={false} closeButton={false} />
+
         </div>
       </Router>
     )
