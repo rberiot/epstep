@@ -28,6 +28,9 @@ DEBUG = True
 ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
 CORS_ORIGIN_ALLOW_ALL = True
 
+# when false, new user will be denied registration.
+ENABLE_REGISTRATION = True
+
 # Application definition
 
 INSTALLED_APPS = [

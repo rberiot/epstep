@@ -6,8 +6,9 @@ from django.conf import settings
 from django.shortcuts import redirect
 
 from models import AuthToken, User
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.views.decorators.cache import cache_page
+from steptracker.utils import email
 
 
 def validate_token(request):
@@ -25,7 +26,7 @@ def validate_token(request):
         return HttpResponseBadRequest('given token does not match email address')
 
     cookie_max_age = 365 * 24 * 60 * 60
-    cookie_expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=cookie_max_age),
+    cookie_expires = datetime.strftime(datetime.utcnow() + timedelta(seconds=cookie_max_age),
                                          "%a, %d-%b-%Y %H:%M:%S GMT")
     try:
         token.validate(validation_key=validation_key_param)
@@ -35,7 +36,7 @@ def validate_token(request):
         response.set_cookie('loggedIn', 'true', max_age=cookie_max_age, expires=cookie_expires)
 
     if token.valid:
-        response = redirect(settings.PUBLIC_URL + 'app/#/Stats')
+        response = redirect(settings.PUBLIC_URL + 'app/#/Stats?alreadyvalid=true')
         response.set_cookie('loggedIn', 'true', max_age=cookie_max_age, expires=cookie_expires)
         return response
 
@@ -69,10 +70,19 @@ def update_profile(request):
 def auth(request):
     token_param = request.GET.get('token')
     email_param = request.GET['email']
+    # device name/identifier
+    device_param = request.GET.get('device')
 
     email_param = email_param.lower()
 
     if token_param is None:  # register new token
+
+        if not settings.ENABLE_REGISTRATION:
+            return JsonResponse({'status': 'REGISTRATION_DISABLED'})
+
+        if not email.is_email_valid(email_param) or not email_param.endswith('europa.eu'):
+            return JsonResponse({'status': 'INVALID_EMAIL'})
+
         user_list = User.objects.filter(email=email_param)
 
         if not user_list:
@@ -82,9 +92,14 @@ def auth(request):
         else:
             u = user_list[0]
 
+        if email.is_spamming(u.email):
+            return JsonResponse({'status': 'CANCELED_BY_SPAM_PREVENTION'})
+
         token = AuthToken(token_string=AuthToken.gen_token_string(email_param), user=u)
         token.gen_validation_key()
         token.save()
+
+
 
         token.send_validation_mail(public_url='https://' + request.META.get('HTTP_HOST', settings.PUBLIC_URL))
         token.save()
