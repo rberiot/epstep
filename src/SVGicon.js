@@ -672,3 +672,23 @@ export class Climber extends React.Component {
         );
     }
 }
+
+
+
+export class Attention extends React.Component {
+    render() {
+        return (
+          <svg width="18px" height="18px" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+              <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                  <g id="User-Dashboard-Copy-13" transform="translate(-171.000000, -52.000000)">
+                      <g id="Page-1" transform="translate(172.000000, 53.000000)">
+                          <polygon id="Stroke-1" stroke="#8C2975" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points="8 0 0 16 16 16"></polygon>
+                          <path d="M8,7 L8,10" id="Stroke-3" stroke="#8C2975" strokeWidth="2" strokeLinecap="round"></path>
+                          <path d="M7,13 C7,12.447 7.447,12 8,12 C8.553,12 9,12.447 9,13 C9,13.553 8.553,14 8,14 C7.447,14 7,13.553 7,13" id="Fill-4" fill="#8C2975"></path>
+                      </g>
+                  </g>
+              </g>
+          </svg>
+        );
+    }
+}

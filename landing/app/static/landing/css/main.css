@@ -983,7 +983,12 @@ video, object {
 	margin-top:2rem;
 	margin-bottom:2rem;
 }
-
+.single_review img.signature{
+	max-width:200px;
+	height:auto;
+	margin-top:2rem;
+	margin-bottom:2rem;
+}
 .review_content {
 	overflow:hidden;
 }
@@ -1310,6 +1315,7 @@ textarea {
 	text-transform: uppercase;
 	border: none;
 	-webkit-tap-highlight-color: transparent;
+	cursor: pointer;
 }
 
 .btn,

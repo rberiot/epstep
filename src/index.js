@@ -9,12 +9,15 @@ import Cookies from 'universal-cookie';
 import {Scan,Stats,Wall,Header,BottomNav,Edit} from './App';
 import registerServiceWorker from './registerServiceWorker';
 import $ from 'jquery'; 
+import MobileDetect from 'mobile-detect';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 import { ValidatorForm, ValidatorComponent } from 'react-form-validator-core';
 import { TextValidator } from 'react-material-ui-form-validator';
 import Checkbox from 'material-ui/Checkbox';
 import { ToastContainer, toast } from 'react-toastify';
+import { Attention} from './SVGicon';
+import 'url-search-params-polyfill';
 import './index.css';
 import './App.css';
 
@@ -92,9 +95,12 @@ var email;
 var token;
 var tokenValidationIntervalId;
 
-//let wsbaseurl = "http://localhost:8000";
+/* DEV web services path */
 //let wsbaseurl = "https://a2780b8b.ngrok.io/app";
+
+/* PROD web services path */
 let wsbaseurl = "/app";
+
 
 function getAuth(self, email, token){
   $.ajax({
@@ -150,6 +156,22 @@ appAuth.signout();
 appAuth.authenticate();
 */
 /* !!! TO REMOVE !!! */
+
+
+const EnableCookieMsg = ({ id, undo, closeToast }) => {
+  function handleClick(){
+    closeToast();
+  }
+  return (
+    <div>
+      <div className="content">
+        <div className="head"><Attention /></div>
+        <p>Please enable your browser cookies to use EPStairs app</p>  
+      </div>
+      <button onClick={handleClick} className="pointer">Ok</button>
+    </div>
+  );
+} 
 
 const CookieMsg = ({ id, undo, closeToast }) => {
   function handleClick(){
@@ -212,6 +234,7 @@ class CheckboxValidatorElement extends ValidatorComponent {
 }
 export default CheckboxValidatorElement;
 
+
 /* https://medium.com/technoetics/create-basic-login-forms-using-create-react-app-module-in-reactjs-511b9790dede */
 /* material input validation : https://www.npmjs.com/package/react-material-ui-form-validator */
 /* core input validation : https://www.npmjs.com/package/react-form-validator-core */
@@ -234,6 +257,15 @@ class Login extends React.Component {
   }
   componentWillMount() {
       ValidatorForm.addValidationRule('isTruthy', value => value);
+
+      const cookieEnabled = navigator.cookieEnabled;
+      if (!cookieEnabled){
+        setTimeout(() => {
+          if (! toast.isActive(this.toastId)) {
+            toast(<EnableCookieMsg />, {className:'enableCookieToast'});
+          }
+        }, 50);
+      }
   }
   componentDidMount(){
     //if(localStorage.getItem('acceptCookie') === null || localStorage.getItem('acceptCookie') === 'false'){
@@ -270,23 +302,37 @@ class Login extends React.Component {
   }
   handleSubmit() {
     let self = this;
+    let md = new MobileDetect(window.navigator.userAgent);
+
     $.ajax({
       url: wsbaseurl+'/auth',
       dataType : 'json',
-      data: { email: this.state.email },
+      data: { email: this.state.email, device: md.mobile() },
       type: 'GET',
       cache: false,           
       success: function(data) {
         //console.log("status:"+data.status+" / "+"token:"+data.token);
         if (data && data.status === "OK") {
-          //localStorage.setItem("email", this.state.email);
-          //localStorage.setItem("token", data.token);
           cookies.set('email', this.state.email, { path: '/', expires: new Date(2030, 0, 1)});
           cookies.set('token', data.token, { path: '/', expires: new Date(2030, 0, 1)});
-
           email = this.state.email;
           token = data.token;
           tokenValidation(self, email, token);
+        } else if (data.status === "INVALID_EMAIL"){
+          const errorMsg = <div><h2>Oops...</h2><p>Your email address is not valid</p></div>;
+          if (! toast.isActive(this.toastId)) {
+            this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+          }
+        } else if (data.status === "CANCELED_BY_SPAM_PREVENTION"){
+          const errorMsg = <div><h2>Oops...</h2><p>Canceled by spam prevention</p></div>;
+          if (! toast.isActive(this.toastId)) {
+            this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+          }
+        } else if (data.status === "REGISTRATION_DISABLED"){
+          const errorMsg = <div><h2>Oops...</h2><p>Registration is currently disabled, please try again later</p></div>;
+          if (! toast.isActive(this.toastId)) {
+            this.toastId = toast(errorMsg, {closeButton: <ToastCloseButton />, className:'errorToast'});
+          }
         }
       }.bind(this),
       error: function(xhr, ajaxOptions, thrownError) {
@@ -370,7 +416,7 @@ processing of your personal data in these conditions.
                     errorMessages={['To continue, please accept the privacy statement']}
                     value={this.state.checked}
                 />
-                <RaisedButton type="Submit" style={styles.button} label="Authenticate" backgroundColor="#a1197d" labelColor="#fff" />
+                <RaisedButton type="Submit" style={styles.button} label="Authenticate this device" backgroundColor="#a1197d" labelColor="#fff" />
               </ValidatorForm>
             </MuiThemeProvider>
 
@@ -457,7 +503,6 @@ export class Main extends React.Component {
     )
   }
 }
-
 
 ReactDOM.render(
     <Main />

@@ -420,7 +420,7 @@ div[data-css-npp5qg]{
   color: #333 !important;
   background-color: #fff !important;
   padding: 0 20px !important;
-  margin: 0 auto !important;
+  margin: 15px auto !important;
   box-shadow: 0 1px 10px 0 rgba(0, 0, 0, .3), 0 4px 20px 0 rgba(0, 0, 0, .4) !important;
   border-radius: 0 !important;
 }
@@ -479,19 +479,22 @@ div[data-css-npp5qg]{
   background: rgba(161, 25, 125, 0.5);
 }
 /*  !important to force overriding Toast.js component (cfr node_modules) inline styles */
-.tourToast{
+.tourToast,
+.enableCookieToast{
   font-family: 'Roboto', sans-serif !important;
   font-size: 16px !important;
   color: #a1197d !important;
   background-color: #fff !important;
   padding: 0 !important;
-  margin: 0 auto !important;
+  margin: 15px auto !important;
   box-shadow: 0 1px 10px 0 rgba(0, 0, 0, .3), 0 4px 20px 0 rgba(0, 0, 0, .4) !important;
 }
-.tourToast > div.content{
+.tourToast > div.content,
+.enableCookieToast div.content{
   padding: 0 20px !important;
 }
-.tourToast button{
+.tourToast button,
+.enableCookieToast button{
   background: #a1197d;
   color: #fff;
   text-transform: uppercase;
@@ -528,6 +531,16 @@ div[data-css-npp5qg]{
 .tourToast .swiper-pagination-bullet-active {
   opacity: 1;
   background: rgba(161, 25, 125, 1);
+}
+
+.enableCookieToast .head{
+  margin-top: 15px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+.enableCookieToast p{
+  text-align: center;
+  font-size: 14px;
 }
 
 .closeToastButton{
@@ -651,7 +664,10 @@ ul.switchtabs-nav li.active a {
 }
 
 .last-calories,
-.last-steps{
+.last-steps,
+.overload-prestige{
+  position: relative;
+  top: -1px;
   background: rgba(161, 25, 125, 1);
   padding: 2px 5px 2px 5px;
   border-radius: 3px;
@@ -661,7 +677,12 @@ ul.switchtabs-nav li.active a {
   display: inline-block;
   margin-left: 3px;
 }
-
+.overload-prestige{
+  margin-left: 0px;
+}
+.overload-prestige svg g{
+  fill: #fff;
+}
 /*
  * react-circular-progressbar styles
  *
@@ -1048,13 +1069,13 @@ ul.switchtabs-nav li.active a {
   display: inline-block;
   color: #fff;
   background: rgba(161,25,125,1);
-  height: 24px;
+  height: 28px;
   text-transform: uppercase;
   font-weight: 500;
   font-size: 10px;
   border: 0;
   border-radius: 3px;
-  line-height: 26px;
+  line-height: 30px;
   padding: 0 24px;
   margin-top: 10px;
   margin-bottom: 30px;
@@ -1064,6 +1085,7 @@ ul.switchtabs-nav li.active a {
   display: inline-block;
   margin-top: 10px;
   margin-bottom: 10px;
+  min-width: 130px;
 }
 .howto .small-btn:last-child{
   margin-bottom: 40px;

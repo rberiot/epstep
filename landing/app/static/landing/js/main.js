@@ -5,7 +5,8 @@ var App = { init: function() { App.HomepageHeight();
 							   App.MaxImage_Slider();          // homepage background - image slider
 							   App.MaxImage_Single();          // homepage background - vingle image
 							   //App.ScrollToSomeplace();        // script resposible for smooth scrolling after clicking on menu item
-							   App.Reviews();                  // reviews carousel
+							   App.Fit_Vids();                 // responsive videos
+                               App.Reviews();                  // reviews carousel
 							   App.Screenshots_Carousel();     // screenshots carousel 
 							   App.Nivo_Lightbox();            // lightbox
 							   App.Elements_animation();       // animations

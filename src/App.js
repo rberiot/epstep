@@ -21,7 +21,8 @@ import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
 import './Loader.css';
 import 'swiper/dist/css/swiper.min.css';
-import {IconRank, IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, IconStats, Star, Medal, Logo, Climber} from './SVGicon';
+import {IconRank, IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, IconStats, Star, Medal, Logo, Climber, Attention} from './SVGicon';
+import 'url-search-params-polyfill';
 import '../node_modules/material-components-web/dist/material-components-web.css';
 import './App.css';
 
@@ -30,8 +31,10 @@ const cookies = new Cookies();
 /* for correct path after build */
 const baseUrl = process.env.PUBLIC_URL;
 
-//const wsbaseurl = "http://localhost:8000";
+/* DEV web services path */
 //let wsbaseurl = "https://a2780b8b.ngrok.io/app";
+
+/* PROD web services path */
 let wsbaseurl = "/app";
 
 const styles = {
@@ -190,7 +193,7 @@ export class AlreadyValid extends Component {
 
   dismiss = () => {
     toast.dismiss(this.toastId);
-    window.history.pushState({}, document.title, "/" + "#/Stats");
+    window.history.pushState({}, document.title, "/app/" + "#/Stats");
   }; 
 
   render() {
@@ -320,7 +323,7 @@ class Topbar extends React.Component {
       var page = window.location.protocol+"//"+window.location.hostname;
       var email = "";
       var subject = "Invitation to join a stair challenge on EPStairs";
-      var body = `Hey! \r\n\r\n I've just setup a mini stair climbing challenge with EPStairs. \r\n Join me and let's compare our results. \r\n\r\n ${page}`;
+      var body = `Hello! \r\n\r\n I would like to challenge you to a stair climbing competition here in the European Parliament! \r\n\r\n Check out the EPStairs mobile web application by clicking this link:\r\n${page} \r\n\r\n We'll be able to compare each other's results, so let's go!!! \r\n\r\n Good luck! \r\n\r\n`;
       window.location.href = "mailto:"+email+"?Subject=" + subject + "&body=" + encodeURIComponent(body);
     }
 
@@ -577,7 +580,7 @@ export class Scan extends React.Component {
                       navLocked = false;
 
                       this.setState({
-                        message: 'THANK YOU, LOOK AT YOUR STATS !',
+                        message: 'THANK YOU, CHECK OUT YOUR STATS !',
                         scansComplete: true
                         //result: true
                       })
@@ -685,17 +688,15 @@ export class Scan extends React.Component {
   componentDidMount(){
     const search = this.props.location.search; // could be '?foo=bar'
     // fallback for edge 17- (URLSearchParams is undefined)
-    if (typeof URLSearchParams !== undefined){
-      const params = new URLSearchParams(search);
-      const qr_id = params.get('qr_id');
-      this.handleScan(qr_id, true)
-    } else {
+    if (typeof URLSearchParams === undefined){
       console.log(`Your browser ${navigator.appVersion} does not support URLSearchParams so we trying fallback...`);
       const qr_id = this.getParameterByName('qr_id')
       this.handleScan(qr_id, true)
+    } else {
+      const params = new URLSearchParams(search);
+      const qr_id = params.get('qr_id');
+      this.handleScan(qr_id, true)
     }
-
-    
   }
 
 
@@ -849,7 +850,6 @@ class ChangingProgressbar extends Component {
       currentPercentageIndex: 0,
       current_steps: 0,
       prestige: 0,
-
       start_count: 0,
       end_count: 0,
     };
@@ -920,10 +920,14 @@ class ChangingProgressbar extends Component {
     const prestigeConfig = () => {
       let prestige = this.state.prestige;
       var stars = [];
-      for (var i = 0; i < prestige; i++) {
+      if(prestige < 9){
+        for (var i = 0; i < prestige; i++) {
           stars.push(<Star key={i}/>);
-      } 
-      return (<div>{stars}</div>);
+        } 
+        return (<div>{stars}</div>);
+      } else {
+        return (<div><span className="overload-prestige">{prestige} <Star key={i}/></span></div>);
+      }
     }
 
     challenge_star = prestigeConfig();
@@ -1055,16 +1059,28 @@ export class Stats extends Component {
   componentWillMount(props){
     const search = this.props.location.search;
     // fallback for edge 17- (URLSearchParams is undefined)
-    if (typeof URLSearchParams !== undefined){
-      const params = new URLSearchParams(search);
-      let alreadyValid = params.get('alreadyvalid');
-      if(alreadyValid == 'true'){
+    if (typeof URLSearchParams === undefined){
+      console.log(`Your browser ${navigator.appVersion} does not support URLSearchParams so we trying fallback...`);
+      let alreadyValid = this.getParameterByName('alreadyvalid')
+      if(alreadyValid == 'true' && cookies.get('token') === undefined){
+        cookies.remove("loggedIn", { path: '/' });
+        //this.props.history.push('/Login');
+        //redirect to error page...
+        window.location.href = "https://epstairs.europarl.europa.eu/app/static/activation.html";
+        return
+      } else if(alreadyValid == 'true'){
         this.handleToast4alreadyValid();
       }
     } else {
-      console.log(`Your browser ${navigator.appVersion} does not support URLSearchParams so we trying fallback...`);
-      let alreadyValid = this.getParameterByName('alreadyvalid')
-      if(alreadyValid == 'true'){
+      const params = new URLSearchParams(search);
+      let alreadyValid = params.get('alreadyvalid');
+      if(alreadyValid == 'true' && cookies.get('token') === undefined){
+        cookies.remove("loggedIn", { path: '/' });
+        //this.props.history.push('/Login');
+        //redirect to error page...
+        window.location.href = "https://epstairs.europarl.europa.eu/app/static/activation.html";
+        return
+      } else if(alreadyValid == 'true'){
         this.handleToast4alreadyValid();
       }
     }
@@ -1154,6 +1170,11 @@ export class Stats extends Component {
     window.location.href = "https://epstairs.europarl.europa.eu/";
   }
 
+  handleContactUs() {
+    var email = "epstairs@europarl.europa.eu";
+    var subject = "Request from EPStairs ";
+    window.location.href = "mailto:"+email+"?Subject=" + subject;
+  }
 
   componentDidMount(){
     if(cookies.get('acceptTour') === undefined || cookies.get('acceptTour') === 'false'){
@@ -1241,7 +1262,8 @@ export class Stats extends Component {
                   <h3 className="title">Learn more?</h3>
                   <h4 className="subtitle">About the app and the initiative</h4>
                   <div className="small-btn" onClick={() => this.handleToast4tour()}>Get the tour</div><br />
-                  <div className="small-btn" onClick={() => this.handleGoToWebsite()}>Go to website</div>
+                  <div className="small-btn" onClick={() => this.handleGoToWebsite()}>Go to website</div><br />
+                  <div className="small-btn" onClick={() => this.handleContactUs()}>Contact us</div>
                 </div>
 
               </div>
@@ -1751,10 +1773,25 @@ export class ScoreResultItem extends Component {
 
   getStars(){
     var stars=[];
+
+    /*
     for(var i=0;i<this.state.wof_stars;i++ ){
       stars.push(<Star key={i} />);
     }
     return stars;
+    */
+
+
+
+    if(this.state.wof_stars < 9){
+      for (var i = 0; i < this.state.wof_stars; i++) {
+        stars.push(<Star key={i}/>);
+      } 
+      return stars;
+    } else {
+      return (<div><span className="overload-prestige">{this.state.wof_stars} <Star key={1}/></span></div>);
+    }
+
   }
 
   render(){
@@ -1795,7 +1832,7 @@ export class Graph extends React.Component {
     this.setState({
       weekly_stats: this.props.data,
       series: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
-      labels: ['Daily stairs', 'Maximum weekly stairs'],
+      labels: ['Daily stairs', 'Top weekly stairs'],
       colors: ['#A1197D', '#F5E8F1']
     });
   }
