@@ -114,6 +114,23 @@ class AuthViewTest(TestCase):
         data = json.loads(response.content)
         self.assertEqual(data['status'], 'OK')
 
+    def test_auth_view_spam_protect(self):
+        from django.test import RequestFactory
+        from django.core.urlresolvers import reverse
+        from views import auth
+
+        factory = RequestFactory()
+
+        rq = factory.get(reverse('auth'), data={'email': 'ee@ext.europarl.europa.eu'})
+        response = auth(rq)
+        self.assertIsNotNone(response)
+        data = json.loads(response.content)
+        self.assertEqual(data['status'], 'OK')
+        rq = factory.get(reverse('auth'), data={'email': 'ee@ext.europarl.europa.eu'})
+        response = auth(rq)
+        data = json.loads(response.content)
+        self.assertEqual(data['status'], 'CANCELED_BY_SPAM_PREVENTION')
+
 
 class GetDistanceViewTest(TestCase):
 

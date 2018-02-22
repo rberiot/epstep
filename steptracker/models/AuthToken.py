@@ -5,12 +5,13 @@ from django.db import models
 import datetime
 from epstep import settings
 from steptracker.models import User
+from django.utils import timezone
 
 
 class AuthToken(models.Model):
     token_string = models.TextField(unique=True)
     user = models.ForeignKey(User, models.CASCADE)
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateTimeField(default=timezone.now)
     valid = models.BooleanField(default=False)
     validation_key = models.TextField()
 
@@ -47,7 +48,6 @@ class AuthToken(models.Model):
     def send_validation_mail(self, public_url):
         from django.core.mail import send_mail
 
-        # todo prevent spamming with a timer
         if settings.EMAILS_ENABLED:
             send_mail(
                 'EPStairs Account Validation',
