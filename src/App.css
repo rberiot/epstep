@@ -11,6 +11,7 @@ select:-webkit-autofill:focus {
   border:none !important;
   -webkit-text-fill-color: inherit !important;
   -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset;
+  box-shadow: 0 0 0px 1000px #FFFFFF inset;
   transition: background-color 5000s ease-in-out 0s;
 }
 :focus {
@@ -36,9 +37,6 @@ button {
   box-shadow: none !important;
 }
 
-button[type=Submit] {
-
-}
 .center{
   text-align: center;
 }
@@ -95,9 +93,6 @@ button[type=Submit] {
   color: rgba(161, 25, 125, 0.7);
   font-weight: bold;
   cursor: pointer;
-}
-.checkbox label a{
-
 }
 .checkbox svg{
   fill: rgba(161, 25, 125, 0.7) !important;
@@ -327,9 +322,6 @@ button[type=Submit] {
 .scoreResultsTitle .badge{
   margin: 6px 12px;
   width: 33px;
-
-  
-
 }
 .scoreResultsTitle .nick_name{
   width: calc(60% - 57px);
@@ -346,12 +338,12 @@ button[type=Submit] {
 
 .scoreResults li .badge{
   margin: 7px 13px;
-  padding: 10px;
+  padding: 9px 0;
   background-color: rgba(161, 25, 125, 1);
   border-radius: 50%;
   position: relative;
-  max-width: 31px;
-  max-height: 31px;
+  width: 31px;
+  height: 31px;
   flex: 1;
 }
 
@@ -399,9 +391,6 @@ div[data-css-npp5qg]{
   background-color: #a1197d !important;
   padding: 0 20px !important;
   margin: 0 auto !important;
-}
-.helloToast>div{
-
 }
 .helloToast span{
   opacity: 0.5 !important;
@@ -519,9 +508,6 @@ div[data-css-npp5qg]{
   text-align: left;
   font-size: 14px;
 }
-.tourToast .swiper-pagination{
-
-}
 .tourToast .swiper-pagination-bullet {
   width: 6px;
   height: 6px;
@@ -581,9 +567,6 @@ div[data-css-npp5qg]{
 }
 
 /* */
-.tabs-wrapper {
-
-}
 ul.switchtabs-nav {
   list-style: none;
   margin: 6px 0;
@@ -619,24 +602,14 @@ ul.switchtabs-nav li a:hover {
 ul.switchtabs-nav li.active{
   background: rgba(161, 25, 125, 1);
 }
-ul.switchtabs-nav li.active a {
-
-}
-
-.switchtabs-content {
-
-}
-
 .switchtabs-content div.switchtab-panel {
     display: none;
     visibility: hidden;
 }
-
 .switchtabs-content div.switchtab-panel.active {
     display: block;
     visibility: visible;
 }
-
 .account-balance{
   position: relative;
 }
@@ -678,8 +651,11 @@ ul.switchtabs-nav li.active a {
   margin-left: 3px;
 }
 .overload-prestige{
+  position: relative;
+  top: -2px;
   margin-left: 0px;
 }
+
 .overload-prestige svg g{
   fill: #fff;
 }
@@ -853,13 +829,20 @@ ul.switchtabs-nav li.active a {
   letter-spacing: -0.6px;
 }
 .progress_ctn > div.challenge_icon{
+
+  
   padding-bottom: 56%; 
   height: 1px; 
   overflow: visible;
+  
+
+
 }
 .progress_ctn > div.challenge_icon > svg{
-  width: 48%; 
+  width: 48%;
+  
 }
+
 .progress_ctn > div.challenge_icon.spin > svg{
   animation-name: spinner;
   animation-timing-function: linear;
@@ -888,6 +871,8 @@ ul.switchtabs-nav li.active a {
 .progress_ctn > div.challenge_icon > div.challenge_star{
   position: relative;
   top: -3px;
+
+
 }
 .progress_ctn > div.challenge_icon div.challenge_star div svg {
   animation-timing-function: ease-in-out;
@@ -958,11 +943,11 @@ ul.switchtabs-nav li.active a {
   100% { transform: scale(1.2) rotate(0deg); }
 }
 
-
 .progress_ctn > div.challenge_meters{
   position: absolute;
-  bottom: 25%;
+  bottom: 22%;
 }
+
 
 @media all and (min-width: 480px) {
   .Login {
@@ -1109,6 +1094,29 @@ ul.switchtabs-nav li.active a {
   to {
     -webkit-transform: scaleY(1);
             transform: scaleY(1);
+  }
+}
+
+
+/* ie only adaptation & workaround */
+@media all and (-ms-high-contrast:none){
+  .account svg{height: 24px;}/* IE10 */
+  *::-ms-backdrop, .account svg{height: 24px;} /* IE11 */
+  *::-ms-backdrop, .CircularProgressbar { width: 298px; height: 298px; }/* IE11 */
+  *::-ms-backdrop, .challenge_icon { height: auto !important; padding-top: 19% !important; padding-bottom: 50px !important;}/* IE11 */
+  *::-ms-backdrop, .challenge_icon > svg { width: 100px !important; height: 100px !important; }/* IE11 */
+  *::-ms-backdrop, .progress_ctn > div.challenge_meters{ bottom: 18% !important; left: 42% !important; }
+}
+/* edge only adaptation & workaround */
+@supports (-ms-ime-align: auto) {
+  .progress_ctn > div.challenge_icon > svg{
+    min-width: 100px;
+    min-height: 100px;
+  }
+  .challenge_icon { 
+    height: auto !important; 
+    padding-top: 19% !important; 
+    padding-bottom: 50px !important;
   }
 }
 

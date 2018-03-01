@@ -1,10 +1,10 @@
 (function($) {
 var App = { init: function() { App.HomepageHeight();
                                App.HomepageOpacity();          // changes homepage opacity on scroll
-							   App.MaxImage_Video();           // homepage background - video
+							   //App.MaxImage_Video();           // homepage background - video
 							   App.MaxImage_Slider();          // homepage background - image slider
 							   App.MaxImage_Single();          // homepage background - vingle image
-							   //App.ScrollToSomeplace();        // script resposible for smooth scrolling after clicking on menu item
+							   App.ScrollToSomeplace();        // script resposible for smooth scrolling after clicking on menu item
 							   App.Fit_Vids();                 // responsive videos
                                App.Reviews();                  // reviews carousel
 							   App.Screenshots_Carousel();     // screenshots carousel 
@@ -72,7 +72,7 @@ var App = { init: function() { App.HomepageHeight();
     
     var lastId,
     navbarheight = $("#menu_bar").outerHeight()+1;
-    topMenu = $('.menu_bar_navigation, .navigation_desktop, #mobile_menu_content, .cta_button_area');
+    topMenu = $('#mobile_menu_content');
     menuItems = topMenu.find('a');
     scrollItems = menuItems.map(function(){
         var item = $($(this).attr("href"));
@@ -81,7 +81,7 @@ var App = { init: function() { App.HomepageHeight();
  
     menuItems.click(function(e){
         var href = $(this).attr("href"),
-        offsetTop = href === "#" ? 0 : $(href).offset().top-navbarheight+2;
+        offsetTop = href === "#" ? 0 : $(href).offset().top/*-navbarheight+2*/;
         $('html, body').stop().animate({ scrollTop: offsetTop  }, 1000, 'easeInOutExpo');
         e.preventDefault();
     });
@@ -142,70 +142,29 @@ var App = { init: function() { App.HomepageHeight();
     	$('#about_video').waypoint(function() {
             setTimeout(function(){$('.about_video_anim1').addClass('animated fadeInUp')},0);
             setTimeout(function(){$('.about_video_anim2').addClass('animated fadeInUp')},200);
-            setTimeout(function(){$('.about_video_anim3').addClass('animated fadeInUp')},400);
-            setTimeout(function(){$('.about_video_anim4').addClass('animated fadeInUp')},600);
-            setTimeout(function(){$('.about_video_anim5').addClass('animated fadeInUp')},800);
-            setTimeout(function(){$('.about_video_anim6').addClass('animated fadeInUp')},1000);
-            setTimeout(function(){$('.about_video_anim7').addClass('animated fadeInUp')},1200);
-            setTimeout(function(){$('.about_video_anim8').addClass('animated fadeInUp')},1400);
-            setTimeout(function(){$('.about_video_anim9').addClass('animated fadeInUp')},1600);
-            setTimeout(function(){$('.about_video_anim10').addClass('animated fadeInUp')},2000);
-        }, { offset: '50%' });
+        }, { offset: '60%' });
         
         $('#reviews').waypoint(function() {
             setTimeout(function(){$('.reviews_anim1').addClass('animated fadeInUp')},0);
             setTimeout(function(){$('.reviews_anim2').addClass('animated fadeInUp')},200);
-            setTimeout(function(){$('.reviews_anim3').addClass('animated fadeInLeft')},600);
-            setTimeout(function(){$('.reviews_anim4').addClass('animated fadeInLeft')},400);
-            setTimeout(function(){$('.reviews_anim5').addClass('animated fadeInRight')},400);
-            setTimeout(function(){$('.reviews_anim6').addClass('animated fadeInRight')},600);
-            setTimeout(function(){$('.reviews_anim7').addClass('animated fadeInUp')},1200);
-            setTimeout(function(){$('.reviews_anim8').addClass('animated fadeInUp')},1400);
-            setTimeout(function(){$('.reviews_anim9').addClass('animated fadeInUp')},1600);
-            setTimeout(function(){$('.reviews_anim10').addClass('animated fadeInUp')},1800);
-        }, { offset: '50%' }); 
+        }, { offset: '60%' }); 
+        
+        $('#plan').waypoint(function() {
+            setTimeout(function(){$('.plan_anim1').addClass('animated fadeInUp')},0);
+        }, { offset: '60%' });
         
         
+        $('#competition').waypoint(function() {
+            setTimeout(function(){$('.competition_anim1').addClass('animated fadeInUp')},0);
+        }, { offset: '60%' });
         
-        $('#screenshots').waypoint(function() {
-            setTimeout(function(){$('.screenshots_anim1').addClass('animated fadeInUp')},0);
-            setTimeout(function(){$('.screenshots_anim2').addClass('animated fadeInUp')},200);
-            setTimeout(function(){$('.screenshots_anim3').addClass('animated fadeInUp')},300);
-            setTimeout(function(){$('.screenshots_anim4').addClass('animated fadeInUp')},400);
-            setTimeout(function(){$('.screenshots_anim5').addClass('animated fadeInUp')},500);
-            setTimeout(function(){$('.screenshots_anim6').addClass('animated fadeInUp')},600);
-            setTimeout(function(){$('.screenshots_anim7').addClass('animated fadeInUp')},700);
-            setTimeout(function(){$('.screenshots_anim8').addClass('animated fadeInUp')},800);
-            setTimeout(function(){$('.screenshots_anim9').addClass('animated fadeInUp')},900);
-            setTimeout(function(){$('.screenshots_anim10').addClass('animated fadeInUp')},1000);
-        }, { offset: '50%' });
-        
-        
-        $('#pricing').waypoint(function() {
-            setTimeout(function(){$('.pricing_anim1').addClass('animated fadeInUp')},0);
-            setTimeout(function(){$('.pricing_anim2').addClass('animated fadeInUp')},200);
-            setTimeout(function(){$('.pricing_anim3').addClass('animated fadeInUp')},400);
-            setTimeout(function(){$('.pricing_anim4').addClass('animated fadeInUp')},600);
-            setTimeout(function(){$('.pricing_anim5').addClass('animated fadeInUp')},800);
-            setTimeout(function(){$('.pricing_anim6').addClass('animated fadeInUp')},1000);
-            setTimeout(function(){$('.pricing_anim7').addClass('animated fadeInUp')},1200);
-            setTimeout(function(){$('.pricing_anim8').addClass('animated fadeInUp')},1400);
-            setTimeout(function(){$('.pricing_anim9').addClass('animated fadeInUp')},1600);
-            setTimeout(function(){$('.pricing_anim10').addClass('animated fadeInUp')},1800);
-        }, { offset: '50%' });
-        
-        $('#team').waypoint(function() {
-            setTimeout(function(){$('.team_anim1').addClass('animated fadeInUp')},0);
-            setTimeout(function(){$('.team_anim2').addClass('animated fadeInLeft')},400);
-            setTimeout(function(){$('.team_anim3').addClass('animated fadeInLeft')},200);
-            setTimeout(function(){$('.team_anim4').addClass('animated fadeInRight')},200);
-            setTimeout(function(){$('.team_anim5').addClass('animated fadeInRight')},400);
-            setTimeout(function(){$('.team_anim6').addClass('animated fadeInUp')},1000);
-            setTimeout(function(){$('.team_anim7').addClass('animated fadeInUp')},1200);
-            setTimeout(function(){$('.team_anim8').addClass('animated fadeInUp')},1400);
-            setTimeout(function(){$('.team_anim9').addClass('animated fadeInUp')},1600);
-            setTimeout(function(){$('.team_anim10').addClass('animated fadeInUp')},1800);
-        }, { offset: '50%' });
+        $('#benefits').waypoint(function() {
+            setTimeout(function(){$('.benefits_anim1').addClass('animated fadeInUp')},0);
+            setTimeout(function(){$('.benefits_anim2').addClass('animated fadeInLeft')},400);
+            setTimeout(function(){$('.benefits_anim3').addClass('animated fadeInLeft')},200);
+            setTimeout(function(){$('.benefits_anim4').addClass('animated fadeInRight')},200);
+            setTimeout(function(){$('.benefits_anim5').addClass('animated fadeInRight')},400);
+        }, { offset: '60%' });
         
         $('#cta_download').waypoint(function() {
             setTimeout(function(){$('.cta_download_anim1').addClass('animated fadeInUp')},0);
@@ -218,19 +177,6 @@ var App = { init: function() { App.HomepageHeight();
             setTimeout(function(){$('.cta_download_anim8').addClass('animated fadeInUp')},1400);
             setTimeout(function(){$('.cta_download_anim9').addClass('animated fadeInUp')},1600);
             setTimeout(function(){$('.cta_download_anim10').addClass('animated fadeInUp')},1800);
-        }, { offset: '50%' });
-        
-        $('#contact').waypoint(function() {
-            setTimeout(function(){$('.contact_anim1').addClass('animated fadeInUp')},0);
-            setTimeout(function(){$('.contact_anim2').addClass('animated fadeInUp')},200);
-            setTimeout(function(){$('.contact_anim3').addClass('animated fadeInUp')},400);
-            setTimeout(function(){$('.contact_anim4').addClass('animated fadeInUp')},600);
-            setTimeout(function(){$('.contact_anim5').addClass('animated fadeInUp')},800);
-            setTimeout(function(){$('.contact_anim6').addClass('animated fadeInUp')},1000);
-            setTimeout(function(){$('.contact_anim7').addClass('animated fadeInUp')},1200);
-            setTimeout(function(){$('.contact_anim8').addClass('animated fadeInUp')},1400);
-            setTimeout(function(){$('.contact_anim9').addClass('animated fadeInUp')},1600);
-            setTimeout(function(){$('.contact_anim10').addClass('animated fadeInUp')},1800);
         }, { offset: '50%' });
           
         

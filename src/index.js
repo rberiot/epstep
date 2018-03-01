@@ -8,9 +8,10 @@ import {
 import Cookies from 'universal-cookie';
 import {Scan,Stats,Wall,Header,BottomNav,Edit} from './App';
 import registerServiceWorker from './registerServiceWorker';
-import $ from 'jquery'; 
+import $ from 'jquery';
 import MobileDetect from 'mobile-detect';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import RaisedButton from 'material-ui/RaisedButton';
 import { ValidatorForm, ValidatorComponent } from 'react-form-validator-core';
 import { TextValidator } from 'react-material-ui-form-validator';
@@ -115,7 +116,6 @@ function getAuth(self, email, token){
 
         cookies.set('loggedIn', 'true', { path: '/', expires: new Date(2030, 0, 1)});
         cookies.set('nickname', data.public_name, { path: '/', expires: new Date(2030, 0, 1)});
-
 
         if(cookies.get('firstVisit') === undefined){
           cookies.set('firstVisit', 'true', { path: '/', expires: new Date(2030, 0, 1)});
@@ -350,6 +350,12 @@ class Login extends React.Component {
     const { email } = this.state;
     //const { nickname } = this.state;
 
+    const muiTheme = getMuiTheme({
+      palette: {
+        primary1Color: '#a1197d',
+      },
+    });
+
     if (redirectToReferrer) {
       return <Redirect to={from} push={true} />
     }
@@ -362,7 +368,7 @@ class Login extends React.Component {
             <Header />
           </div>
           <div className="col-xs-12 col-sm-6 col-sm-offset-3">
-            <MuiThemeProvider>
+            <MuiThemeProvider muiTheme={muiTheme}>
               <ValidatorForm
                 ref="form"
                 onSubmit={this.handleSubmit}
@@ -379,6 +385,7 @@ class Login extends React.Component {
                   onChange={this.handleChange}
                   name="email"
                   value={email}
+                  autoCapitalize="none"
                   validators={['required', 'isEmail', 'matchRegexp:^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@europarl.europa.eu|^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@ext.europarl.europa.eu|^[a-zA-Z0-9](.?[a-zA-Z0-9]){3,}@ep.europa.eu$']}
                   errorMessages={['Your email address is required', 'Please provide a valid email address', 'Please provide a valid @ep.europa.eu, @europarl.europa.eu or @ext.europarl.europa.eu email address']}
                 />
@@ -394,8 +401,8 @@ class Login extends React.Component {
                   onChange={this.handleChange2}
                   name="nickname"
                   value={nickname}
-                  validators={['required', 'maxStringLength:12']}
-                  errorMessages={['This field is required', 'Maximum 12 characters']}
+                  validators={['required', 'maxStringLength:15']}
+                  errorMessages={['This field is required', 'Maximum 15 characters']}
                 />
                 */}
 
@@ -411,7 +418,6 @@ processing of your personal data in these conditions.
                     checked={this.state.checked}
                     onCheck={this.handleCheck}
                     className="checkbox"
-                    checkedColor="#a1197d"
                     validators={['isTruthy']}
                     errorMessages={['To continue, please accept the privacy statement']}
                     value={this.state.checked}

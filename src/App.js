@@ -21,10 +21,12 @@ import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
 import './Loader.css';
 import 'swiper/dist/css/swiper.min.css';
-import {IconRank, IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, IconStats, Star, Medal, Logo, Climber, Attention} from './SVGicon';
+import {IconRank, IconUser, Share, QrcodeTour, EditPlaceholder, EditPen, IconUserEdit, UserPicturePlaceholder, IconUserTab, QrcodeTab, IconRankTab, IconCalories, IconSteps, Atomium, Montain, IconStats, Star, Medal, Logo, Climber} from './SVGicon';
 import 'url-search-params-polyfill';
 import '../node_modules/material-components-web/dist/material-components-web.css';
 import './App.css';
+
+
 
 const cookies = new Cookies();
 
@@ -193,7 +195,7 @@ export class AlreadyValid extends Component {
 
   dismiss = () => {
     toast.dismiss(this.toastId);
-    window.history.pushState({}, document.title, "/app/" + "#/Stats");
+    window.history.pushState({}, document.title, "/app/#/Stats");
   }; 
 
   render() {
@@ -261,7 +263,7 @@ export class TourMsg extends Component {
                       <h4 className="subtitle">Edit your profile</h4>
                     </div>     
                     <p>Add your picture to your profile or edit your nickname.<br /><br />
-                    Make the EP climbing challenge more personal and more fun by adding your profile picture! Just click the person icon on the right of the toolbar and choose “Edit my account” on the top right of the screen. <br /><br />Click the grey logo to add your picture!</p>
+                    Make the EP climbing challenge more personal and more fun by adding your profile picture! Just click the “Edit my account” on the top right of the screen. <br /><br />Click the grey logo to add your picture!</p>
                   </div>
                   
               </div>
@@ -939,6 +941,14 @@ class ChangingProgressbar extends Component {
         this.setState({showStars: true});
       } else {
         this.setState({showStars: false});
+
+        //remove after d-day
+        /*
+        if(challenge_icon !== null){
+          this.handleConfetti();
+        }
+        */
+        
       }
       
     };
@@ -1065,7 +1075,7 @@ export class Stats extends Component {
       if(alreadyValid == 'true' && cookies.get('token') === undefined){
         cookies.remove("loggedIn", { path: '/' });
         //this.props.history.push('/Login');
-        //redirect to error page...
+        //redirect to activation page...
         window.location.href = "https://epstairs.europarl.europa.eu/app/static/activation.html";
         return
       } else if(alreadyValid == 'true'){
@@ -1077,7 +1087,7 @@ export class Stats extends Component {
       if(alreadyValid == 'true' && cookies.get('token') === undefined){
         cookies.remove("loggedIn", { path: '/' });
         //this.props.history.push('/Login');
-        //redirect to error page...
+        //redirect to activation page...
         window.location.href = "https://epstairs.europarl.europa.eu/app/static/activation.html";
         return
       } else if(alreadyValid == 'true'){
@@ -1091,7 +1101,7 @@ export class Stats extends Component {
       if (!toast.isActive(this.toastId)) {
         this.toastId = toast(<AlreadyValid />, {className:'cookieToast'});
       }
-    }, 200);
+    }, 500);
   }
 
   getStatsData() {
@@ -1163,7 +1173,7 @@ export class Stats extends Component {
       if (!toast.isActive(this.toastId)) {
         this.toastId = toast(<TourMsg />, {className:'tourToast'});
       }
-    }, 200);
+    }, 100);
   }
 
   handleGoToWebsite(tab) {
@@ -1601,7 +1611,6 @@ export class TopTen extends Component {
                         <RaisedButton type="Button" style={styles.button} label="Scan QR-Code" backgroundColor="#a1197d" labelColor="#fff" onClick={() => history.push('/Scan')} />
                       </MuiThemeProvider>
                     </div>
-
                   </div>
                 )}
               </SwitchTab>
@@ -2187,8 +2196,8 @@ export class Edit extends React.Component {
                     onChange={this.handleChange2}
                     name="nickname"
                     value={this.state.nickname}
-                    validators={['required', 'maxStringLength:12']}
-                    errorMessages={['This field is required', 'Maximum 12 characters']}
+                    validators={['required', 'maxStringLength:15']}
+                    errorMessages={['This field is required', 'Maximum 15 characters']}
                   />
                   <RaisedButton type="Submit" style={styles.button} label="Save" backgroundColor="#a1197d" labelColor="#fff" />
                 </ValidatorForm>

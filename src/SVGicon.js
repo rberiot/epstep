@@ -253,7 +253,7 @@ export class MontEuropa extends React.Component {
 export class Montain extends React.Component {
     render() {
         return (
-          <svg viewBox="0 0 48 48" preserveAspectRatio="xMidYMin slice" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 48 48"  xmlns="http://www.w3.org/2000/svg">
             <g id="STEP2" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
               <g transform="translate(-157.000000, -155.000000)">
                 <g transform="translate(0.000000, -110.000000)">
